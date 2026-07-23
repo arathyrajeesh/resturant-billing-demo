@@ -22,6 +22,7 @@ class App {
     this.selectedImagePreset = 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&auto=format&fit=crop&q=80';
     this.staffSubTab = 'pos'; // 'floor', 'pos', 'billing'
     this.isMobileSidebarOpen = false;
+    this.customerCart = [];
     
     store.subscribe(() => this.render());
 
@@ -533,15 +534,15 @@ class App {
 
     this.container.innerHTML = `
       <div class="view-container">
-        <div style="display:flex; gap:10px; margin-bottom:20px;">
+        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
           <button class="btn-enterprise ${this.staffSubTab === 'pos' ? 'btn-primary' : ''}" onclick="window.app.setStaffSubTab('pos')">
-            💻 Desktop Web POS Terminal
+            💻 Web POS Terminal
           </button>
           <button class="btn-enterprise ${this.staffSubTab === 'floor' ? 'btn-primary' : ''}" onclick="window.app.setStaffSubTab('floor')">
-            📍 Floor Map (${activeTablesCount}/${store.tables.length} Occupied)
+            📍 Floor Map (${activeTablesCount}/${store.tables.length})
           </button>
           <button class="btn-enterprise ${this.staffSubTab === 'billing' ? 'btn-primary' : ''}" onclick="window.app.setStaffSubTab('billing')">
-            💳 Cashier Billing Counter (${unpaidOrders.length} Unpaid)
+            💳 Cashier Billing (${unpaidOrders.length} Unpaid)
           </button>
         </div>
 
@@ -882,38 +883,194 @@ class App {
   // ================= 🤳 CUSTOMER WEB PORTAL =================
   renderCustomerWebPortal() {
     const table = store.tables.find(t => t.id === store.customerTableId) || store.tables[3];
-    const customerOrder = store.orders.find(o => o.tableId === table.id && o.status !== 'paid');
+    const customerOrder = store.orders.find(o => o.tableId === table.id && o.paymentStatus === 'unpaid' && o.status !== 'completed');
+
+    const filteredMenu = store.menu.filter(m => {
+      if (store.selectedCategory !== 'all' && m.category !== store.selectedCategory) return false;
+      if (store.searchQuery) {
+        return m.name.toLowerCase().includes(store.searchQuery.toLowerCase());
+      }
+      return true;
+    });
+
+    const cartTotal = (this.customerCart || []).reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const cartTax = Math.round(cartTotal * 0.05 * 100) / 100;
+    const grandTotal = cartTotal + cartTax;
 
     this.container.innerHTML = `
       <div class="view-container">
-        <div style="background:var(--primary); border-radius:var(--radius-lg); padding:20px; color:#FFF; margin-bottom:20px;">
-          <h2>🌴 Malabar Table - Self Ordering</h2>
-          <p style="opacity:0.9; font-size:13px; margin-top:2px;">Table ${table.number} Scanned</p>
+        <!-- Header Banner -->
+        <div style="background:linear-gradient(135deg, var(--primary), var(--primary-hover)); border-radius:var(--radius-lg); padding:20px; color:#FFF; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; box-shadow:var(--shadow-md);">
+          <div>
+            <h2 style="color:#FFF; font-size:22px;">🌴 Malabar Table - Self Ordering</h2>
+            <p style="opacity:0.95; font-size:13px; margin-top:2px;">📍 Table ${table.number} (${table.section || 'Main Hall'})</p>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:12px; background:rgba(255,255,255,0.2); padding:6px 12px; border-radius:20px; font-weight:700;">Simulate Table:</span>
+            <select style="background:#FFF; color:#0F172A; border:none; padding:6px 10px; border-radius:8px; font-weight:800; cursor:pointer;" onchange="window.store.setView('customer', {tableId: Number(this.value)})">
+              ${store.tables.map(t => `<option value="${t.id}" ${t.id === table.id ? 'selected' : ''}>Table ${t.number}</option>`).join('')}
+            </select>
+          </div>
         </div>
 
+        <!-- Live Order Status Tracker (If table has an active order) -->
         ${customerOrder ? `
-          <div class="panel-card" style="text-align:center; padding:40px;">
-            <h2>Order #${customerOrder.orderNumber} is Live!</h2>
-            <p style="color:var(--text-muted); font-size:14px; margin-top:4px;">Status: <strong style="color:var(--primary);">${customerOrder.status.toUpperCase()}</strong></p>
+          <div class="panel-card" style="border-left: 5px solid var(--primary); margin-bottom:24px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+              <div>
+                <h3 style="font-size:17px; font-weight:800;">🔥 Live Order #${customerOrder.orderNumber} Status</h3>
+                <p style="font-size:12px; color:var(--text-muted);">Real-time status updates from Kitchen KDS</p>
+              </div>
+              <span class="status-tag ${customerOrder.status === 'ready' ? 'tag-available' : customerOrder.status === 'preparing' ? 'tag-bill' : 'tag-occupied'}" style="font-size:12px; padding:6px 12px;">
+                ${customerOrder.status.toUpperCase()}
+              </span>
+            </div>
+
+            <!-- 4-Step Visual Tracker -->
+            <div style="display:flex; justify-content:space-between; margin:16px 0; background:var(--bg-main); padding:14px 10px; border-radius:12px; border:1px solid var(--surface-border); gap:6px;">
+              <div style="flex:1; text-align:center; opacity: ${['placed','preparing','ready','served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'placed' ? '800' : '600'};">
+                <div style="font-size:22px;">📝</div>
+                <div style="font-size:11px; margin-top:2px;">1. Order Placed</div>
+              </div>
+              <div style="flex:1; text-align:center; opacity: ${['preparing','ready','served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'preparing' ? '800' : '600'}; color:${customerOrder.status === 'preparing' ? 'var(--primary)' : 'inherit'};">
+                <div style="font-size:22px;">👨‍🍳</div>
+                <div style="font-size:11px; margin-top:2px;">2. Cooking</div>
+              </div>
+              <div style="flex:1; text-align:center; opacity: ${['ready','served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'ready' ? '800' : '600'}; color:${customerOrder.status === 'ready' ? 'var(--success)' : 'inherit'};">
+                <div style="font-size:22px;">🔔</div>
+                <div style="font-size:11px; margin-top:2px;">3. Ready</div>
+              </div>
+              <div style="flex:1; text-align:center; opacity: ${customerOrder.status === 'served' ? 1 : 0.35}; font-weight:${customerOrder.status === 'served' ? '800' : '600'};">
+                <div style="font-size:22px;">😋</div>
+                <div style="font-size:11px; margin-top:2px;">4. Served</div>
+              </div>
+            </div>
+
+            <!-- Active Order Items Summary -->
+            <div style="background:var(--surface-hover); padding:12px; border-radius:8px; font-size:13px;">
+              <strong style="display:block; margin-bottom:6px;">Current Table Items (${customerOrder.items.length}):</strong>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                ${customerOrder.items.map(i => `<span style="background:var(--surface-white); border:1px solid var(--surface-border); padding:4px 10px; border-radius:16px; font-size:12px; font-weight:700;">${i.quantity}x ${i.name}</span>`).join('')}
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-top:10px; font-weight:800; font-size:14px; border-top:1px dashed var(--surface-border); padding-top:8px;">
+                <span>Total Live Bill Amount:</span>
+                <span style="color:var(--primary);">₹${customerOrder.total}</span>
+              </div>
+            </div>
+            <p style="font-size:11px; color:var(--text-muted); margin-top:10px; text-align:center;">💡 Want to order extra food or drinks? Select items below and tap <strong>'Submit Order'</strong>!</p>
           </div>
-        ` : `
-          <div class="web-pos-grid">
-            <div class="panel-card">
-              <div class="web-menu-grid">
-                ${store.menu.map(item => `
+        ` : ''}
+
+        <!-- Main Order Interface Grid -->
+        <div class="web-pos-grid">
+          <!-- Menu Catalog Panel -->
+          <div class="panel-card">
+            <div style="margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;">
+              <h3 style="font-size:16px;">🍲 Menu Catalog</h3>
+              <span style="font-size:12px; color:var(--text-muted);">${filteredMenu.length} dishes available</span>
+            </div>
+
+            <div class="menu-categories">
+              ${CATEGORIES.map(cat => `
+                <button class="cat-chip ${store.selectedCategory === cat.id ? 'active' : ''}" onclick="window.store.setSelectedCategory('${cat.id}')">
+                  ${cat.name}
+                </button>
+              `).join('')}
+            </div>
+
+            <div class="web-menu-grid">
+              ${filteredMenu.map(item => {
+                const cartEntry = (this.customerCart || []).find(c => c.itemId === item.id);
+                const qty = cartEntry ? cartEntry.quantity : 0;
+
+                return `
                   <div class="web-menu-card">
-                    <h5>${item.name}</h5>
-                    <p style="font-size:12px; color:var(--text-muted);">${item.description}</p>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
-                      <strong>₹${item.price}</strong>
-                      <button class="add-cart-btn" onclick="window.app.updateCustomerCartQty('${item.id}', 1)">+ Add</button>
+                    <div>
+                      <img src="${item.image}" class="web-menu-img" alt="${item.name}" />
+                      <div class="web-menu-info">
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2px;">
+                          <h5>${item.name}</h5>
+                          <span style="font-size:10px; font-weight:800;">${item.isVeg ? '🟢 Veg' : '🔴 Non-Veg'}</span>
+                        </div>
+                        <p>${item.description}</p>
+                      </div>
+                    </div>
+
+                    <div class="web-menu-footer">
+                      <div class="menu-price">₹${item.price}</div>
+
+                      ${qty > 0 ? `
+                        <div class="counter-stepper">
+                          <button class="counter-btn-std" onclick="window.app.updateCustomerCartQty('${item.id}', -1)">-</button>
+                          <span style="font-weight:800; padding:0 8px;">${qty}</span>
+                          <button class="counter-btn-std" onclick="window.app.updateCustomerCartQty('${item.id}', 1)">+</button>
+                        </div>
+                      ` : `
+                        <button class="add-cart-btn" onclick="window.app.updateCustomerCartQty('${item.id}', 1)">+ Add</button>
+                      `}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <!-- Customer Cart Summary & Submit Order Drawer -->
+          <div class="web-pos-cart-panel">
+            <div>
+              <div style="padding-bottom:14px; border-bottom:1px solid var(--surface-border); margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;">
+                <h3>🛒 Your Order</h3>
+                <span class="status-tag tag-available">Table ${table.number}</span>
+              </div>
+
+              <div class="orders-list" style="max-height:280px; overflow-y:auto;">
+                ${(!this.customerCart || this.customerCart.length === 0) ? `
+                  <div style="text-align:center; padding:40px 10px; color:var(--text-muted);">
+                    <div style="font-size:36px; margin-bottom:8px;">🛒</div>
+                    <p style="font-size:13px; font-weight:600;">Your Cart is Empty</p>
+                    <p style="font-size:11px; margin-top:4px;">Tap '+ Add' on dishes to start your order</p>
+                  </div>
+                ` : ''}
+
+                ${(this.customerCart || []).map(item => `
+                  <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--surface-border);">
+                    <div>
+                      <strong style="font-size:13px;">${item.name}</strong>
+                      <p style="font-size:11px; color:var(--text-muted);">₹${item.price} each</p>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <div class="counter-stepper">
+                        <button class="counter-btn-std" onclick="window.app.updateCustomerCartQty('${item.itemId}', -1)">-</button>
+                        <span style="font-weight:800; padding:0 6px;">${item.quantity}</span>
+                        <button class="counter-btn-std" onclick="window.app.updateCustomerCartQty('${item.itemId}', 1)">+</button>
+                      </div>
+                      <span style="font-weight:800; font-size:14px; min-width:45px; text-align:right;">₹${item.price * item.quantity}</span>
                     </div>
                   </div>
                 `).join('')}
               </div>
             </div>
+
+            <div style="border-top:1px solid var(--surface-border); padding-top:14px; margin-top:14px;">
+              <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px; color:var(--text-muted);">
+                <span>Subtotal</span>
+                <span>₹${cartTotal}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:12px; color:var(--text-muted);">
+                <span>GST (5%)</span>
+                <span>₹${cartTax}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:800; color:var(--primary); margin-bottom:14px;">
+                <span>Total Payable</span>
+                <span>₹${grandTotal}</span>
+              </div>
+
+              <button class="btn-primary" style="width:100%; justify-content:center; padding:12px; font-size:14px; font-weight:800;" ${(!this.customerCart || this.customerCart.length === 0) ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="window.app.submitCustomerOrder()">
+                <span>🚀</span> Submit Order to Kitchen
+              </button>
+            </div>
           </div>
-        `}
+        </div>
       </div>
     `;
   }
@@ -921,6 +1078,8 @@ class App {
   updateCustomerCartQty(itemId, delta) {
     const item = store.menu.find(m => m.id === itemId);
     if (!item) return;
+
+    if (!this.customerCart) this.customerCart = [];
 
     let existing = this.customerCart.find(c => c.itemId === itemId);
     if (existing) {
@@ -931,6 +1090,25 @@ class App {
     } else if (delta > 0) {
       this.customerCart.push({ itemId: item.id, name: item.name, price: item.price, quantity: 1 });
     }
+    this.render();
+  }
+
+  submitCustomerOrder() {
+    if (!this.customerCart || this.customerCart.length === 0) {
+      alert('Please add dishes to your cart before submitting.');
+      return;
+    }
+
+    const table = store.tables.find(t => t.id === store.customerTableId) || store.tables[3];
+
+    store.createOrder({
+      tableId: table.id,
+      source: 'qr-customer',
+      orderedBy: `Customer (Table ${table.number})`,
+      items: this.customerCart
+    });
+
+    this.customerCart = [];
     this.render();
   }
 
@@ -973,7 +1151,7 @@ class App {
 
             <div style="background:var(--bg-main); border:1px solid var(--surface-border); padding:12px; border-radius:8px; margin-bottom:14px;">
               <label style="font-size:12px; font-weight:700; color:var(--text-dark); display:block; margin-bottom:8px;">Portion Pricing (₹):</label>
-              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); gap:10px;">
                 <div class="form-group-std" style="margin:0;">
                   <label>Full Portion (₹) *</label>
                   <input type="number" id="price-full" placeholder="380" required />

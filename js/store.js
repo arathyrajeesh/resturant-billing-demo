@@ -188,6 +188,32 @@ class RestaurantStore {
     const table = tableId ? this.tables.find(t => t.id === Number(tableId)) : null;
     const tableNumber = table ? table.number : (source === 'swiggy' ? 'ONLINE-SWIGGY' : 'ONLINE-ZOMATO');
 
+    // Check if active unpaid order exists for this table
+    let existingOrder = table ? this.orders.find(o => o.tableId === table.id && o.paymentStatus === 'unpaid' && o.status !== 'completed' && o.status !== 'served') : null;
+
+    if (existingOrder) {
+      items.forEach(newItem => {
+        const match = existingOrder.items.find(i => i.itemId === newItem.itemId || i.name === newItem.name);
+        if (match) {
+          match.quantity += newItem.quantity;
+        } else {
+          existingOrder.items.push({ ...newItem });
+        }
+      });
+
+      existingOrder.subtotal = existingOrder.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      existingOrder.tax = Math.round(existingOrder.subtotal * 0.05 * 100) / 100;
+      existingOrder.total = existingOrder.subtotal + existingOrder.tax;
+      if (existingOrder.status === 'ready' || existingOrder.status === 'served') {
+        existingOrder.status = 'preparing';
+      }
+
+      soundEffects.playNewOrderChime();
+      this.showToast(`Added ${items.length} new item(s) to Table ${tableNumber} Order #${existingOrder.orderNumber}!`, '🚀');
+      this.notify('NEW_ORDER', existingOrder);
+      return existingOrder;
+    }
+
     const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const tax = Math.round(subtotal * 0.05 * 100) / 100;
     const total = subtotal + tax;
@@ -200,7 +226,7 @@ class RestaurantStore {
       source: source || 'dine-in',
       orderedBy: orderedBy || (source === 'qr-customer' ? 'Customer QR Scan' : 'Staff POS'),
       customerName: customerName || null,
-      items,
+      items: [...items],
       subtotal,
       tax,
       total,
