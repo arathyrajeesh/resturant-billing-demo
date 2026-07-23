@@ -28,6 +28,11 @@ export const MENU_ITEMS = [
     name: 'Malabar Mutton Biryani',
     category: 'biryani',
     price: 380,
+    portions: [
+      { size: 'Full', price: 380 },
+      { size: 'Half', price: 220 },
+      { size: 'Quarter', price: 130 }
+    ],
     isVeg: false,
     spiceLevel: 2,
     description: 'Authentic Thalassery style dum biryani cooked with Kaima rice, tender mutton and aromatic spices.',
@@ -40,6 +45,11 @@ export const MENU_ITEMS = [
     name: 'Kerala Parotta & Beef Roast',
     category: 'mains',
     price: 290,
+    portions: [
+      { size: 'Full', price: 290 },
+      { size: 'Half', price: 170 },
+      { size: 'Quarter', price: 100 }
+    ],
     isVeg: false,
     spiceLevel: 3,
     description: 'Flaky layered Kerala parottas served with slow-cooked spicy Malabar beef roast.',
@@ -52,6 +62,10 @@ export const MENU_ITEMS = [
     name: 'Karimeen Pollichathu',
     category: 'mains',
     price: 450,
+    portions: [
+      { size: 'Full', price: 450 },
+      { size: 'Half', price: 260 }
+    ],
     isVeg: false,
     spiceLevel: 2,
     description: 'Pearl spot fish marinated in shallot-chilli paste, wrapped in banana leaf and pan grilled.',
@@ -64,6 +78,10 @@ export const MENU_ITEMS = [
     name: 'Appam with Chicken Stew',
     category: 'mains',
     price: 260,
+    portions: [
+      { size: 'Full', price: 260 },
+      { size: 'Half', price: 150 }
+    ],
     isVeg: false,
     spiceLevel: 1,
     description: 'Soft laced coconut milk hoppers served with rich creamy potato chicken stew.',
@@ -76,6 +94,11 @@ export const MENU_ITEMS = [
     name: 'Kozhi Porichathu (Malabar Fried Chicken)',
     category: 'starters',
     price: 240,
+    portions: [
+      { size: 'Full', price: 240 },
+      { size: 'Half', price: 140 },
+      { size: 'Quarter', price: 80 }
+    ],
     isVeg: false,
     spiceLevel: 3,
     description: 'Deep fried crispy chicken marinated in Kerala spice mix, curry leaves and coconut oil.',
@@ -88,6 +111,10 @@ export const MENU_ITEMS = [
     name: 'Paneer Butter Masala',
     category: 'mains',
     price: 240,
+    portions: [
+      { size: 'Full', price: 240 },
+      { size: 'Half', price: 140 }
+    ],
     isVeg: true,
     spiceLevel: 1,
     description: 'Cottage cheese cubes simmered in rich cashew tomato butter gravy.',
@@ -100,6 +127,11 @@ export const MENU_ITEMS = [
     name: 'Malabar Chicken Biryani',
     category: 'biryani',
     price: 280,
+    portions: [
+      { size: 'Full', price: 280 },
+      { size: 'Half', price: 160 },
+      { size: 'Quarter', price: 100 }
+    ],
     isVeg: false,
     spiceLevel: 2,
     description: 'Signature Malabar chicken biryani served with date pickle, coconut chammanthi and raita.',
@@ -160,6 +192,10 @@ export const MENU_ITEMS = [
     name: 'Kerala Fish Molee',
     category: 'mains',
     price: 390,
+    portions: [
+      { size: 'Full', price: 390 },
+      { size: 'Half', price: 230 }
+    ],
     isVeg: false,
     spiceLevel: 1,
     description: 'Seer fish cooked in mild coconut milk curry infused with green chillies and turmeric.',

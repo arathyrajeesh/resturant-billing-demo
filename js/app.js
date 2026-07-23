@@ -23,6 +23,7 @@ class App {
     this.staffSubTab = 'pos'; // 'floor', 'pos', 'billing'
     this.isMobileSidebarOpen = false;
     this.customerCart = [];
+    this.selectedPortions = {}; // { [itemId]: 'Full' | 'Half' | 'Quarter' }
     
     store.subscribe(() => this.render());
 
@@ -52,6 +53,11 @@ class App {
     store.orders = store.load('malabar_orders', store.orders);
     store.tables = store.load('malabar_tables', store.tables);
     store.showToast('Synced latest KDS status!', '🔄');
+    this.render();
+  }
+
+  setPortion(itemId, portionSize) {
+    this.selectedPortions[itemId] = portionSize;
     this.render();
   }
 
@@ -269,6 +275,32 @@ class App {
 
   // ================= TOP HEADER =================
   renderTopHeader() {
+    if (store.activeView === 'customer') {
+      const table = store.tables.find(t => t.id === store.customerTableId) || store.tables[3];
+      this.topHeader.innerHTML = `
+        <div class="header-left" style="display:flex; align-items:center; gap:12px;">
+          <div style="width:36px; height:36px; background:var(--primary); color:#FFF; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px;">MT</div>
+          <div>
+            <h3 style="font-size:15px; font-weight:800; margin:0; line-height:1.2;">Malabar Table</h3>
+            <span style="font-size:11px; color:var(--primary); font-weight:700;">Customer Self-Order • Table ${table.number}</span>
+          </div>
+        </div>
+
+        <div class="header-right-actions">
+          ${store.currentUser && store.currentUser.isLoggedIn && store.currentUser.role !== 'customer' ? `
+            <button class="btn-enterprise" style="color:var(--primary); border-color:var(--primary); font-weight:700;" onclick="window.app.switchView('${store.currentUser.role === 'admin' ? 'admin' : 'staff'}')">
+              ← Back to ${store.currentUser.role === 'admin' ? 'Admin' : 'Staff'} Dashboard
+            </button>
+          ` : ''}
+          
+          <button class="btn-enterprise" title="Toggle Theme" onclick="window.store.toggleTheme()">
+            ${store.theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          </button>
+        </div>
+      `;
+      return;
+    }
+
     this.topHeader.innerHTML = `
       <div class="header-left">
         <button class="mobile-menu-btn" onclick="window.app.toggleMobileSidebar()" aria-label="Toggle Navigation Menu">
@@ -662,7 +694,15 @@ class App {
 
               <div class="web-menu-grid">
                 ${filteredMenu.map(item => {
-                  const cartEntry = this.staffCart.find(c => c.itemId === item.id);
+                  const activePortion = this.selectedPortions[item.id] || (item.portions ? item.portions[0].size : null);
+                  let price = item.price;
+                  if (item.portions && activePortion) {
+                    const pObj = item.portions.find(p => p.size === activePortion) || item.portions[0];
+                    price = pObj.price;
+                  }
+
+                  const cartItemId = item.portions ? `${item.id}_${activePortion}` : item.id;
+                  const cartEntry = this.staffCart.find(c => c.itemId === cartItemId);
                   const qty = cartEntry ? cartEntry.quantity : 0;
 
                   return `
@@ -672,22 +712,32 @@ class App {
                         <div class="web-menu-info">
                           <h5>${item.name}</h5>
                           <p>${item.description}</p>
+
+                          ${item.portions ? `
+                            <div style="display:flex; gap:4px; margin-top:8px; flex-wrap:wrap;">
+                              ${item.portions.map(p => `
+                                <button class="btn-enterprise" style="padding:3px 7px; font-size:10px; font-weight:800; border-radius:12px; ${activePortion === p.size ? 'background:var(--primary); color:#FFF; border-color:var(--primary);' : ''}" onclick="window.app.setPortion('${item.id}', '${p.size}')">
+                                  ${p.size} ₹${p.price}
+                                </button>
+                              `).join('')}
+                            </div>
+                          ` : ''}
                         </div>
                       </div>
 
-                      <div class="web-menu-footer">
+                      <div class="web-menu-footer" style="margin-top:8px;">
                         <div>
-                          <div class="menu-price">₹${item.price}</div>
+                          <div class="menu-price">₹${price}</div>
                         </div>
 
                         ${qty > 0 ? `
                           <div class="counter-stepper">
-                            <button class="counter-btn-std" onclick="window.app.updateStaffCartQty('${item.id}', -1)">-</button>
+                            <button class="counter-btn-std" onclick="window.app.updateStaffCartQty('${item.id}', -1, '${activePortion}')">-</button>
                             <span style="font-weight:800; padding:0 8px;">${qty}</span>
-                            <button class="counter-btn-std" onclick="window.app.updateStaffCartQty('${item.id}', 1)">+</button>
+                            <button class="counter-btn-std" onclick="window.app.updateStaffCartQty('${item.id}', 1, '${activePortion}')">+</button>
                           </div>
                         ` : `
-                          <button class="add-cart-btn" onclick="window.app.updateStaffCartQty('${item.id}', 1)">+ Add</button>
+                          <button class="add-cart-btn" onclick="window.app.updateStaffCartQty('${item.id}', 1, '${activePortion}')">+ Add ${item.portions ? `(${activePortion})` : ''}</button>
                         `}
                       </div>
                     </div>
@@ -883,18 +933,30 @@ class App {
     this.render();
   }
 
-  updateStaffCartQty(itemId, delta) {
-    const item = store.menu.find(m => m.id === itemId);
+  updateStaffCartQty(itemId, delta, portion = null) {
+    const item = store.menu.find(m => m.id === itemId || m.id === itemId.split('_')[0]);
     if (!item) return;
 
-    let existing = this.staffCart.find(c => c.itemId === itemId);
+    const selectedPortion = portion || this.selectedPortions[item.id] || (item.portions ? item.portions[0].size : null);
+    let price = item.price;
+    let name = item.name;
+
+    if (item.portions && selectedPortion) {
+      const pObj = item.portions.find(p => p.size === selectedPortion) || item.portions[0];
+      price = pObj.price;
+      name = `${item.name} (${pObj.size})`;
+    }
+
+    const cartItemId = item.portions ? `${item.id}_${selectedPortion}` : item.id;
+
+    let existing = this.staffCart.find(c => c.itemId === cartItemId);
     if (existing) {
       existing.quantity += delta;
       if (existing.quantity <= 0) {
-        this.staffCart = this.staffCart.filter(c => c.itemId !== itemId);
+        this.staffCart = this.staffCart.filter(c => c.itemId !== cartItemId);
       }
     } else if (delta > 0) {
-      this.staffCart.push({ itemId: item.id, name: item.name, price: item.price, quantity: 1, notes: '' });
+      this.staffCart.push({ itemId: cartItemId, name, price, quantity: 1, notes: '' });
     }
     this.render();
   }
@@ -1125,7 +1187,15 @@ class App {
 
             <div class="web-menu-grid">
               ${filteredMenu.map(item => {
-                const cartEntry = (this.customerCart || []).find(c => c.itemId === item.id);
+                const activePortion = this.selectedPortions[item.id] || (item.portions ? item.portions[0].size : null);
+                let price = item.price;
+                if (item.portions && activePortion) {
+                  const pObj = item.portions.find(p => p.size === activePortion) || item.portions[0];
+                  price = pObj.price;
+                }
+
+                const cartItemId = item.portions ? `${item.id}_${activePortion}` : item.id;
+                const cartEntry = (this.customerCart || []).find(c => c.itemId === cartItemId);
                 const qty = cartEntry ? cartEntry.quantity : 0;
 
                 return `
@@ -1138,22 +1208,32 @@ class App {
                           <span style="font-size:10px; font-weight:800; color:${item.isVeg ? 'var(--success)' : 'var(--danger)'};">${item.isVeg ? 'Veg' : 'Non-Veg'}</span>
                         </div>
                         <p>${item.description}</p>
+                        
+                        ${item.portions ? `
+                          <div style="display:flex; gap:4px; margin-top:8px; flex-wrap:wrap;">
+                            ${item.portions.map(p => `
+                              <button class="btn-enterprise" style="padding:3px 7px; font-size:10px; font-weight:800; border-radius:12px; ${activePortion === p.size ? 'background:var(--primary); color:#FFF; border-color:var(--primary);' : ''}" onclick="window.app.setPortion('${item.id}', '${p.size}')">
+                                ${p.size} ₹${p.price}
+                              </button>
+                            `).join('')}
+                          </div>
+                        ` : ''}
                       </div>
                     </div>
 
-                    <div class="web-menu-footer">
-                      <div class="menu-price">₹${item.price}</div>
+                    <div class="web-menu-footer" style="margin-top:8px;">
+                      <div class="menu-price">₹${price}</div>
 
                       ${item.available === false ? `
                         <button class="add-cart-btn" disabled style="opacity:0.6; cursor:not-allowed; background:var(--surface-border); color:var(--danger); border-color:var(--surface-border);">Out of Stock</button>
                       ` : qty > 0 ? `
                         <div class="counter-stepper">
-                          <button class="counter-btn-std" onclick="window.app.updateCustomerCartQty('${item.id}', -1)">-</button>
+                          <button class="counter-btn-std" onclick="window.app.updateCustomerCartQty('${item.id}', -1, '${activePortion}')">-</button>
                           <span style="font-weight:800; padding:0 8px;">${qty}</span>
-                          <button class="counter-btn-std" onclick="window.app.updateCustomerCartQty('${item.id}', 1)">+</button>
+                          <button class="counter-btn-std" onclick="window.app.updateCustomerCartQty('${item.id}', 1, '${activePortion}')">+</button>
                         </div>
                       ` : `
-                        <button class="add-cart-btn" onclick="window.app.updateCustomerCartQty('${item.id}', 1)">+ Add</button>
+                        <button class="add-cart-btn" onclick="window.app.updateCustomerCartQty('${item.id}', 1, '${activePortion}')">+ Add ${item.portions ? `(${activePortion})` : ''}</button>
                       `}
                     </div>
                   </div>
@@ -1221,20 +1301,32 @@ class App {
     `;
   }
 
-  updateCustomerCartQty(itemId, delta) {
-    const item = store.menu.find(m => m.id === itemId);
+  updateCustomerCartQty(itemId, delta, portion = null) {
+    const item = store.menu.find(m => m.id === itemId || m.id === itemId.split('_')[0]);
     if (!item) return;
 
     if (!this.customerCart) this.customerCart = [];
 
-    let existing = this.customerCart.find(c => c.itemId === itemId);
+    const selectedPortion = portion || this.selectedPortions[item.id] || (item.portions ? item.portions[0].size : null);
+    let price = item.price;
+    let name = item.name;
+
+    if (item.portions && selectedPortion) {
+      const pObj = item.portions.find(p => p.size === selectedPortion) || item.portions[0];
+      price = pObj.price;
+      name = `${item.name} (${pObj.size})`;
+    }
+
+    const cartItemId = item.portions ? `${item.id}_${selectedPortion}` : item.id;
+
+    let existing = this.customerCart.find(c => c.itemId === cartItemId);
     if (existing) {
       existing.quantity += delta;
       if (existing.quantity <= 0) {
-        this.customerCart = this.customerCart.filter(c => c.itemId !== itemId);
+        this.customerCart = this.customerCart.filter(c => c.itemId !== cartItemId);
       }
     } else if (delta > 0) {
-      this.customerCart.push({ itemId: item.id, name: item.name, price: item.price, quantity: 1 });
+      this.customerCart.push({ itemId: cartItemId, name, price, quantity: 1 });
     }
     this.render();
   }
