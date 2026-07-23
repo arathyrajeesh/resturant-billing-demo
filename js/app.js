@@ -938,7 +938,11 @@ class App {
   // ================= 🤳 CUSTOMER WEB PORTAL =================
   renderCustomerWebPortal() {
     const table = store.tables.find(t => t.id === store.customerTableId) || store.tables[3];
-    const customerOrder = store.orders.find(o => o.tableId === table.id && o.paymentStatus === 'unpaid' && o.status !== 'completed');
+    const customerOrder = store.orders.find(o => 
+      o.tableId === table.id && 
+      o.paymentStatus === 'unpaid' && 
+      (o.status === 'placed' || o.status === 'preparing' || o.status === 'ready')
+    );
 
     const filteredMenu = store.menu.filter(m => {
       if (store.selectedCategory !== 'all' && m.category !== store.selectedCategory) return false;
