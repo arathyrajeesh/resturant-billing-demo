@@ -61,6 +61,236 @@ class App {
     this.render();
   }
 
+  // Swiggy / Zomato style Item Customization Modal methods
+  openItemCustomizationModal(itemId) {
+    const item = store.menu.find(m => m.id === itemId);
+    if (!item) return;
+
+    const activePortion = this.selectedPortions[item.id] || (item.portions && item.portions.length > 0 ? item.portions[0].size : null);
+    
+    this.modalState = {
+      itemId: item.id,
+      selectedPortion: activePortion,
+      qty: 1,
+      notes: ''
+    };
+
+    this.renderCustomizationModal();
+  }
+
+  closeItemCustomizationModal() {
+    this.modalState = null;
+    const modal = document.getElementById('item-customization-modal');
+    if (modal) modal.remove();
+  }
+
+  updateModalPortion(itemId, portionSize) {
+    if (!this.modalState) return;
+    this.modalState.selectedPortion = portionSize;
+    this.selectedPortions[itemId] = portionSize;
+    this.updateModalDOM();
+  }
+
+  changeModalQty(delta) {
+    if (!this.modalState) return;
+    const newQty = this.modalState.qty + delta;
+    if (newQty >= 1) {
+      this.modalState.qty = newQty;
+      this.updateModalDOM();
+    }
+  }
+
+  updateModalNotes(text) {
+    if (!this.modalState) return;
+    this.modalState.notes = text;
+    const countEl = document.getElementById('modal-char-count');
+    if (countEl) countEl.innerText = `${text.length}/100`;
+  }
+
+  appendQuickNote(chipText) {
+    if (!this.modalState) return;
+    let current = this.modalState.notes || '';
+    if (current.includes(chipText)) {
+      current = current.replace(chipText, '').replace(/,\s*,/g, ',').replace(/^,\s*/, '').replace(/,\s*$/, '').trim();
+    } else {
+      current = current ? `${current}, ${chipText}` : chipText;
+    }
+    if (current.length > 100) current = current.substring(0, 100);
+    this.modalState.notes = current;
+    
+    const textarea = document.getElementById('modal-cooking-notes');
+    if (textarea) textarea.value = current;
+    const countEl = document.getElementById('modal-char-count');
+    if (countEl) countEl.innerText = `${current.length}/100`;
+  }
+
+  confirmAddItemFromModal(itemId) {
+    if (!this.modalState) return;
+    const item = store.menu.find(m => m.id === itemId);
+    if (!item) return;
+
+    const portion = this.modalState.selectedPortion;
+    const qty = this.modalState.qty;
+    const notes = this.modalState.notes;
+
+    let price = item.price;
+    let name = item.name;
+
+    if (item.portions && portion) {
+      const pObj = item.portions.find(p => p.size === portion) || item.portions[0];
+      price = pObj.price;
+      name = `${item.name} (${pObj.size})`;
+    }
+
+    const cartItemId = item.portions ? `${item.id}_${portion}` : item.id;
+
+    if (!this.customerCart) this.customerCart = [];
+    let existing = this.customerCart.find(c => c.itemId === cartItemId);
+    if (existing) {
+      existing.quantity += qty;
+      if (notes) existing.notes = existing.notes ? `${existing.notes}; ${notes}` : notes;
+    } else {
+      this.customerCart.push({
+        itemId: cartItemId,
+        name: name,
+        price: price,
+        quantity: qty,
+        notes: notes || ''
+      });
+    }
+
+    store.showToast(`Added ${qty}x ${name} to your cart!`, '😋');
+    this.closeItemCustomizationModal();
+    this.render();
+  }
+
+  updateModalDOM() {
+    if (!this.modalState) return;
+    const item = store.menu.find(m => m.id === this.modalState.itemId);
+    if (!item) return;
+
+    let price = item.price;
+    if (item.portions && this.modalState.selectedPortion) {
+      const pObj = item.portions.find(p => p.size === this.modalState.selectedPortion) || item.portions[0];
+      price = pObj.price;
+    }
+
+    const totalPrice = price * this.modalState.qty;
+
+    const qtyVal = document.getElementById('modal-qty-val');
+    if (qtyVal) qtyVal.innerText = this.modalState.qty;
+
+    const addBtn = document.getElementById('modal-add-btn');
+    if (addBtn) addBtn.innerText = `Add item ₹${totalPrice}`;
+
+    const radioRows = document.querySelectorAll('.portion-radio-row');
+    radioRows.forEach(row => {
+      const radio = row.querySelector('input[type="radio"]');
+      if (radio && radio.value === this.modalState.selectedPortion) {
+        row.classList.add('active');
+        radio.checked = true;
+      } else {
+        row.classList.remove('active');
+      }
+    });
+  }
+
+  renderCustomizationModal() {
+    const existing = document.getElementById('item-customization-modal');
+    if (existing) existing.remove();
+
+    if (!this.modalState) return;
+    const item = store.menu.find(m => m.id === this.modalState.itemId);
+    if (!item) return;
+
+    const activePortion = this.modalState.selectedPortion;
+    let price = item.price;
+    if (item.portions && activePortion) {
+      const pObj = item.portions.find(p => p.size === activePortion) || item.portions[0];
+      price = pObj.price;
+    }
+    const totalPrice = price * this.modalState.qty;
+
+    const modalHtml = `
+      <div class="item-custom-overlay" id="item-customization-modal" onclick="if(event.target === this) window.app.closeItemCustomizationModal()">
+        <div class="item-custom-sheet">
+          <button class="item-modal-close" onclick="window.app.closeItemCustomizationModal()" title="Close">✕</button>
+
+          <div class="item-modal-header">
+            <img src="${item.image}" class="item-modal-thumb" alt="${item.name}" />
+            <div class="item-modal-title-box">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <div class="item-veg-tag ${item.isVeg ? 'veg' : ''}">
+                  <span class="dot"></span>
+                </div>
+                <span style="font-size:11px; font-weight:700; color:${item.isVeg ? 'var(--success)' : 'var(--danger)'};">${item.isVeg ? 'Veg' : 'Non-Veg'}</span>
+              </div>
+              <h4>${item.name}</h4>
+            </div>
+          </div>
+
+          <div class="item-modal-body">
+            ${item.portions && item.portions.length > 0 ? `
+              <div class="custom-section">
+                <div class="custom-section-header">
+                  <span class="custom-title">Size</span>
+                  <span class="custom-subtitle">Required • Select any 1 option</span>
+                </div>
+                <div class="portion-radio-group">
+                  ${item.portions.map(p => `
+                    <label class="portion-radio-row ${activePortion === p.size ? 'active' : ''}" onclick="window.app.updateModalPortion('${item.id}', '${p.size}')">
+                      <span class="portion-name">${item.name} (${p.size})</span>
+                      <div class="portion-right">
+                        <span class="portion-price">₹${p.price}</span>
+                        <input type="radio" name="modal-portion" value="${p.size}" ${activePortion === p.size ? 'checked' : ''} />
+                        <span class="custom-radio-mark"></span>
+                      </div>
+                    </label>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            <div class="custom-section">
+              <div class="custom-section-header">
+                <span class="custom-title">Add a cooking request (optional)</span>
+                <p class="custom-disclaimer">The restaurant will try its best to fulfil your requests. However, refunds or cancellations related to such requests won't be possible.</p>
+              </div>
+
+              <div class="cooking-notes-box">
+                <textarea id="modal-cooking-notes" maxlength="100" placeholder="e.g. Don't make it too spicy" oninput="window.app.updateModalNotes(this.value)">${this.modalState.notes || ''}</textarea>
+                <span class="char-count" id="modal-char-count">${(this.modalState.notes || '').length}/100</span>
+              </div>
+
+              <div class="quick-notes-chips">
+                <button type="button" class="note-chip" onclick="window.app.appendQuickNote('Without onion and garlic')">Without onion and garlic</button>
+                <button type="button" class="note-chip" onclick="window.app.appendQuickNote('Less Spicy')">Less Spicy</button>
+                <button type="button" class="note-chip" onclick="window.app.appendQuickNote('Non spicy')">Non spicy</button>
+                <button type="button" class="note-chip" onclick="window.app.appendQuickNote('Mild')">Mild</button>
+                <button type="button" class="note-chip" onclick="window.app.appendQuickNote('Extra Gravy')">Extra Gravy</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="item-modal-footer">
+            <div class="counter-stepper-lg">
+              <button type="button" class="counter-btn-lg" onclick="window.app.changeModalQty(-1)">-</button>
+              <span class="counter-val-lg" id="modal-qty-val">${this.modalState.qty}</span>
+              <button type="button" class="counter-btn-lg" onclick="window.app.changeModalQty(1)">+</button>
+            </div>
+
+            <button type="button" class="btn-add-item-primary" id="modal-add-btn" onclick="window.app.confirmAddItemFromModal('${item.id}')">
+              Add item ₹${totalPrice}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  }
+
+
   toggleMobileSidebar() {
     this.isMobileSidebarOpen = !this.isMobileSidebarOpen;
     this.updateMobileSidebarDOM();

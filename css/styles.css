@@ -1376,5 +1376,418 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+/* ================= SWIGGY / ZOMATO ITEM CUSTOMIZATION MODAL & BOTTOM SHEET ================= */
+.item-custom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-end; /* Slides up from bottom on mobile */
+  justify-content: center;
+  animation: fadeInOverlay 0.25s ease-out forwards;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.item-custom-sheet {
+  background: var(--surface-white);
+  width: 100%;
+  max-width: 520px;
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px 20px 20px;
+  position: relative;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
+  animation: slideUpSheet 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (min-width: 640px) {
+  .item-custom-overlay {
+    align-items: center; /* Centered modal on larger screens */
+  }
+  .item-custom-sheet {
+    border-radius: 20px;
+    max-height: 90vh;
+  }
+}
+
+@keyframes slideUpSheet {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* Floating Circular Close Button above sheet matching image */
+.item-modal-close {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #27272A;
+  color: #FFFFFF;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, background 0.15s ease;
+  z-index: 10;
+}
+
+.item-modal-close:hover {
+  background: #18181B;
+  transform: translateX(-50%) scale(1.08);
+}
+
+/* Modal Dish Header */
+.item-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.item-modal-thumb {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+
+.item-modal-title-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.item-veg-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--danger);
+  padding: 1px;
+  border-radius: 3px;
+  justify-content: center;
+}
+
+.item-veg-tag.veg {
+  border-color: var(--success);
+}
+
+.item-veg-tag .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--danger);
+}
+
+.item-veg-tag.veg .dot {
+  background: var(--success);
+}
+
+.item-modal-title-box h4 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-dark);
+  line-height: 1.2;
+}
+
+/* Scrollable Modal Content */
+.item-modal-body {
+  overflow-y: auto;
+  padding: 16px 0;
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
+}
+
+.custom-section {
+  background: var(--bg-main);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid var(--surface-border);
+}
+
+.custom-section-header {
+  margin-bottom: 14px;
+}
+
+.custom-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-dark);
+  display: block;
+}
+
+.custom-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 2px;
+  display: block;
+}
+
+.custom-disclaimer {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+/* Portion / Size Radio List matching Swiggy Design */
+.portion-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.portion-radio-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--surface-white);
+  border: 1.5px solid var(--surface-border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.portion-radio-row.active {
+  border-color: #E11D48;
+  background: #FFF1F2;
+}
+
+[data-theme="dark"] .portion-radio-row.active {
+  background: rgba(225, 29, 72, 0.15);
+  border-color: #F43F5E;
+}
+
+.portion-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.portion-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.portion-price {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+/* Swiggy Custom Radio Button */
+.portion-radio-row input[type="radio"] {
+  display: none;
+}
+
+.custom-radio-mark {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--surface-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.portion-radio-row.active .custom-radio-mark {
+  border-color: #E11D48;
+}
+
+.portion-radio-row.active .custom-radio-mark::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #E11D48;
+}
+
+/* Cooking Request Box */
+.cooking-notes-box {
+  position: relative;
+  margin-top: 10px;
+}
+
+.cooking-notes-box textarea {
+  width: 100%;
+  height: 75px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--surface-border);
+  background: var(--surface-white);
+  color: var(--text-dark);
+  font-size: 13px;
+  resize: none;
+  font-family: inherit;
+}
+
+.cooking-notes-box textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.cooking-notes-box .char-count {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.quick-notes-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 0 2px 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.quick-notes-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.note-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--surface-border);
+  background: var(--surface-white);
+  color: var(--text-dark);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.note-chip:hover, .note-chip.selected {
+  border-color: #E11D48;
+  color: #E11D48;
+  background: #FFF1F2;
+}
+
+/* Modal Bottom Sticky Bar */
+.item-modal-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--surface-border);
+}
+
+.counter-stepper-lg {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1.5px solid #E11D48;
+  border-radius: 12px;
+  padding: 4px;
+  width: 110px;
+  background: var(--surface-white);
+}
+
+.counter-btn-lg {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #E11D48;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.counter-btn-lg:hover {
+  background: #FFF1F2;
+}
+
+.counter-val-lg {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+.btn-add-item-primary {
+  flex: 1;
+  background: linear-gradient(135deg, #E11D48, #BE123C);
+  color: #FFFFFF;
+  border: none;
+  padding: 13px 20px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.btn-add-item-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(225, 29, 72, 0.4);
+}
+
+/* Mobile Sticky Bottom Cart Bar */
+.mobile-sticky-cart-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #18181B;
+  color: #FFFFFF;
+  padding: 12px 16px;
+  z-index: 900;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
+  border-radius: 16px 16px 0 0;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (max-width: 900px) {
+  .mobile-sticky-cart-bar {
+    display: flex;
+  }
+  
+  .web-menu-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+}
+
+
 
 
