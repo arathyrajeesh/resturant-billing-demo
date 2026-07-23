@@ -442,7 +442,12 @@ class App {
                 ${store.orders.slice(0, 5).map(o => `
                   <div class="order-card ${o.source}" style="padding:12px;">
                     <div>
-                      <strong style="font-size:13px;">#${o.orderNumber} - ${o.tableNumber}</strong>
+                      <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
+                        <strong style="font-size:13px;">#${o.orderNumber} - ${o.tableNumber}</strong>
+                        <span class="source-tag ${o.source === 'qr-customer' ? 'tag-qr-customer' : o.source === 'swiggy' ? 'tag-swiggy' : o.source === 'zomato' ? 'tag-zomato' : 'tag-dinein'}">
+                          ${o.source === 'qr-customer' ? '🤳 QR Self-Order' : o.source === 'swiggy' ? '🛵 Swiggy' : o.source === 'zomato' ? '🔴 Zomato' : '🪑 Staff POS'}
+                        </span>
+                      </div>
                       <p style="font-size:11px; color:var(--text-muted);">${o.items.length} items • ₹${o.total}</p>
                     </div>
                     <span class="status-tag ${o.status === 'ready' ? 'tag-available' : 'tag-occupied'}">${o.status}</span>
@@ -673,11 +678,16 @@ class App {
               <div class="orders-list">
                 ${unpaidOrders.length === 0 ? '<p style="color:var(--text-muted); font-size:13px; text-align:center; padding:40px 0;">No pending bills.</p>' : ''}
                 ${unpaidOrders.map(o => `
-                  <div class="order-card ${selectedOrder && selectedOrder.id === o.id ? 'dine-in' : ''}" 
+                  <div class="order-card ${o.source} ${selectedOrder && selectedOrder.id === o.id ? 'dine-in' : ''}" 
                        style="cursor:pointer;"
                        onclick="window.app.selectBillingOrder('${o.id}')">
                     <div>
-                      <h4 style="font-size:14px;">Table ${o.tableNumber}</h4>
+                      <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
+                        <h4 style="font-size:14px;">Table ${o.tableNumber}</h4>
+                        <span class="source-tag ${o.source === 'qr-customer' ? 'tag-qr-customer' : o.source === 'swiggy' ? 'tag-swiggy' : o.source === 'zomato' ? 'tag-zomato' : 'tag-dinein'}">
+                          ${o.source === 'qr-customer' ? '🤳 QR Self-Order' : o.source === 'swiggy' ? '🛵 Swiggy' : o.source === 'zomato' ? '🔴 Zomato' : '🪑 Staff POS'}
+                        </span>
+                      </div>
                       <p style="font-size:11px; color:var(--text-muted);">${o.items.length} items • #${o.orderNumber}</p>
                     </div>
                     <div style="text-align:right;">
@@ -839,9 +849,13 @@ class App {
             <div class="kds-card ${o.status}">
               <div>
                 <div class="kds-header">
-                  <div class="kds-table-badge">
-                    <span>${o.source === 'swiggy' ? '🛵' : o.source === 'zomato' ? '🔴' : '🪑'}</span>
-                    ${o.tableNumber}
+                  <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                    <div class="kds-table-badge">
+                      ${o.tableNumber}
+                    </div>
+                    <span class="source-tag ${o.source === 'qr-customer' ? 'tag-qr-customer' : o.source === 'swiggy' ? 'tag-swiggy' : o.source === 'zomato' ? 'tag-zomato' : 'tag-dinein'}">
+                      ${o.source === 'qr-customer' ? '🤳 QR Self-Order' : o.source === 'swiggy' ? '🛵 Swiggy' : o.source === 'zomato' ? '🔴 Zomato' : '🪑 Staff POS'}
+                    </span>
                   </div>
                   <div class="kds-timer">⏱️ #${o.orderNumber}</div>
                 </div>
