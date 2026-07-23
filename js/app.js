@@ -139,15 +139,15 @@ class App {
     `).join('');
   }
 
-  // ================= 🔐 LOGIN SCREEN =================
+  // ================= LOGIN SCREEN =================
   renderLoginScreen() {
     this.container.innerHTML = `
       <div class="login-wrapper">
         <div class="login-card-std" style="max-width:440px;">
           <div style="text-align:center; margin-bottom:24px;">
-            <div style="width:50px; height:50px; background:var(--primary); color:#fff; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; margin:0 auto 12px auto; font-weight:800;">🌴</div>
-            <h2 style="font-size:22px; font-weight:800;">Malabar Table</h2>
-            <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">Select Dashboard Role to Continue</p>
+            <div style="width:48px; height:48px; background:var(--primary); color:#fff; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; margin:0 auto 12px auto; font-weight:800;">MT</div>
+            <h2 style="font-size:22px; font-weight:800;">Malabar Table POS</h2>
+            <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">Select Dashboard Workspace to Continue</p>
           </div>
 
           <form onsubmit="window.app.handleLoginSubmit(event)">
@@ -156,26 +156,23 @@ class App {
               <div style="display:flex; flex-direction:column; gap:10px;">
                 
                 <div class="role-choice-card ${this.selectedLoginRole === 'admin' ? 'selected' : ''}" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px;" onclick="window.app.selectLoginRole('admin')">
-                  <div style="font-size:26px;">👑</div>
                   <div>
                     <strong style="font-size:14px; display:block;">1. Admin Dashboard</strong>
-                    <p style="font-size:11px; color:var(--text-muted);">Private Analytics, Menu Management, Add Tables & Real QR Codes</p>
+                    <p style="font-size:11px; color:var(--text-muted);">Analytics, Menu Catalog, Add Tables & QR Stickers</p>
                   </div>
                 </div>
 
                 <div class="role-choice-card ${this.selectedLoginRole === 'staff' ? 'selected' : ''}" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px;" onclick="window.app.selectLoginRole('staff')">
-                  <div style="font-size:26px;">📋</div>
                   <div>
-                    <strong style="font-size:14px; display:block;">2. Staff POS & Billing Dashboard</strong>
-                    <p style="font-size:11px; color:var(--text-muted);">Floor Map, Desktop Web POS & Cashier Billing Counter</p>
+                    <strong style="font-size:14px; display:block;">2. Staff POS & Billing Counter</strong>
+                    <p style="font-size:11px; color:var(--text-muted);">Floor Map, Web POS Terminal & Cashier Billing</p>
                   </div>
                 </div>
 
                 <div class="role-choice-card ${this.selectedLoginRole === 'kitchen' ? 'selected' : ''}" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px;" onclick="window.app.selectLoginRole('kitchen')">
-                  <div style="font-size:26px;">👨‍🍳</div>
                   <div>
-                    <strong style="font-size:14px; display:block;">3. Kitchen KDS Dashboard</strong>
-                    <p style="font-size:11px; color:var(--text-muted);">Live Order Cooking Cards & Preparation Queue</p>
+                    <strong style="font-size:14px; display:block;">3. Kitchen KDS Display</strong>
+                    <p style="font-size:11px; color:var(--text-muted);">Live Order Cooking Cards & Kitchen Queue</p>
                   </div>
                 </div>
 
@@ -191,19 +188,19 @@ class App {
               <div class="form-group-std">
                 <label>Admin Passcode</label>
                 <input type="password" id="login-password" value="owner123" required />
-                <span style="font-size:11px; color:var(--primary); font-weight:600;">(Admin Passcode: owner123)</span>
+                <span style="font-size:11px; color:var(--primary); font-weight:600;">(Passcode: owner123)</span>
               </div>
             ` : ''}
 
             <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:12px; margin-top:8px;">
-              Open ${this.selectedLoginRole.toUpperCase()} Dashboard 🔓
+              Open ${this.selectedLoginRole.toUpperCase()} Dashboard
             </button>
           </form>
 
           <div style="margin-top:20px; border-top:1px solid var(--surface-border); padding-top:16px; text-align:center;">
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">Customer QR Self-Order View?</p>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">Customer QR Self-Order View</p>
             <button class="btn-enterprise" style="width:100%; justify-content:center;" onclick="window.store.login('customer', 'Customer QR User')">
-              📲 View Customer Ordering Portal
+              View Customer Ordering Portal
             </button>
           </div>
         </div>
@@ -222,15 +219,15 @@ class App {
     store.login(this.selectedLoginRole, username);
   }
 
-  // ================= 🏛️ SIDEBAR NAVIGATION (Customer Portal Accessible for Admin, Staff & Kitchen) =================
+  // ================= SIDEBAR NAVIGATION =================
   renderSidebar() {
     const role = store.currentUser.role;
 
     const allNavItems = [
-      { id: 'admin', label: '👑 Admin Dashboard', roles: ['admin'] },
-      { id: 'staff', label: '📋 Staff POS & Billing', roles: ['admin', 'staff'] },
-      { id: 'kitchen', label: '👨‍🍳 Kitchen KDS Screen', roles: ['admin', 'staff', 'kitchen'] },
-      { id: 'customer', label: '🤳 Customer Portal', roles: ['admin', 'staff', 'kitchen', 'customer'] }
+      { id: 'admin', label: 'Admin Dashboard', roles: ['admin'] },
+      { id: 'staff', label: 'Staff POS & Billing', roles: ['admin', 'staff'] },
+      { id: 'kitchen', label: 'Kitchen KDS Screen', roles: ['admin', 'staff', 'kitchen'] },
+      { id: 'customer', label: 'Customer Portal', roles: ['admin', 'staff', 'kitchen', 'customer'] }
     ];
 
     const visibleItems = allNavItems.filter(item => item.roles.includes(role));
@@ -238,7 +235,7 @@ class App {
     this.sidebar.innerHTML = `
       <div>
         <a href="#" class="sidebar-brand" onclick="return false;">
-          <div class="sidebar-brand-logo">🌴</div>
+          <div class="sidebar-brand-logo">MT</div>
           <div class="sidebar-brand-info">
             <h1>Malabar Table</h1>
             <p style="font-size:10px; color:var(--primary); font-weight:700;">${role.toUpperCase()} DASHBOARD</p>
@@ -246,7 +243,7 @@ class App {
         </a>
 
         <div class="sidebar-nav-group">
-          <div class="sidebar-label">Active Workspaces</div>
+          <div class="sidebar-label">Workspaces</div>
           ${visibleItems.map(item => `
             <button class="nav-link ${store.activeView === item.id ? 'active' : ''}" onclick="window.app.switchView('${item.id}')">
               <span>${item.label}</span>
@@ -264,13 +261,13 @@ class App {
         </div>
 
         <button class="btn-enterprise" style="width:100%; justify-content:center; color:var(--danger); border-color:var(--danger); font-weight:700;" onclick="window.store.logout()">
-          🔒 Logout
+          Logout
         </button>
       </div>
     `;
   }
 
-  // ================= 🔝 TOP HEADER =================
+  // ================= TOP HEADER =================
   renderTopHeader() {
     this.topHeader.innerHTML = `
       <div class="header-left">
@@ -278,25 +275,24 @@ class App {
           ☰
         </button>
         <div class="header-search">
-          <span>🔍</span>
           <input type="text" placeholder="Search orders, dishes, table numbers..." value="${store.searchQuery}" oninput="window.store.setSearchQuery(this.value)" />
         </div>
       </div>
 
       <div class="header-right-actions">
         <button class="btn-enterprise" style="color:var(--primary); border-color:var(--primary);" onclick="window.app.switchView('customer')">
-          <span>🤳</span> <span class="btn-text">Customer Portal</span>
+          <span class="btn-text">Customer Portal</span>
         </button>
 
         <button class="btn-enterprise" style="color:var(--swiggy-orange);" onclick="window.store.simulateOnlineOrder('swiggy')">
-          <span>🛵</span> <span class="btn-text">+ Swiggy</span>
+          <span class="btn-text">+ Swiggy</span>
         </button>
         <button class="btn-enterprise" style="color:var(--zomato-red);" onclick="window.store.simulateOnlineOrder('zomato')">
-          <span>🔴</span> <span class="btn-text">+ Zomato</span>
+          <span class="btn-text">+ Zomato</span>
         </button>
 
         <button class="btn-enterprise" title="Toggle Theme" onclick="window.store.toggleTheme()">
-          ${store.theme === 'dark' ? '☀️' : '🌙'}
+          ${store.theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
         </button>
 
         <button class="btn-enterprise" style="color:var(--danger); border-color:var(--danger); font-weight:700;" onclick="window.store.logout()">
@@ -332,7 +328,7 @@ class App {
     }
   }
 
-  // ================= 👑 1. ADMIN DASHBOARD =================
+  // ================= ADMIN DASHBOARD =================
   renderAdminDashboard() {
     const totalSales = store.orders.filter(o => o.paymentStatus === 'paid' || o.paymentStatus === 'paid-online')
       .reduce((sum, o) => sum + o.total, 0);
@@ -350,15 +346,15 @@ class App {
       <div class="view-container">
         <div class="owner-banner">
           <div>
-            <h2 style="font-size:22px;">👑 Admin Executive Dashboard</h2>
-            <p style="color:var(--text-muted); font-size:13px; margin-top:2px;">Private Business Analytics, Financial Margins, Add Tables & Real QR Stickers</p>
+            <h2 style="font-size:22px;">Admin Executive Dashboard</h2>
+            <p style="color:var(--text-muted); font-size:13px; margin-top:2px;">Business Analytics, Financial Margins, Table Management & QR Codes</p>
           </div>
           <div style="display:flex; gap:10px;">
             <button class="btn-enterprise" style="border-color:var(--primary); color:var(--primary); font-weight:700;" onclick="window.app.openAddTableModal()">
-              ➕ Add New Table
+              Add New Table
             </button>
             <button class="btn-primary" style="background:#D97706;" onclick="window.app.openAddMenuModal()">
-              ➕ Add New Menu Dish
+              Add New Menu Dish
             </button>
           </div>
         </div>
@@ -367,7 +363,6 @@ class App {
           <div class="metric-card">
             <div class="metric-top">
               <div class="metric-lbl">Total Gross Revenue</div>
-              <div class="metric-icon">💰</div>
             </div>
             <div class="metric-val">₹${totalSales.toLocaleString('en-IN')}</div>
           </div>
@@ -375,15 +370,13 @@ class App {
           <div class="metric-card">
             <div class="metric-top">
               <div class="metric-lbl">Est. Net Profit (32%)</div>
-              <div class="metric-icon" style="color:var(--success); background:rgba(16,185,129,0.15);">📈</div>
             </div>
-            <div class="metric-val">₹${estimatedNetProfit.toLocaleString('en-IN')}</div>
+            <div class="metric-val" style="color:var(--success);">₹${estimatedNetProfit.toLocaleString('en-IN')}</div>
           </div>
 
           <div class="metric-card">
             <div class="metric-top">
               <div class="metric-lbl">Active Tables & QR</div>
-              <div class="metric-icon" style="color:var(--primary); background:var(--primary-light);">📍</div>
             </div>
             <div class="metric-val">${store.tables.length} Tables</div>
           </div>
@@ -391,7 +384,6 @@ class App {
           <div class="metric-card">
             <div class="metric-top">
               <div class="metric-lbl">Active Menu Catalog</div>
-              <div class="metric-icon" style="color:var(--purple); background:rgba(139,92,246,0.15);">🍲</div>
             </div>
             <div class="metric-val">${store.menu.length} Dishes</div>
           </div>
@@ -401,8 +393,8 @@ class App {
           <div>
             <div class="panel-card">
               <div class="section-header">
-                <div class="panel-title"><span>📲</span> Table QR Code Generator & Stickers (${store.tables.length} Tables)</div>
-                <button class="btn-enterprise" onclick="window.app.openAddTableModal()">➕ Add New Table</button>
+                <div class="panel-title">Table QR Code Generator (${store.tables.length} Tables)</div>
+                <button class="btn-enterprise" onclick="window.app.openAddTableModal()">Add New Table</button>
               </div>
 
               <div class="tables-floor-grid">
@@ -418,8 +410,8 @@ class App {
 
             <div class="panel-card">
               <div class="section-header">
-                <div class="panel-title"><span>🍲</span> Admin Menu Management (${store.menu.length} Dishes)</div>
-                <button class="btn-enterprise" onclick="window.app.openAddMenuModal()">➕ Add Dish</button>
+                <div class="panel-title">Admin Menu Management (${store.menu.length} Dishes)</div>
+                <button class="btn-enterprise" onclick="window.app.openAddMenuModal()">Add Dish</button>
               </div>
 
               <table class="data-table">
@@ -443,7 +435,7 @@ class App {
                       </td>
                       <td>
                         <button class="btn-enterprise" style="padding:4px 10px; font-size:11px; font-weight:800; color:${m.available === false ? 'var(--danger)' : 'var(--success)'}; border-color:${m.available === false ? 'var(--danger)' : 'var(--success)'};" onclick="window.store.toggleMenuItemAvailability('${m.id}')">
-                          ${m.available === false ? '🔴 Out of Stock' : '🟢 In Stock'}
+                          ${m.available === false ? 'Out of Stock' : 'In Stock'}
                         </button>
                       </td>
                     </tr>
@@ -455,25 +447,25 @@ class App {
 
           <div>
             <div class="panel-card">
-              <div class="panel-title"><span>📊</span> Revenue by Channel</div>
+              <div class="panel-title">Revenue by Channel</div>
               <div style="display:flex; flex-direction:column; gap:12px;">
                 <div class="ranking-item">
-                  <span>🍽️ Dine-in Revenue</span>
+                  <span>Dine-in Revenue</span>
                   <strong>₹${dineInRevenue}</strong>
                 </div>
                 <div class="ranking-item">
-                  <span style="color:var(--swiggy-orange)">🛵 Swiggy Revenue</span>
+                  <span style="color:var(--swiggy-orange)">Swiggy Revenue</span>
                   <strong>₹${swiggyRevenue}</strong>
                 </div>
                 <div class="ranking-item">
-                  <span style="color:var(--zomato-red)">🔴 Zomato Revenue</span>
+                  <span style="color:var(--zomato-red)">Zomato Revenue</span>
                   <strong>₹${zomatoRevenue}</strong>
                 </div>
               </div>
             </div>
 
             <div class="panel-card">
-              <div class="panel-title"><span>⚡</span> Live Orders Task Monitor</div>
+              <div class="panel-title">Live Orders Task Monitor</div>
               <div class="orders-list">
                 ${store.orders.slice(0, 5).map(o => `
                   <div class="order-card ${o.source}" style="padding:12px;">
@@ -481,7 +473,7 @@ class App {
                       <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
                         <strong style="font-size:13px;">#${o.orderNumber} - ${o.tableNumber}</strong>
                         <span class="source-tag ${o.source === 'qr-customer' ? 'tag-qr-customer' : o.source === 'swiggy' ? 'tag-swiggy' : o.source === 'zomato' ? 'tag-zomato' : 'tag-dinein'}">
-                          ${o.source === 'qr-customer' ? '🤳 QR Self-Order' : o.source === 'swiggy' ? '🛵 Swiggy' : o.source === 'zomato' ? '🔴 Zomato' : '🪑 Staff POS'}
+                          ${o.source === 'qr-customer' ? 'QR Self-Order' : o.source === 'swiggy' ? 'Swiggy' : o.source === 'zomato' ? 'Zomato' : 'Staff POS'}
                         </span>
                       </div>
                       <p style="font-size:11px; color:var(--text-muted);">${o.items.length} items • ₹${o.total}</p>
@@ -679,7 +671,7 @@ class App {
                 </div>
 
                 <button class="btn-primary" style="width:100%; justify-content:center; padding:11px;" onclick="window.app.submitStaffOrder()">
-                  <span>⚡</span> Dispatch Order to Kitchen
+                  Dispatch Order to Kitchen
                 </button>
               </div>
             </div>
@@ -687,7 +679,7 @@ class App {
         ` : this.staffSubTab === 'floor' ? `
           <div class="panel-card">
             <div class="section-header">
-              <div class="panel-title"><span>📍</span> Restaurant Floor Map (${store.tables.length} Tables)</div>
+              <div class="panel-title">Restaurant Floor Map (${store.tables.length} Tables)</div>
               <div style="display:flex; gap:12px;">
                 <span class="status-tag tag-available">Free: ${store.tables.length - activeTablesCount}</span>
                 <span class="status-tag tag-occupied">Occupied: ${activeTablesCount}</span>
@@ -698,11 +690,11 @@ class App {
               ${store.tables.map(t => `
                 <div class="table-card-std ${t.status}">
                   <div class="table-title">${t.number}</div>
-                  <div style="font-size:12px; color:var(--text-muted); font-weight:600;">👥 ${t.seats} Seats</div>
+                  <div style="font-size:12px; color:var(--text-muted); font-weight:600;">${t.seats} Seats</div>
                   <span class="status-tag ${t.status === 'available' ? 'tag-available' : t.status === 'occupied' ? 'tag-occupied' : 'tag-bill'}">
                     ${t.status.toUpperCase()}
                   </span>
-                  <button class="table-qr-btn" onclick="window.app.openStaffOrderForTable(${t.id})">➕ Take Order</button>
+                  <button class="table-qr-btn" onclick="window.app.openStaffOrderForTable(${t.id})">Take Order</button>
                 </div>
               `).join('')}
             </div>
@@ -721,7 +713,7 @@ class App {
                       <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
                         <h4 style="font-size:14px;">Table ${o.tableNumber}</h4>
                         <span class="source-tag ${o.source === 'qr-customer' ? 'tag-qr-customer' : o.source === 'swiggy' ? 'tag-swiggy' : o.source === 'zomato' ? 'tag-zomato' : 'tag-dinein'}">
-                          ${o.source === 'qr-customer' ? '🤳 QR Self-Order' : o.source === 'swiggy' ? '🛵 Swiggy' : o.source === 'zomato' ? '🔴 Zomato' : '🪑 Staff POS'}
+                          ${o.source === 'qr-customer' ? 'QR Self-Order' : o.source === 'swiggy' ? 'Swiggy' : o.source === 'zomato' ? 'Zomato' : 'Staff POS'}
                         </span>
                       </div>
                       <p style="font-size:11px; color:var(--text-muted);">${o.items.length} items • #${o.orderNumber}</p>
@@ -741,7 +733,7 @@ class App {
                   <div class="receipt-paper">
                     <div class="receipt-header">
                       <h2>MALABAR TABLE</h2>
-                      <p style="font-size:11px;">Authentic Kerala Fine Dining</p>
+                      <p style="font-size:11px;">Fine Dining Restaurant</p>
                     </div>
 
                     <div class="receipt-row">
@@ -781,14 +773,14 @@ class App {
                     <div style="margin-bottom:16px;">
                       <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:6px;">Select Payment Method:</label>
                       <div style="display:flex; flex-direction:column; gap:8px;">
-                        <button class="btn-enterprise ${this.selectedPaymentMethod === 'UPI' ? 'btn-primary' : ''}" style="justify-content:center;" onclick="window.app.setPaymentMethod('UPI')">📲 UPI / QR Code</button>
-                        <button class="btn-enterprise ${this.selectedPaymentMethod === 'Cash' ? 'btn-primary' : ''}" style="justify-content:center;" onclick="window.app.setPaymentMethod('Cash')">💵 Cash Register</button>
-                        <button class="btn-enterprise ${this.selectedPaymentMethod === 'Card' ? 'btn-primary' : ''}" style="justify-content:center;" onclick="window.app.setPaymentMethod('Card')">💳 Credit / Debit Card</button>
+                        <button class="btn-enterprise ${this.selectedPaymentMethod === 'UPI' ? 'btn-primary' : ''}" style="justify-content:center;" onclick="window.app.setPaymentMethod('UPI')">UPI / QR Code</button>
+                        <button class="btn-enterprise ${this.selectedPaymentMethod === 'Cash' ? 'btn-primary' : ''}" style="justify-content:center;" onclick="window.app.setPaymentMethod('Cash')">Cash Register</button>
+                        <button class="btn-enterprise ${this.selectedPaymentMethod === 'Card' ? 'btn-primary' : ''}" style="justify-content:center;" onclick="window.app.setPaymentMethod('Card')">Credit / Debit Card</button>
                       </div>
                     </div>
 
                     <button class="btn-primary" style="width:100%; justify-content:center; padding:11px;" onclick="window.app.payOrder('${selectedOrder.id}')">
-                      <span>✅</span> Complete ₹${selectedOrder.total} & Clear Table
+                      Complete ₹${selectedOrder.total} & Clear Table
                     </button>
                   </div>
                 </div>
@@ -861,7 +853,7 @@ class App {
     this.render();
   }
 
-  // ================= 👨‍🍳 3. KITCHEN DISPLAY DASHBOARD =================
+  // ================= KITCHEN DISPLAY DASHBOARD =================
   renderKitchenDashboard() {
     const activeOrders = store.orders.filter(o => o.status !== 'paid' && o.status !== 'served' && o.status !== 'completed');
 
@@ -869,7 +861,7 @@ class App {
       <div class="view-container">
         <div class="section-header" style="margin-bottom:20px;">
           <div>
-            <h2>👨‍🍳 Kitchen Display System (KDS)</h2>
+            <h2>Kitchen Display System (KDS)</h2>
             <p style="color:var(--text-muted); font-size:13px;">Dedicated cooking queue for kitchen chefs</p>
           </div>
           <div style="display:flex; gap:10px;">
@@ -882,8 +874,8 @@ class App {
         <div class="kds-grid">
           ${activeOrders.length === 0 ? `
             <div class="panel-card" style="text-align:center; padding:50px 20px; grid-column:1/-1;">
-              <p style="color:var(--text-muted); font-size:16px; margin-bottom:14px;">🎉 Kitchen Queue Clean! All orders fulfilled.</p>
-              <button class="btn-primary" style="margin:0 auto; display:inline-flex;" onclick="window.store.resetDemoData()">🔄 Load Sample Live Orders into Kitchen Queue</button>
+              <p style="color:var(--text-muted); font-size:16px; margin-bottom:14px;">Kitchen Queue Clean. All orders fulfilled.</p>
+              <button class="btn-primary" style="margin:0 auto; display:inline-flex;" onclick="window.store.resetDemoData()">Load Sample Live Orders into Kitchen Queue</button>
             </div>
           ` : ''}
           ${activeOrders.map(o => `
@@ -895,10 +887,10 @@ class App {
                       ${o.tableNumber}
                     </div>
                     <span class="source-tag ${o.source === 'qr-customer' ? 'tag-qr-customer' : o.source === 'swiggy' ? 'tag-swiggy' : o.source === 'zomato' ? 'tag-zomato' : 'tag-dinein'}">
-                      ${o.source === 'qr-customer' ? '🤳 QR Self-Order' : o.source === 'swiggy' ? '🛵 Swiggy' : o.source === 'zomato' ? '🔴 Zomato' : '🪑 Staff POS'}
+                      ${o.source === 'qr-customer' ? 'QR Self-Order' : o.source === 'swiggy' ? 'Swiggy' : o.source === 'zomato' ? 'Zomato' : 'Staff POS'}
                     </span>
                   </div>
-                  <div class="kds-timer">⏱️ #${o.orderNumber}</div>
+                  <div class="kds-timer">#${o.orderNumber}</div>
                 </div>
 
                 <div class="kds-items">
@@ -916,15 +908,15 @@ class App {
               <div>
                 ${o.status === 'placed' ? `
                   <button class="kds-action-btn btn-prep" onclick="window.store.updateOrderStatus('${o.id}', 'preparing')">
-                    <span>🔥</span> Start Cooking
+                    Start Cooking
                   </button>
                 ` : o.status === 'preparing' ? `
                   <button class="kds-action-btn btn-ready" onclick="window.store.updateOrderStatus('${o.id}', 'ready')">
-                    <span>✅</span> Mark Order Ready
+                    Mark Order Ready
                   </button>
                 ` : `
                   <button class="kds-action-btn" style="background:#059669; color:#FFF;" onclick="window.store.updateOrderStatus('${o.id}', 'served')">
-                    <span>✅</span> Order Served (Clear)
+                    Order Served (Clear)
                   </button>
                 `}
               </div>
@@ -935,7 +927,7 @@ class App {
     `;
   }
 
-  // ================= 🤳 CUSTOMER WEB PORTAL =================
+  // ================= CUSTOMER WEB PORTAL =================
   renderCustomerWebPortal() {
     const table = store.tables.find(t => t.id === store.customerTableId) || store.tables[3];
     const customerOrder = store.orders.find(o => 
@@ -961,8 +953,8 @@ class App {
         <!-- Header Banner -->
         <div style="background:linear-gradient(135deg, var(--primary), var(--primary-hover)); border-radius:var(--radius-lg); padding:20px; color:#FFF; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; box-shadow:var(--shadow-md);">
           <div>
-            <h2 style="color:#FFF; font-size:22px;">🌴 Malabar Table - Self Ordering</h2>
-            <p style="opacity:0.95; font-size:13px; margin-top:2px;">📍 Table ${table.number} (${table.section || 'Main Hall'})</p>
+            <h2 style="color:#FFF; font-size:22px;">Malabar Table - Self Ordering</h2>
+            <p style="opacity:0.95; font-size:13px; margin-top:2px;">Table ${table.number} (${table.section || 'Main Hall'})</p>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
             <span style="font-size:12px; background:rgba(255,255,255,0.2); padding:6px 12px; border-radius:20px; font-weight:700;">Simulate Table:</span>
@@ -977,17 +969,17 @@ class App {
           <div class="panel-card" style="border-left: 5px solid ${customerOrder.status === 'ready' ? 'var(--success)' : customerOrder.status === 'preparing' ? 'var(--primary)' : customerOrder.status === 'served' ? '#8B5CF6' : 'var(--warning)'}; margin-bottom:24px;">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
               <div>
-                <h3 style="font-size:17px; font-weight:800;">🔥 Live Order #${customerOrder.orderNumber} Status</h3>
+                <h3 style="font-size:17px; font-weight:800;">Live Order #${customerOrder.orderNumber} Status</h3>
                 <p style="font-size:12px; color:var(--primary); font-weight:700; margin-top:2px;">
-                  ${customerOrder.status === 'placed' ? '📝 Order received! Kitchen chef has received your ticket.' :
-                    customerOrder.status === 'preparing' ? '👨‍🍳 Chef master is currently cooking your food live in the kitchen!' :
-                    customerOrder.status === 'ready' ? '🔔 Hot & Ready! Waiter is serving your dishes to your table.' :
-                    '😋 Order Served! Enjoy your delicious meal.'}
+                  ${customerOrder.status === 'placed' ? 'Order received. Kitchen chef has received your ticket.' :
+                    customerOrder.status === 'preparing' ? 'Chef master is currently cooking your food live in the kitchen.' :
+                    customerOrder.status === 'ready' ? 'Hot & Ready. Waiter is serving your dishes to your table.' :
+                    'Order Served. Enjoy your meal.'}
                 </p>
               </div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <button class="btn-enterprise" style="padding:4px 8px; font-size:11px; border-color:var(--surface-border);" onclick="window.app.refreshLiveStatus()" title="Refresh Live Status">
-                  🔄 Refresh
+                  Refresh
                 </button>
                 <span class="status-tag ${customerOrder.status === 'ready' ? 'tag-available' : customerOrder.status === 'preparing' ? 'tag-bill' : 'tag-occupied'}" style="font-size:12px; padding:6px 12px;">
                   ${customerOrder.status.toUpperCase()}
@@ -998,20 +990,20 @@ class App {
             <!-- 4-Step Visual Tracker -->
             <div class="status-tracker-container" style="display:flex; justify-content:space-between; margin:16px 0; background:var(--bg-main); padding:14px 10px; border-radius:12px; border:1px solid var(--surface-border); gap:6px;">
               <div class="status-tracker-step" style="flex:1; text-align:center; opacity: ${['placed','preparing','ready','served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'placed' ? '800' : '600'};">
-                <div style="font-size:22px;">📝</div>
-                <div style="font-size:11px; margin-top:2px;">1. Order Placed</div>
+                <div style="font-size:12px; font-weight:800;">1</div>
+                <div style="font-size:11px; margin-top:2px;">Order Placed</div>
               </div>
               <div class="status-tracker-step" style="flex:1; text-align:center; opacity: ${['preparing','ready','served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'preparing' ? '800' : '600'}; color:${customerOrder.status === 'preparing' ? 'var(--primary)' : 'inherit'};">
-                <div style="font-size:22px;">👨‍🍳</div>
-                <div style="font-size:11px; margin-top:2px;">2. Cooking</div>
+                <div style="font-size:12px; font-weight:800;">2</div>
+                <div style="font-size:11px; margin-top:2px;">In Preparation</div>
               </div>
               <div class="status-tracker-step" style="flex:1; text-align:center; opacity: ${['ready','served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'ready' ? '800' : '600'}; color:${customerOrder.status === 'ready' ? 'var(--success)' : 'inherit'};">
-                <div style="font-size:22px;">🔔</div>
-                <div style="font-size:11px; margin-top:2px;">3. Ready</div>
+                <div style="font-size:12px; font-weight:800;">3</div>
+                <div style="font-size:11px; margin-top:2px;">Ready for Pickup</div>
               </div>
               <div class="status-tracker-step" style="flex:1; text-align:center; opacity: ${customerOrder.status === 'served' ? 1 : 0.35}; font-weight:${customerOrder.status === 'served' ? '800' : '600'};">
-                <div style="font-size:22px;">😋</div>
-                <div style="font-size:11px; margin-top:2px;">4. Served</div>
+                <div style="font-size:12px; font-weight:800;">4</div>
+                <div style="font-size:11px; margin-top:2px;">Served</div>
               </div>
             </div>
 
@@ -1026,11 +1018,11 @@ class App {
                 <span style="color:var(--primary);">₹${customerOrder.total}</span>
               </div>
             </div>
-            <p style="font-size:11px; color:var(--text-muted); margin-top:10px; text-align:center;">💡 Want to order extra food or drinks? Select items below and tap <strong>'Submit Order'</strong>!</p>
+            <p style="font-size:11px; color:var(--text-muted); margin-top:10px; text-align:center;">Want to order extra food or drinks? Select items below and tap <strong>'Submit Order'</strong>.</p>
           </div>
         ` : `
           <div class="panel-card" style="background:var(--primary-light); border:1px solid var(--primary); margin-bottom:20px; text-align:center; padding:14px;">
-            <p style="font-size:13px; font-weight:700; color:var(--primary);">👋 Ready to order? Select your dishes below & tap <strong>'Submit Order'</strong>!</p>
+            <p style="font-size:13px; font-weight:700; color:var(--primary);">Ready to order? Select your dishes below & tap <strong>'Submit Order'</strong>.</p>
           </div>
         `}
 
@@ -1039,7 +1031,7 @@ class App {
           <!-- Menu Catalog Panel -->
           <div class="panel-card">
             <div style="margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;">
-              <h3 style="font-size:16px;">🍲 Menu Catalog</h3>
+              <h3 style="font-size:16px;">Menu Catalog</h3>
               <span style="font-size:12px; color:var(--text-muted);">${filteredMenu.length} dishes available</span>
             </div>
 
@@ -1063,7 +1055,7 @@ class App {
                       <div class="web-menu-info">
                         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2px;">
                           <h5>${item.name}</h5>
-                          <span style="font-size:10px; font-weight:800;">${item.isVeg ? '🟢 Veg' : '🔴 Non-Veg'}</span>
+                          <span style="font-size:10px; font-weight:800; color:${item.isVeg ? 'var(--success)' : 'var(--danger)'};">${item.isVeg ? 'Veg' : 'Non-Veg'}</span>
                         </div>
                         <p>${item.description}</p>
                       </div>
@@ -1073,7 +1065,7 @@ class App {
                       <div class="menu-price">₹${item.price}</div>
 
                       ${item.available === false ? `
-                        <button class="add-cart-btn" disabled style="opacity:0.6; cursor:not-allowed; background:var(--surface-border); color:var(--danger); border-color:var(--surface-border);">Out of Stock 🔴</button>
+                        <button class="add-cart-btn" disabled style="opacity:0.6; cursor:not-allowed; background:var(--surface-border); color:var(--danger); border-color:var(--surface-border);">Out of Stock</button>
                       ` : qty > 0 ? `
                         <div class="counter-stepper">
                           <button class="counter-btn-std" onclick="window.app.updateCustomerCartQty('${item.id}', -1)">-</button>
@@ -1094,14 +1086,13 @@ class App {
           <div class="web-pos-cart-panel">
             <div>
               <div style="padding-bottom:14px; border-bottom:1px solid var(--surface-border); margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;">
-                <h3>🛒 Your Order</h3>
+                <h3>Your Order</h3>
                 <span class="status-tag tag-available">Table ${table.number}</span>
               </div>
 
               <div class="orders-list" style="max-height:280px; overflow-y:auto;">
                 ${(!this.customerCart || this.customerCart.length === 0) ? `
                   <div style="text-align:center; padding:40px 10px; color:var(--text-muted);">
-                    <div style="font-size:36px; margin-bottom:8px;">🛒</div>
                     <p style="font-size:13px; font-weight:600;">Your Cart is Empty</p>
                     <p style="font-size:11px; margin-top:4px;">Tap '+ Add' on dishes to start your order</p>
                   </div>
@@ -1141,7 +1132,7 @@ class App {
               </div>
 
               <button class="btn-primary" style="width:100%; justify-content:center; padding:12px; font-size:14px; font-weight:800;" ${(!this.customerCart || this.customerCart.length === 0) ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="window.app.submitCustomerOrder()">
-                <span>🚀</span> Submit Order to Kitchen
+                Submit Order to Kitchen
               </button>
             </div>
           </div>

@@ -87,7 +87,7 @@ class RestaurantStore {
     this.notify('THEME_CHANGED', this.theme);
   }
 
-  showToast(message, icon = '⚡') {
+  showToast(message, icon = '') {
     const toast = { id: Date.now(), message, icon };
     this.toasts.push(toast);
     this.notify('TOAST_ADDED', toast);
@@ -105,15 +105,15 @@ class RestaurantStore {
 
     if (data.type === 'NEW_ORDER') {
       soundEffects.playNewOrderChime();
-      this.showToast(`New Order #${data.payload.orderNumber} (${data.payload.tableNumber}) received!`, '🔔');
+      this.showToast(`New Order #${data.payload.orderNumber} (${data.payload.tableNumber}) received!`);
     } else if (data.type === 'ORDER_STATUS_UPDATED') {
       soundEffects.playSuccessChime();
-      this.showToast(`Order status updated to ${data.payload.newStatus.toUpperCase()}!`, '👨‍🍳');
+      this.showToast(`Order status updated to ${data.payload.newStatus.toUpperCase()}`);
     } else if (data.type === 'PAYMENT_COMPLETE') {
       soundEffects.playSuccessChime();
-      this.showToast(`Bill settled for Order #${data.payload.orderId}!`, '✅');
+      this.showToast(`Bill settled for Order #${data.payload.orderId}`);
     } else if (data.type === 'MENU_UPDATED') {
-      this.showToast(`Menu updated!`, '🍲');
+      this.showToast(`Menu catalog updated`);
     }
     
     this.listeners.forEach((listener) => listener(this));
@@ -138,7 +138,7 @@ class RestaurantStore {
       this.activeView = 'staff';
     }
 
-    this.showToast(`Welcome back, ${name}! Active Role: ${role.toUpperCase()}`, '🔓');
+    this.showToast(`Welcome back, ${name}. Active Role: ${role.toUpperCase()}`);
     this.notify('AUTH_LOGIN', this.currentUser);
   }
 
@@ -149,7 +149,7 @@ class RestaurantStore {
       isLoggedIn: false
     };
     this.activeView = 'login';
-    this.showToast('Logged out successfully.', '🔒');
+    this.showToast('Logged out successfully.');
     this.notify('AUTH_LOGOUT');
   }
 
