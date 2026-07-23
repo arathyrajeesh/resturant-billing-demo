@@ -940,11 +940,16 @@ class App {
 
         <!-- Live Order Status Tracker (If table has an active order) -->
         ${customerOrder ? `
-          <div class="panel-card" style="border-left: 5px solid var(--primary); margin-bottom:24px;">
+          <div class="panel-card" style="border-left: 5px solid ${customerOrder.status === 'ready' ? 'var(--success)' : customerOrder.status === 'preparing' ? 'var(--primary)' : customerOrder.status === 'served' ? '#8B5CF6' : 'var(--warning)'}; margin-bottom:24px;">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
               <div>
                 <h3 style="font-size:17px; font-weight:800;">🔥 Live Order #${customerOrder.orderNumber} Status</h3>
-                <p style="font-size:12px; color:var(--text-muted);">Real-time status updates from Kitchen KDS</p>
+                <p style="font-size:12px; color:var(--primary); font-weight:700; margin-top:2px;">
+                  ${customerOrder.status === 'placed' ? '📝 Order received! Kitchen chef has received your ticket.' :
+                    customerOrder.status === 'preparing' ? '👨‍🍳 Chef master is currently cooking your food live in the kitchen!' :
+                    customerOrder.status === 'ready' ? '🔔 Hot & Ready! Waiter is serving your dishes to your table.' :
+                    '😋 Order Served! Enjoy your delicious meal.'}
+                </p>
               </div>
               <span class="status-tag ${customerOrder.status === 'ready' ? 'tag-available' : customerOrder.status === 'preparing' ? 'tag-bill' : 'tag-occupied'}" style="font-size:12px; padding:6px 12px;">
                 ${customerOrder.status.toUpperCase()}
@@ -984,7 +989,11 @@ class App {
             </div>
             <p style="font-size:11px; color:var(--text-muted); margin-top:10px; text-align:center;">💡 Want to order extra food or drinks? Select items below and tap <strong>'Submit Order'</strong>!</p>
           </div>
-        ` : ''}
+        ` : `
+          <div class="panel-card" style="background:var(--primary-light); border:1px solid var(--primary); margin-bottom:20px; text-align:center; padding:14px;">
+            <p style="font-size:13px; font-weight:700; color:var(--primary);">👋 Ready to order? Select your dishes below & tap <strong>'Submit Order'</strong>!</p>
+          </div>
+        `}
 
         <!-- Main Order Interface Grid -->
         <div class="web-pos-grid">
