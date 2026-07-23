@@ -381,7 +381,10 @@ class App {
             <h2 style="font-size:22px;">Admin Executive Dashboard</h2>
             <p style="color:var(--text-muted); font-size:13px; margin-top:2px;">Business Analytics, Financial Margins, Table Management & QR Codes</p>
           </div>
-          <div style="display:flex; gap:10px;">
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn-enterprise" style="border-color:var(--primary); color:var(--primary); font-weight:700;" onclick="window.app.scrollToReceiptSettings()">
+              Edit Billing Settings
+            </button>
             <button class="btn-enterprise" style="border-color:var(--primary); color:var(--primary); font-weight:700;" onclick="window.app.openAddTableModal()">
               Add New Table
             </button>
@@ -478,46 +481,8 @@ class App {
           </div>
 
           <div>
-            <div class="panel-card">
-              <div class="panel-title">Revenue by Channel</div>
-              <div style="display:flex; flex-direction:column; gap:12px;">
-                <div class="ranking-item">
-                  <span>Dine-in Revenue</span>
-                  <strong>₹${dineInRevenue}</strong>
-                </div>
-                <div class="ranking-item">
-                  <span style="color:var(--swiggy-orange)">Swiggy Revenue</span>
-                  <strong>₹${swiggyRevenue}</strong>
-                </div>
-                <div class="ranking-item">
-                  <span style="color:var(--zomato-red)">Zomato Revenue</span>
-                  <strong>₹${zomatoRevenue}</strong>
-                </div>
-              </div>
-            </div>
-
-            <div class="panel-card">
-              <div class="panel-title">Live Orders Task Monitor</div>
-              <div class="orders-list">
-                ${store.orders.slice(0, 5).map(o => `
-                  <div class="order-card ${o.source}" style="padding:12px;">
-                    <div>
-                      <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
-                        <strong style="font-size:13px;">#${o.orderNumber} - ${o.tableNumber}</strong>
-                        <span class="source-tag ${o.source === 'qr-customer' ? 'tag-qr-customer' : o.source === 'swiggy' ? 'tag-swiggy' : o.source === 'zomato' ? 'tag-zomato' : 'tag-dinein'}">
-                          ${o.source === 'qr-customer' ? 'QR Self-Order' : o.source === 'swiggy' ? 'Swiggy' : o.source === 'zomato' ? 'Zomato' : 'Staff POS'}
-                        </span>
-                      </div>
-                      <p style="font-size:11px; color:var(--text-muted);">${o.items.length} items • ₹${o.total}</p>
-                    </div>
-                    <span class="status-tag ${o.status === 'ready' ? 'tag-available' : 'tag-occupied'}">${o.status}</span>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-
-            <!-- Receipt & Billing Customization Panel -->
-            <div class="panel-card" style="margin-top:20px;">
+            <!-- Receipt & Billing Customization Panel (Top of Right Column) -->
+            <div class="panel-card" id="billing-settings-panel" style="border: 2px solid var(--primary);">
               <div class="section-header" style="margin-bottom:14px;">
                 <div class="panel-title">Billing & Receipt Customization</div>
                 <span class="status-tag tag-available" style="font-size:11px;">Live Branding</span>
@@ -564,6 +529,44 @@ class App {
                 </button>
               </form>
             </div>
+
+            <div class="panel-card" style="margin-top:20px;">
+              <div class="panel-title">Revenue by Channel</div>
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <div class="ranking-item">
+                  <span>Dine-in Revenue</span>
+                  <strong>₹${dineInRevenue}</strong>
+                </div>
+                <div class="ranking-item">
+                  <span style="color:var(--swiggy-orange)">Swiggy Revenue</span>
+                  <strong>₹${swiggyRevenue}</strong>
+                </div>
+                <div class="ranking-item">
+                  <span style="color:var(--zomato-red)">Zomato Revenue</span>
+                  <strong>₹${zomatoRevenue}</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel-card">
+              <div class="panel-title">Live Orders Task Monitor</div>
+              <div class="orders-list">
+                ${store.orders.slice(0, 5).map(o => `
+                  <div class="order-card ${o.source}" style="padding:12px;">
+                    <div>
+                      <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
+                        <strong style="font-size:13px;">#${o.orderNumber} - ${o.tableNumber}</strong>
+                        <span class="source-tag ${o.source === 'qr-customer' ? 'tag-qr-customer' : o.source === 'swiggy' ? 'tag-swiggy' : o.source === 'zomato' ? 'tag-zomato' : 'tag-dinein'}">
+                          ${o.source === 'qr-customer' ? 'QR Self-Order' : o.source === 'swiggy' ? 'Swiggy' : o.source === 'zomato' ? 'Zomato' : 'Staff POS'}
+                        </span>
+                      </div>
+                      <p style="font-size:11px; color:var(--text-muted);">${o.items.length} items • ₹${o.total}</p>
+                    </div>
+                    <span class="status-tag ${o.status === 'ready' ? 'tag-available' : 'tag-occupied'}">${o.status}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -589,6 +592,15 @@ class App {
       logoUrl,
       footerNote
     });
+  }
+
+  scrollToReceiptSettings() {
+    const el = document.getElementById('billing-settings-panel');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+      el.style.boxShadow = '0 0 0 4px var(--primary)';
+      setTimeout(() => el.style.boxShadow = '', 2500);
+    }
   }
 
   // ================= ➕ ADD TABLE MODAL =================
