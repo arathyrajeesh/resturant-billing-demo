@@ -656,7 +656,15 @@ class RestaurantStore {
     const order = this.orders.find(o => o.id === orderId);
     if (!order) return;
 
-    order.status = newStatus;
+    if (newStatus === 'served') {
+      if (order.source === 'swiggy' || order.source === 'zomato' || !order.tableId) {
+        order.status = 'completed';
+      } else {
+        order.status = 'served';
+      }
+    } else {
+      order.status = newStatus;
+    }
 
     if (newStatus === 'ready' && order.tableId) {
       const table = this.tables.find(t => t.id === order.tableId);
@@ -665,8 +673,8 @@ class RestaurantStore {
       }
     }
 
-    this.showToast(`Order #${order.orderNumber} status: ${newStatus.toUpperCase()}`, '👨‍🍳');
-    this.notify('ORDER_STATUS_UPDATED', { orderId, newStatus });
+    this.showToast(`Order #${order.orderNumber} ${order.status === 'completed' ? 'Cleared & Completed' : 'Status: ' + order.status.toUpperCase()}`, '👨‍🍳');
+    this.notify('ORDER_STATUS_UPDATED', { orderId, newStatus: order.status });
   }
 
   settleBill(orderId, paymentMethod = 'UPI') {
@@ -1825,7 +1833,7 @@ class App {
   }
 
   renderKitchenDashboard() {
-    const activeOrders = store.orders.filter(o => o.status !== 'paid' && o.status !== 'completed');
+    const activeOrders = store.orders.filter(o => o.status !== 'paid' && o.status !== 'served' && o.status !== 'completed');
 
     this.container.innerHTML = `
       <div class="view-container">
@@ -1887,7 +1895,7 @@ class App {
                   </button>
                 ` : `
                   <button class="kds-action-btn" style="background:#059669; color:#FFF;" onclick="window.store.updateOrderStatus('${o.id}', 'served')">
-                    Order Served (Clear)
+                    ✓ Clear Ticket (Order Fulfilled)
                   </button>
                 `}
               </div>

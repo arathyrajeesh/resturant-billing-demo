@@ -337,7 +337,15 @@ class RestaurantStore {
     const order = this.orders.find(o => o.id === orderId);
     if (!order) return;
 
-    order.status = newStatus;
+    if (newStatus === 'served') {
+      if (order.source === 'swiggy' || order.source === 'zomato' || !order.tableId) {
+        order.status = 'completed';
+      } else {
+        order.status = 'served';
+      }
+    } else {
+      order.status = newStatus;
+    }
 
     if (newStatus === 'ready' && order.tableId) {
       const table = this.tables.find(t => t.id === order.tableId);
@@ -346,8 +354,8 @@ class RestaurantStore {
       }
     }
 
-    this.showToast(`Order #${order.orderNumber} status: ${newStatus.toUpperCase()}`, '👨‍🍳');
-    this.notify('ORDER_STATUS_UPDATED', { orderId, newStatus });
+    this.showToast(`Order #${order.orderNumber} ${order.status === 'completed' ? 'Cleared & Completed' : 'Status: ' + order.status.toUpperCase()}`, '👨‍🍳');
+    this.notify('ORDER_STATUS_UPDATED', { orderId, newStatus: order.status });
   }
 
   settleBill(orderId, paymentMethod = 'UPI') {
