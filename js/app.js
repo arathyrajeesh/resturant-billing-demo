@@ -30,7 +30,9 @@ class App {
     const urlParams = new URLSearchParams(window.location.search);
     const tableParam = urlParams.get('table');
     if (tableParam) {
-      store.setView('customer', { tableId: Number(tableParam) });
+      const tId = Number(tableParam);
+      store.login('customer', `Customer (Table ${tId})`);
+      store.setView('customer', { tableId: tId });
     }
 
     // Auto-poll localStorage every 1.5 seconds for instant multi-window/device state sync
@@ -84,7 +86,18 @@ class App {
 
   render() {
     const mainContent = document.querySelector('.app-main-content');
-    if (store.activeView === 'login' || !store.currentUser.isLoggedIn) {
+    if (store.activeView === 'customer') {
+      this.sidebar.style.display = 'none';
+      this.topHeader.style.display = 'flex';
+      if (mainContent) {
+        mainContent.style.marginLeft = '0';
+        mainContent.style.width = '100%';
+      }
+      this.closeMobileSidebar();
+      this.renderTopHeader();
+      this.renderToasts();
+      this.renderCustomerWebPortal();
+    } else if (store.activeView === 'login' || !store.currentUser || !store.currentUser.isLoggedIn) {
       this.sidebar.style.display = 'none';
       this.topHeader.style.display = 'none';
       if (mainContent) {

@@ -183,6 +183,13 @@ class RestaurantStore {
     if (params.tableId) {
       this.customerTableId = params.tableId;
     }
+    if (viewName === 'customer' && (!this.currentUser || !this.currentUser.isLoggedIn)) {
+      this.currentUser = {
+        name: `Customer (Table ${this.customerTableId})`,
+        role: 'customer',
+        isLoggedIn: true
+      };
+    }
     this.notify('VIEW_CHANGED', { viewName, params });
   }
 
