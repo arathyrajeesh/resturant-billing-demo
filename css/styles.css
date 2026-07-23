@@ -909,14 +909,28 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Thermal Billing Receipt Preview */
 .receipt-paper {
-  background: #FFFFFF;
-  color: #000000;
+  background: #FFFFFF !important;
+  color: #000000 !important;
   width: 320px;
   padding: 20px 16px;
   border-radius: var(--radius-sm);
   font-family: 'Courier New', Courier, monospace;
   box-shadow: var(--shadow-md);
   margin: 0 auto;
+}
+
+.receipt-paper h1,
+.receipt-paper h2,
+.receipt-paper h3,
+.receipt-paper h4,
+.receipt-paper h5,
+.receipt-paper h6,
+.receipt-paper p,
+.receipt-paper span,
+.receipt-paper div,
+.receipt-paper td,
+.receipt-paper th {
+  color: #000000 !important;
 }
 
 .receipt-header {
@@ -1245,5 +1259,122 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.1;
   }
 }
+
+/* ================= ENHANCED MOBILE RESPONSIVE RULES ================= */
+@media (max-width: 900px) {
+  .dashboard-grid-2col,
+  .web-pos-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .web-pos-cart-panel {
+    position: relative;
+    top: 0;
+    margin-top: 16px;
+  }
+
+  /* Cashier billing & receipt container collapse */
+  div[style*="grid-template-columns: 340px 1fr"],
+  div[style*="grid-template-columns: 1fr 340px"] {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .owner-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .owner-banner > div:last-child {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .header-right-actions {
+    gap: 6px;
+    overflow-x: auto;
+    max-width: 100%;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .btn-enterprise, .btn-primary {
+    padding: 8px 10px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 600px) {
+  .top-header {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .header-search {
+    max-width: 110px;
+  }
+
+  .header-search input {
+    padding: 6px 10px 6px 28px;
+    font-size: 11px;
+  }
+
+  .view-container {
+    padding: 10px 8px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .metric-card {
+    padding: 10px;
+  }
+
+  .metric-val {
+    font-size: 16px;
+  }
+
+  .web-menu-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .table-card-std {
+    padding: 8px 4px;
+  }
+
+  .table-title {
+    font-size: 15px;
+  }
+
+  .receipt-paper {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 14px 10px !important;
+  }
+
+  .modal-card {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    padding: 16px 12px !important;
+    margin: 8px auto !important;
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+
+  .kds-card {
+    padding: 12px;
+  }
+
+  .kds-table-badge {
+    font-size: 13px;
+    padding: 3px 8px;
+  }
+}
+
 
 

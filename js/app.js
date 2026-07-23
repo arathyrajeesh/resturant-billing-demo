@@ -316,10 +316,10 @@ class App {
           <span class="btn-text">Customer Portal</span>
         </button>
 
-        <button class="btn-enterprise" style="color:var(--swiggy-orange);" onclick="window.store.simulateOnlineOrder('swiggy')">
+        <button class="btn-enterprise" style="color:var(--swiggy-orange);" onclick="window.app.openOnlineOrderModal('swiggy')">
           <span class="btn-text">+ Swiggy</span>
         </button>
-        <button class="btn-enterprise" style="color:var(--zomato-red);" onclick="window.store.simulateOnlineOrder('zomato')">
+        <button class="btn-enterprise" style="color:var(--zomato-red);" onclick="window.app.openOnlineOrderModal('zomato')">
           <span class="btn-text">+ Zomato</span>
         </button>
 
@@ -1777,6 +1777,98 @@ class App {
     } else {
       this.openStaffOrderForTable(tableId);
     }
+  }
+
+  openOnlineOrderModal(aggregator = 'swiggy') {
+    const isSwiggy = aggregator === 'swiggy';
+    const brandColor = isSwiggy ? '#FC8019' : '#CB202D';
+    const brandName = isSwiggy ? 'Swiggy Delivery' : 'Zomato Delivery';
+
+    const modalHtml = `
+      <div class="modal-overlay" id="online-order-modal">
+        <div class="modal-card" style="max-width:520px; border-top: 5px solid ${brandColor};">
+          <button class="modal-close" onclick="document.getElementById('online-order-modal').remove()">✕</button>
+          
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+            <div style="background:${brandColor}; color:#FFF; padding:6px 12px; border-radius:8px; font-weight:800; font-size:14px;">
+              ${isSwiggy ? '🛵 SWIGGY' : '🍕 ZOMATO'}
+            </div>
+            <div>
+              <h3 style="font-size:18px; margin:0;">${brandName} Order Relay</h3>
+              <p style="font-size:11px; color:var(--text-muted); margin:0;">Live Online Aggregator Order Simulation & API Webhook Integration</p>
+            </div>
+          </div>
+
+          <form onsubmit="window.app.handleOnlineOrderSubmit(event, '${aggregator}')">
+            <div class="form-group-std">
+              <label>Customer Name & Delivery Address</label>
+              <input type="text" id="online-cust-name" value="${isSwiggy ? 'Rahul Nair (Beach Road, Flat 4B)' : 'Priya Menon (Kadavanthra, Block C)'}" required />
+            </div>
+
+            <div class="form-group-std">
+              <label>Select Primary Dish</label>
+              <select id="online-item-1">
+                ${store.menu.map(m => `<option value="${m.id}">${m.name} - ₹${m.price}</option>`).join('')}
+              </select>
+            </div>
+
+            <div class="form-group-std">
+              <label>Select Beverage / Side Dish</label>
+              <select id="online-item-2">
+                ${store.menu.filter(m => m.category === 'beverages' || m.category === 'desserts' || m.category === 'starters').map(m => `<option value="${m.id}">${m.name} - ₹${m.price}</option>`).join('')}
+              </select>
+            </div>
+
+            <div style="background:var(--bg-main); border:1px solid var(--surface-border); padding:10px; border-radius:8px; margin-bottom:14px; font-size:12px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                <span>Payment Status:</span>
+                <strong style="color:var(--success);">✅ Paid Online (${isSwiggy ? 'Swiggy Pay' : 'Zomato UPI'})</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between;">
+                <span>Routing Target:</span>
+                <strong style="color:var(--primary);">👨‍🍳 Direct to KDS Cooking Queue</strong>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+              <button type="button" class="btn-enterprise" style="flex:1; justify-content:center;" onclick="window.store.simulateOnlineOrder('${aggregator}'); document.getElementById('online-order-modal').remove();">
+                ⚡ Quick Random Order
+              </button>
+              <button type="submit" class="btn-primary" style="flex:1.2; justify-content:center; background:${brandColor}; color:#FFF;">
+                🚀 Dispatch ${isSwiggy ? 'Swiggy' : 'Zomato'} Ticket
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  }
+
+  handleOnlineOrderSubmit(e, aggregator) {
+    e.preventDefault();
+    const isSwiggy = aggregator === 'swiggy';
+    const custName = document.getElementById('online-cust-name').value;
+    const item1Id = document.getElementById('online-item-1').value;
+    const item2Id = document.getElementById('online-item-2').value;
+
+    const item1 = store.menu.find(m => m.id === item1Id);
+    const item2 = store.menu.find(m => m.id === item2Id);
+
+    const items = [];
+    if (item1) items.push({ itemId: item1.id, name: item1.name, price: item1.price, quantity: 1, notes: 'Online Delivery' });
+    if (item2) items.push({ itemId: item2.id, name: item2.name, price: item2.price, quantity: 1, notes: '' });
+
+    store.createOrder({
+      tableId: null,
+      source: isSwiggy ? 'swiggy' : 'zomato',
+      customerName: `${custName} (${isSwiggy ? 'Swiggy' : 'Zomato'})`,
+      items
+    });
+
+    const modal = document.getElementById('online-order-modal');
+    if (modal) modal.remove();
   }
 
   openQRModal(tableId) {
