@@ -32,12 +32,21 @@ class RestaurantStore {
 
     this.nextOrderNumber = this.orders.reduce((max, o) => Math.max(max, o.orderNumber || 1000), 1000) + 1;
 
-    // Listen to cross-tab broadcasts
+    // Listen to cross-tab broadcasts & browser storage updates
     this.channel.onmessage = (event) => {
       if (event.data && event.data.type) {
         this.handleRemoteAction(event.data);
       }
     };
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'malabar_orders' || e.key === 'malabar_tables' || e.key === 'malabar_menu') {
+        this.tables = this.load('malabar_tables', this.tables);
+        this.orders = this.load('malabar_orders', this.orders);
+        this.menu = this.load('malabar_menu', this.menu);
+        this.listeners.forEach((listener) => listener(this));
+      }
+    });
   }
 
   load(key, fallback) {

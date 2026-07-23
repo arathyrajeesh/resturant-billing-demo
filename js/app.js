@@ -844,7 +844,12 @@ class App {
         </div>
 
         <div class="kds-grid">
-          ${activeOrders.length === 0 ? '<div class="panel-card" style="text-align:center; padding:60px; grid-column:1/-1;"><p style="color:var(--text-muted); font-size:16px;">🎉 Kitchen Queue Clean! All orders fulfilled.</p></div>' : ''}
+          ${activeOrders.length === 0 ? `
+            <div class="panel-card" style="text-align:center; padding:50px 20px; grid-column:1/-1;">
+              <p style="color:var(--text-muted); font-size:16px; margin-bottom:14px;">🎉 Kitchen Queue Clean! All orders fulfilled.</p>
+              <button class="btn-primary" style="margin:0 auto; display:inline-flex;" onclick="window.store.resetDemoData()">🔄 Load Sample Live Orders into Kitchen Queue</button>
+            </div>
+          ` : ''}
           ${activeOrders.map(o => `
             <div class="kds-card ${o.status}">
               <div>
