@@ -227,7 +227,7 @@ class RestaurantStore {
     const tableNumber = table ? table.number : (source === 'swiggy' ? 'ONLINE-SWIGGY' : 'ONLINE-ZOMATO');
 
     // Check if active unpaid order exists for this table
-    let existingOrder = table ? this.orders.find(o => o.tableId === table.id && o.paymentStatus === 'unpaid' && o.status !== 'completed' && o.status !== 'served') : null;
+    let existingOrder = table ? this.orders.find(o => o.tableId === table.id && o.paymentStatus === 'unpaid' && o.status !== 'completed') : null;
 
     if (existingOrder) {
       items.forEach(newItem => {
@@ -242,12 +242,17 @@ class RestaurantStore {
       existingOrder.subtotal = existingOrder.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       existingOrder.tax = Math.round(existingOrder.subtotal * 0.05 * 100) / 100;
       existingOrder.total = existingOrder.subtotal + existingOrder.tax;
-      if (existingOrder.status === 'ready' || existingOrder.status === 'served') {
-        existingOrder.status = 'preparing';
+      existingOrder.status = 'placed'; // Reset status to 'placed' so KDS immediately displays ticket to Kitchen!
+      existingOrder.hasNewItems = true;
+      existingOrder.updatedAt = new Date().toISOString();
+
+      if (table) {
+        table.status = 'occupied';
+        table.currentOrderId = existingOrder.id;
       }
 
       soundEffects.playNewOrderChime();
-      this.showToast(`Added ${items.length} new item(s) to Table ${tableNumber} Order #${existingOrder.orderNumber}!`, '🚀');
+      this.showToast(`Order #${existingOrder.orderNumber} (Table ${tableNumber}) updated & dispatched to Kitchen!`, '🚀');
       this.notify('NEW_ORDER', existingOrder);
       return existingOrder;
     }
@@ -269,6 +274,7 @@ class RestaurantStore {
       tax,
       total,
       status: 'placed',
+      hasNewItems: false,
       timestamp: new Date().toISOString(),
       elapsedMins: 0,
       paymentStatus: (source === 'swiggy' || source === 'zomato') ? 'paid-online' : 'unpaid',
@@ -287,6 +293,44 @@ class RestaurantStore {
     this.showToast(`Order #${newOrder.orderNumber} dispatched to Kitchen & Billing!`, '🚀');
     this.notify('NEW_ORDER', newOrder);
     return newOrder;
+  }
+
+  updateOrderItems(orderId, updatedItems) {
+    const order = this.orders.find(o => o.id === orderId);
+    if (!order) return;
+
+    if (!updatedItems || updatedItems.length === 0) {
+      if (order.tableId) {
+        const table = this.tables.find(t => t.id === order.tableId);
+        if (table) {
+          table.status = 'available';
+          table.currentOrderId = null;
+        }
+      }
+      this.orders = this.orders.filter(o => o.id !== orderId);
+      this.showToast(`Order #${order.orderNumber} cleared.`, '🗑️');
+      this.notify('ORDER_DELETED', orderId);
+      return;
+    }
+
+    order.items = [...updatedItems];
+    order.subtotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    order.tax = Math.round(order.subtotal * 0.05 * 100) / 100;
+    order.total = order.subtotal + order.tax;
+    order.status = 'placed'; // Reset status to placed for kitchen to cook updated items
+    order.hasNewItems = true;
+    order.updatedAt = new Date().toISOString();
+
+    if (order.tableId) {
+      const table = this.tables.find(t => t.id === order.tableId);
+      if (table) {
+        table.status = 'occupied';
+      }
+    }
+
+    soundEffects.playNewOrderChime();
+    this.showToast(`Order #${order.orderNumber} updated and dispatched to Kitchen!`, '✏️');
+    this.notify('ORDER_UPDATED', order);
   }
 
   updateOrderStatus(orderId, newStatus) {

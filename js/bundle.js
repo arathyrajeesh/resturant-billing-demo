@@ -546,7 +546,7 @@ class RestaurantStore {
     const table = tableId ? this.tables.find(t => t.id === Number(tableId)) : null;
     const tableNumber = table ? table.number : (source === 'swiggy' ? 'ONLINE-SWIGGY' : 'ONLINE-ZOMATO');
 
-    let existingOrder = table ? this.orders.find(o => o.tableId === table.id && o.paymentStatus === 'unpaid' && o.status !== 'completed' && o.status !== 'served') : null;
+    let existingOrder = table ? this.orders.find(o => o.tableId === table.id && o.paymentStatus === 'unpaid' && o.status !== 'completed') : null;
 
     if (existingOrder) {
       items.forEach(newItem => {
@@ -561,12 +561,17 @@ class RestaurantStore {
       existingOrder.subtotal = existingOrder.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       existingOrder.tax = Math.round(existingOrder.subtotal * 0.05 * 100) / 100;
       existingOrder.total = existingOrder.subtotal + existingOrder.tax;
-      if (existingOrder.status === 'ready' || existingOrder.status === 'served') {
-        existingOrder.status = 'preparing';
+      existingOrder.status = 'placed'; // Reset status to 'placed' so KDS immediately displays ticket to Kitchen!
+      existingOrder.hasNewItems = true;
+      existingOrder.updatedAt = new Date().toISOString();
+
+      if (table) {
+        table.status = 'occupied';
+        table.currentOrderId = existingOrder.id;
       }
 
       soundEffects.playNewOrderChime();
-      this.showToast(`Added ${items.length} new item(s) to Table ${tableNumber} Order #${existingOrder.orderNumber}!`, '🚀');
+      this.showToast(`Order #${existingOrder.orderNumber} (Table ${tableNumber}) updated & dispatched to Kitchen!`, '🚀');
       this.notify('NEW_ORDER', existingOrder);
       return existingOrder;
     }
@@ -588,6 +593,7 @@ class RestaurantStore {
       tax,
       total,
       status: 'placed',
+      hasNewItems: false,
       timestamp: new Date().toISOString(),
       elapsedMins: 0,
       paymentStatus: (source === 'swiggy' || source === 'zomato') ? 'paid-online' : 'unpaid',
@@ -606,6 +612,44 @@ class RestaurantStore {
     this.showToast(`Order #${newOrder.orderNumber} dispatched to Kitchen & Billing!`, '🚀');
     this.notify('NEW_ORDER', newOrder);
     return newOrder;
+  }
+
+  updateOrderItems(orderId, updatedItems) {
+    const order = this.orders.find(o => o.id === orderId);
+    if (!order) return;
+
+    if (!updatedItems || updatedItems.length === 0) {
+      if (order.tableId) {
+        const table = this.tables.find(t => t.id === order.tableId);
+        if (table) {
+          table.status = 'available';
+          table.currentOrderId = null;
+        }
+      }
+      this.orders = this.orders.filter(o => o.id !== orderId);
+      this.showToast(`Order #${order.orderNumber} cleared.`, '🗑️');
+      this.notify('ORDER_DELETED', orderId);
+      return;
+    }
+
+    order.items = [...updatedItems];
+    order.subtotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    order.tax = Math.round(order.subtotal * 0.05 * 100) / 100;
+    order.total = order.subtotal + order.tax;
+    order.status = 'placed'; // Reset status to placed for kitchen to cook updated items
+    order.hasNewItems = true;
+    order.updatedAt = new Date().toISOString();
+
+    if (order.tableId) {
+      const table = this.tables.find(t => t.id === order.tableId);
+      if (table) {
+        table.status = 'occupied';
+      }
+    }
+
+    soundEffects.playNewOrderChime();
+    this.showToast(`Order #${order.orderNumber} updated and dispatched to Kitchen!`, '✏️');
+    this.notify('ORDER_UPDATED', order);
   }
 
   updateOrderStatus(orderId, newStatus) {
@@ -1500,13 +1544,31 @@ class App {
               <div>
                 <div style="padding-bottom:14px; border-bottom:1px solid var(--surface-border); margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;">
                   <h3>Current Order</h3>
-                  <select id="staff-table-select" style="background:var(--primary); color:#fff; border:none; padding:7px 12px; border-radius:8px; font-weight:800;" onchange="window.app.staffSelectedTable = Number(this.value)">
+                  <select id="staff-table-select" style="background:var(--primary); color:#fff; border:none; padding:7px 12px; border-radius:8px; font-weight:800;" onchange="window.app.staffSelectedTable = Number(this.value); window.app.render();">
                     ${store.tables.map(t => `<option value="${t.id}" ${t.id === this.staffSelectedTable ? 'selected' : ''}>Table ${t.number}</option>`).join('')}
                   </select>
                 </div>
 
+                ${(() => {
+                  const activeTableOrder = store.orders.find(o => o.tableId === this.staffSelectedTable && o.paymentStatus === 'unpaid' && o.status !== 'completed');
+                  if (!activeTableOrder) return '';
+                  return `
+                    <div style="background:var(--primary-light); border:1px solid var(--primary); padding:10px 12px; border-radius:10px; margin-bottom:12px;">
+                      <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                          <strong style="font-size:12px; color:var(--primary); display:block;">Active Running Order #${activeTableOrder.orderNumber}</strong>
+                          <span style="font-size:11px; color:var(--text-muted);">${activeTableOrder.items.length} items in kitchen • ₹${activeTableOrder.total}</span>
+                        </div>
+                        <button class="btn-enterprise" style="padding:4px 8px; font-size:11px; font-weight:800; color:var(--primary); border-color:var(--primary);" onclick="window.app.openEditOrderModal('${activeTableOrder.id}')">
+                          ✏️ Edit Order
+                        </button>
+                      </div>
+                    </div>
+                  `;
+                })()}
+
                 <div class="orders-list" style="max-height:300px; overflow-y:auto;">
-                  ${this.staffCart.length === 0 ? '<p style="color:var(--text-muted); font-size:13px; text-align:center; padding:40px 0;">Cart is empty.</p>' : ''}
+                  ${this.staffCart.length === 0 ? '<p style="color:var(--text-muted); font-size:13px; text-align:center; padding:30px 0;">Cart is empty.<br/><span style="font-size:11px;">Select dishes from menu to add to table order.</span></p>' : ''}
                   ${this.staffCart.map(item => `
                     <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--surface-border);">
                       <div>
@@ -1541,7 +1603,7 @@ class App {
                 </div>
 
                 <button class="btn-primary" style="width:100%; justify-content:center; padding:11px;" onclick="window.app.submitStaffOrder()">
-                  Dispatch Order to Kitchen
+                  🚀 Dispatch Order to Kitchen
                 </button>
               </div>
             </div>
@@ -1557,16 +1619,24 @@ class App {
             </div>
 
             <div class="tables-floor-grid">
-              ${store.tables.map(t => `
-                <div class="table-card-std ${t.status}">
-                  <div class="table-title">${t.number}</div>
-                  <div style="font-size:12px; color:var(--text-muted); font-weight:600;">${t.seats} Seats</div>
-                  <span class="status-tag ${t.status === 'available' ? 'tag-available' : t.status === 'occupied' ? 'tag-occupied' : 'tag-bill'}">
-                    ${t.status.toUpperCase()}
-                  </span>
-                  <button class="table-qr-btn" onclick="window.app.openStaffOrderForTable(${t.id})">Take Order</button>
-                </div>
-              `).join('')}
+              ${store.tables.map(t => {
+                const tableOrder = store.orders.find(o => o.tableId === t.id && o.paymentStatus === 'unpaid' && o.status !== 'completed');
+                return `
+                  <div class="table-card-std ${t.status}">
+                    <div class="table-title">${t.number}</div>
+                    <div style="font-size:12px; color:var(--text-muted); font-weight:600;">${t.seats} Seats</div>
+                    <span class="status-tag ${t.status === 'available' ? 'tag-available' : t.status === 'occupied' ? 'tag-occupied' : 'tag-bill'}">
+                      ${t.status.toUpperCase()}
+                    </span>
+                    <div style="display:flex; flex-direction:column; gap:4px; width:100%; margin-top:8px;">
+                      <button class="table-qr-btn" onclick="window.app.openStaffOrderForTable(${t.id})">➕ ${tableOrder ? 'Add Items' : 'Take Order'}</button>
+                      ${tableOrder ? `
+                        <button class="table-qr-btn" style="background:var(--blue); color:#FFF;" onclick="window.app.openEditOrderModal('${tableOrder.id}')">✏️ Edit Order</button>
+                      ` : ''}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
             </div>
           </div>
         ` : `
@@ -1579,18 +1649,22 @@ class App {
                   <div class="order-card ${o.source} ${selectedOrder && selectedOrder.id === o.id ? 'dine-in' : ''}" 
                        style="cursor:pointer;"
                        onclick="window.app.selectBillingOrder('${o.id}')">
-                    <div>
-                      <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
-                        <h4 style="font-size:14px;">Table ${o.tableNumber}</h4>
-                        <span class="source-tag ${o.source === 'qr-customer' ? 'tag-qr-customer' : o.source === 'swiggy' ? 'tag-swiggy' : o.source === 'zomato' ? 'tag-zomato' : 'tag-dinein'}">
-                          ${o.source === 'qr-customer' ? 'QR Self-Order' : o.source === 'swiggy' ? 'Swiggy' : o.source === 'zomato' ? 'Zomato' : 'Staff POS'}
-                        </span>
+                    <div style="width:100%;">
+                      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2px;">
+                        <div style="display:flex; align-items:center; gap:6px;">
+                          <h4 style="font-size:14px;">Table ${o.tableNumber}</h4>
+                          <span class="source-tag ${o.source === 'qr-customer' ? 'tag-qr-customer' : o.source === 'swiggy' ? 'tag-swiggy' : o.source === 'zomato' ? 'tag-zomato' : 'tag-dinein'}">
+                            ${o.source === 'qr-customer' ? 'QR Self-Order' : o.source === 'swiggy' ? 'Swiggy' : o.source === 'zomato' ? 'Zomato' : 'Staff POS'}
+                          </span>
+                        </div>
+                        <button class="btn-enterprise" style="padding:2px 8px; font-size:11px; color:var(--primary); border-color:var(--primary);" onclick="event.stopPropagation(); window.app.openEditOrderModal('${o.id}')">
+                          ✏️ Edit
+                        </button>
                       </div>
-                      <p style="font-size:11px; color:var(--text-muted);">${o.items.length} items • #${o.orderNumber}</p>
-                    </div>
-                    <div style="text-align:right;">
-                      <div style="font-weight:800; font-size:15px; color:var(--primary);">₹${o.total}</div>
-                      <span class="status-tag tag-bill">${o.status}</span>
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                        <p style="font-size:11px; color:var(--text-muted);">${o.items.length} items • #${o.orderNumber}</p>
+                        <div style="font-weight:800; font-size:15px; color:var(--primary);">₹${o.total}</div>
+                      </div>
                     </div>
                   </div>
                 `).join('')}
@@ -1648,7 +1722,12 @@ class App {
                   </div>
 
                   <div class="panel-card">
-                    <h3 style="font-size:15px; margin-bottom:14px;">Settle Payment</h3>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                      <h3 style="font-size:15px;">Settle Payment</h3>
+                      <button class="btn-enterprise" style="padding:4px 8px; font-size:11px; color:var(--primary); border-color:var(--primary);" onclick="window.app.openEditOrderModal('${selectedOrder.id}')">
+                        ✏️ Edit Items
+                      </button>
+                    </div>
                     
                     <div style="margin-bottom:16px;">
                       <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:6px;">Select Payment Method:</label>
@@ -1746,7 +1825,7 @@ class App {
   }
 
   renderKitchenDashboard() {
-    const activeOrders = store.orders.filter(o => o.status !== 'paid' && o.status !== 'served' && o.status !== 'completed');
+    const activeOrders = store.orders.filter(o => o.status !== 'paid' && o.status !== 'completed');
 
     this.container.innerHTML = `
       <div class="view-container">
@@ -1780,6 +1859,7 @@ class App {
                     <span class="source-tag ${o.source === 'qr-customer' ? 'tag-qr-customer' : o.source === 'swiggy' ? 'tag-swiggy' : o.source === 'zomato' ? 'tag-zomato' : 'tag-dinein'}">
                       ${o.source === 'qr-customer' ? 'QR Self-Order' : o.source === 'swiggy' ? 'Swiggy' : o.source === 'zomato' ? 'Zomato' : 'Staff POS'}
                     </span>
+                    ${o.hasNewItems ? `<span class="status-tag tag-occupied" style="background:#EF4444; color:#FFF; font-weight:800;">🔥 NEW ITEMS ADDED</span>` : ''}
                   </div>
                   <div class="kds-timer">#${o.orderNumber}</div>
                 </div>
@@ -2089,6 +2169,129 @@ class App {
 
     this.customerCart = [];
     this.render();
+  }
+
+  openEditOrderModal(orderId) {
+    const order = store.orders.find(o => o.id === orderId);
+    if (!order) return;
+
+    let tempItems = JSON.parse(JSON.stringify(order.items));
+    window.app._currentEditTempItems = tempItems;
+    window.app._currentEditOrderId = orderId;
+
+    const modalHtml = `
+      <div class="modal-overlay" id="edit-order-modal">
+        <div class="modal-card" style="max-width:520px;">
+          <button class="modal-close" onclick="document.getElementById('edit-order-modal').remove()">✕</button>
+          <h3 style="font-size:20px; margin-bottom:4px;">✏️ Edit Order #${order.orderNumber} (${order.tableNumber})</h3>
+          <p style="color:var(--text-muted); font-size:12px; margin-bottom:14px;">Modify quantities, remove items, or add new dishes to this table's order</p>
+          <div id="edit-order-modal-content"></div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    this.refreshEditModalDOM();
+  }
+
+  adjustEditItemQty(idx, delta) {
+    if (!window.app._currentEditTempItems) return;
+    const item = window.app._currentEditTempItems[idx];
+    if (!item) return;
+    item.quantity += delta;
+    if (item.quantity <= 0) {
+      window.app._currentEditTempItems.splice(idx, 1);
+    }
+    this.refreshEditModalDOM();
+  }
+
+  removeEditItem(idx) {
+    if (!window.app._currentEditTempItems) return;
+    window.app._currentEditTempItems.splice(idx, 1);
+    this.refreshEditModalDOM();
+  }
+
+  refreshEditModalDOM() {
+    const modalEl = document.getElementById('edit-order-modal-content');
+    if (!modalEl) return;
+    const tempItems = window.app._currentEditTempItems || [];
+    const subtotal = tempItems.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+    const tax = Math.round(subtotal * 0.05 * 100) / 100;
+    const total = subtotal + tax;
+
+    modalEl.innerHTML = `
+      <div style="max-height:300px; overflow-y:auto; margin-bottom:14px; border-bottom:1px solid var(--surface-border); padding-bottom:10px;">
+        ${tempItems.length === 0 ? '<p style="color:var(--text-muted); text-align:center; padding:20px 0;">No items in order.</p>' : ''}
+        ${tempItems.map((item, idx) => `
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--surface-border);">
+            <div>
+              <strong style="font-size:13px; display:block;">${item.name}</strong>
+              <span style="font-size:11px; color:var(--text-muted);">₹${item.price} each</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div class="counter-stepper">
+                <button class="counter-btn-std" onclick="window.app.adjustEditItemQty(${idx}, -1)">-</button>
+                <span style="font-weight:800; padding:0 8px;">${item.quantity}</span>
+                <button class="counter-btn-std" onclick="window.app.adjustEditItemQty(${idx}, 1)">+</button>
+              </div>
+              <strong style="font-size:14px; min-width:55px; text-align:right;">₹${item.price * item.quantity}</strong>
+              <button class="btn-enterprise" style="padding:2px 6px; color:var(--danger); border-color:var(--danger);" onclick="window.app.removeEditItem(${idx})">🗑️</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px; color:var(--text-muted);">
+        <span>Subtotal</span>
+        <span>₹${subtotal}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:10px; color:var(--text-muted);">
+        <span>GST (5%)</span>
+        <span>₹${tax}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:800; color:var(--primary); margin-bottom:16px;">
+        <span>Total Amount</span>
+        <span>₹${total}</span>
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-enterprise" style="flex:1; justify-content:center;" onclick="window.app.addMoreFromMenuForOrder('${window.app._currentEditOrderId}')">
+          ➕ Add More Dishes from Menu
+        </button>
+        <button class="btn-primary" style="flex:1; justify-content:center;" onclick="window.app.saveEditOrder('${window.app._currentEditOrderId}')">
+          🚀 Save & Dispatch to Kitchen
+        </button>
+      </div>
+    `;
+  }
+
+  saveEditOrder(orderId) {
+    const tempItems = window.app._currentEditTempItems || [];
+    store.updateOrderItems(orderId, tempItems);
+    const modal = document.getElementById('edit-order-modal');
+    if (modal) modal.remove();
+    this.render();
+  }
+
+  addMoreFromMenuForOrder(orderId) {
+    const order = store.orders.find(o => o.id === orderId);
+    const modal = document.getElementById('edit-order-modal');
+    if (modal) modal.remove();
+
+    if (order && order.tableId) {
+      this.staffSelectedTable = order.tableId;
+    }
+    this.staffSubTab = 'pos';
+    this.render();
+  }
+
+  openEditOrderModalForTable(tableId) {
+    const order = store.orders.find(o => o.tableId === tableId && o.paymentStatus === 'unpaid' && o.status !== 'completed');
+    if (order) {
+      this.openEditOrderModal(order.id);
+    } else {
+      this.openStaffOrderForTable(tableId);
+    }
   }
 
   openAddMenuModal() {
