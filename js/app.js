@@ -33,6 +33,23 @@ class App {
       store.setView('customer', { tableId: Number(tableParam) });
     }
 
+    // Auto-poll localStorage every 1.5 seconds for instant multi-window/device state sync
+    setInterval(() => {
+      const freshOrders = store.load('malabar_orders', null);
+      if (freshOrders && JSON.stringify(freshOrders) !== JSON.stringify(store.orders)) {
+        store.orders = freshOrders;
+        store.tables = store.load('malabar_tables', store.tables);
+        this.render();
+      }
+    }, 1500);
+
+    this.render();
+  }
+
+  refreshLiveStatus() {
+    store.orders = store.load('malabar_orders', store.orders);
+    store.tables = store.load('malabar_tables', store.tables);
+    store.showToast('Synced latest KDS status!', '🔄');
     this.render();
   }
 
@@ -951,9 +968,14 @@ class App {
                     '😋 Order Served! Enjoy your delicious meal.'}
                 </p>
               </div>
-              <span class="status-tag ${customerOrder.status === 'ready' ? 'tag-available' : customerOrder.status === 'preparing' ? 'tag-bill' : 'tag-occupied'}" style="font-size:12px; padding:6px 12px;">
-                ${customerOrder.status.toUpperCase()}
-              </span>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button class="btn-enterprise" style="padding:4px 8px; font-size:11px; border-color:var(--surface-border);" onclick="window.app.refreshLiveStatus()" title="Refresh Live Status">
+                  🔄 Refresh
+                </button>
+                <span class="status-tag ${customerOrder.status === 'ready' ? 'tag-available' : customerOrder.status === 'preparing' ? 'tag-bill' : 'tag-occupied'}" style="font-size:12px; padding:6px 12px;">
+                  ${customerOrder.status.toUpperCase()}
+                </span>
+              </div>
             </div>
 
             <!-- 4-Step Visual Tracker -->
