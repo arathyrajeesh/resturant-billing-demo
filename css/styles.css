@@ -69,8 +69,30 @@ h1, h2, h3, h4, h5, h6 {
 /* Master Layout */
 .app-layout {
   display: flex;
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Sidebar Backdrop Overlay for Mobile */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 990;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.sidebar-overlay.active {
+  display: block;
+  opacity: 1;
 }
 
 /* Simple Clean Sidebar */
@@ -86,7 +108,8 @@ h1, h2, h3, h4, h5, h6 {
   top: 0;
   bottom: 0;
   left: 0;
-  z-index: 100;
+  z-index: 1000;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar-brand {
@@ -110,6 +133,7 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
   font-size: 20px;
   font-weight: 800;
+  flex-shrink: 0;
 }
 
 .sidebar-brand-info h1 {
@@ -141,7 +165,7 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 9px 12px;
+  padding: 10px 12px;
   border-radius: var(--radius-sm);
   color: var(--text-muted);
   font-size: 13px;
@@ -152,6 +176,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   text-align: left;
   transition: all 0.15s ease;
+  min-height: 40px;
 }
 
 .nav-link:hover {
@@ -183,7 +208,9 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  width: calc(100vw - 240px);
+  width: calc(100% - 240px);
+  max-width: 100%;
+  transition: margin-left 0.25s ease, width 0.25s ease;
 }
 
 /* Top Header Bar */
@@ -191,13 +218,42 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--surface-white);
   border-bottom: 1px solid var(--surface-border);
   height: 60px;
-  padding: 0 24px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 90;
+  gap: 12px;
+}
+
+.mobile-menu-btn {
+  display: none;
+  background: var(--surface-hover);
+  border: 1px solid var(--surface-border);
+  color: var(--text-dark);
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.mobile-menu-btn:hover {
+  background: var(--surface-border);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  max-width: 440px;
 }
 
 .header-search {
@@ -208,7 +264,8 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid var(--surface-border);
   padding: 7px 14px;
   border-radius: var(--radius-md);
-  width: 340px;
+  width: 100%;
+  max-width: 340px;
 }
 
 .header-search input {
@@ -899,3 +956,208 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .modal-close:hover { color: var(--text-dark); }
+
+/* ================= 📱 MOBILE & TABLET RESPONSIVE SYSTEM ================= */
+
+/* Floating Bottom Cart Bar for Mobile POS & Customer view */
+.mobile-cart-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface-white);
+  border-top: 1px solid var(--surface-border);
+  padding: 12px 16px;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+  z-index: 800;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (max-width: 1024px) {
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  .app-sidebar {
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-md);
+  }
+
+  .app-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .app-main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  .web-pos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .web-pos-cart-panel {
+    position: relative;
+    top: 0;
+    min-height: auto;
+    width: 100%;
+  }
+
+  .dashboard-grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .top-header {
+    padding: 0 12px;
+    height: 56px;
+  }
+
+  .header-left {
+    gap: 8px;
+  }
+
+  .header-search {
+    max-width: 200px;
+    padding: 5px 10px;
+  }
+
+  .btn-enterprise span.btn-text {
+    display: none;
+  }
+
+  .view-container {
+    padding: 14px 12px;
+  }
+
+  .owner-banner, .staff-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .owner-banner > div:last-child, .staff-banner > div:last-child {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+  }
+
+  .metric-card {
+    padding: 12px;
+  }
+
+  .metric-val {
+    font-size: 20px;
+  }
+
+  .tables-floor-grid {
+    grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+    gap: 8px;
+  }
+
+  .table-card-std {
+    padding: 10px 6px;
+  }
+
+  .table-title {
+    font-size: 18px;
+  }
+
+  .kds-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .web-menu-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+
+  .web-menu-card {
+    padding: 10px;
+  }
+
+  .web-menu-img {
+    height: 95px;
+  }
+
+  .login-card-std {
+    padding: 20px 16px;
+    margin: 12px;
+  }
+
+  .receipt-paper {
+    width: 100%;
+    max-width: 320px;
+    padding: 16px 12px;
+  }
+
+  .modal-overlay {
+    padding: 12px;
+  }
+
+  .modal-card {
+    padding: 18px 14px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .toast-container {
+    top: 64px;
+    right: 12px;
+    left: 12px;
+  }
+
+  .toast {
+    width: 100%;
+  }
+
+  /* Responsive Tables with horizontal scrolling */
+  .data-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .order-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .order-card > div:last-child {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-search {
+    max-width: 140px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tables-floor-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .web-menu-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+

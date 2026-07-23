@@ -21,6 +21,7 @@ class App {
     this.uploadedImageDataUrl = null;
     this.selectedImagePreset = 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&auto=format&fit=crop&q=80';
     this.staffSubTab = 'pos'; // 'floor', 'pos', 'billing'
+    this.isMobileSidebarOpen = false;
     
     store.subscribe(() => this.render());
 
@@ -34,23 +35,59 @@ class App {
     this.render();
   }
 
+  toggleMobileSidebar() {
+    this.isMobileSidebarOpen = !this.isMobileSidebarOpen;
+    this.updateMobileSidebarDOM();
+  }
+
+  closeMobileSidebar() {
+    this.isMobileSidebarOpen = false;
+    this.updateMobileSidebarDOM();
+  }
+
+  updateMobileSidebarDOM() {
+    let overlay = document.getElementById('sidebar-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'sidebar-overlay';
+      overlay.className = 'sidebar-overlay';
+      overlay.onclick = () => this.closeMobileSidebar();
+      document.body.appendChild(overlay);
+    }
+
+    if (this.isMobileSidebarOpen) {
+      this.sidebar.classList.add('mobile-open');
+      overlay.classList.add('active');
+    } else {
+      this.sidebar.classList.remove('mobile-open');
+      overlay.classList.remove('active');
+    }
+  }
+
   render() {
+    const mainContent = document.querySelector('.app-main-content');
     if (store.activeView === 'login' || !store.currentUser.isLoggedIn) {
       this.sidebar.style.display = 'none';
       this.topHeader.style.display = 'none';
-      document.querySelector('.app-main-content').style.marginLeft = '0';
-      document.querySelector('.app-main-content').style.width = '100vw';
+      if (mainContent) {
+        mainContent.style.marginLeft = '0';
+        mainContent.style.width = '100%';
+      }
+      this.closeMobileSidebar();
       this.renderLoginScreen();
     } else {
       this.sidebar.style.display = 'flex';
       this.topHeader.style.display = 'flex';
-      document.querySelector('.app-main-content').style.marginLeft = '240px';
-      document.querySelector('.app-main-content').style.width = 'calc(100vw - 240px)';
+      if (mainContent) {
+        mainContent.style.marginLeft = '';
+        mainContent.style.width = '';
+      }
       
       this.renderSidebar();
       this.renderTopHeader();
       this.renderToasts();
       this.renderActiveView();
+      this.updateMobileSidebarDOM();
     }
   }
 
@@ -205,39 +242,41 @@ class App {
   // ================= 🔝 TOP HEADER =================
   renderTopHeader() {
     this.topHeader.innerHTML = `
-      <div class="header-search">
-        <span>🔍</span>
-        <input type="text" placeholder="Search orders, dishes, table numbers..." value="${store.searchQuery}" oninput="window.store.setSearchQuery(this.value)" />
+      <div class="header-left">
+        <button class="mobile-menu-btn" onclick="window.app.toggleMobileSidebar()" aria-label="Toggle Navigation Menu">
+          ☰
+        </button>
+        <div class="header-search">
+          <span>🔍</span>
+          <input type="text" placeholder="Search orders, dishes, table numbers..." value="${store.searchQuery}" oninput="window.store.setSearchQuery(this.value)" />
+        </div>
       </div>
 
       <div class="header-right-actions">
         <button class="btn-enterprise" style="color:var(--primary); border-color:var(--primary);" onclick="window.app.switchView('customer')">
-          <span>🤳</span> View Customer Portal
+          <span>🤳</span> <span class="btn-text">Customer Portal</span>
         </button>
 
         <button class="btn-enterprise" style="color:var(--swiggy-orange);" onclick="window.store.simulateOnlineOrder('swiggy')">
-          <span>🛵</span> + Swiggy
+          <span>🛵</span> <span class="btn-text">+ Swiggy</span>
         </button>
         <button class="btn-enterprise" style="color:var(--zomato-red);" onclick="window.store.simulateOnlineOrder('zomato')">
-          <span>🔴</span> + Zomato
+          <span>🔴</span> <span class="btn-text">+ Zomato</span>
         </button>
 
         <button class="btn-enterprise" title="Toggle Theme" onclick="window.store.toggleTheme()">
-          ${store.theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
-        </button>
-
-        <button class="btn-enterprise" title="Reset Demo Data" onclick="window.store.resetDemoData()">
-          🔄 Reset
+          ${store.theme === 'dark' ? '☀️' : '🌙'}
         </button>
 
         <button class="btn-enterprise" style="color:var(--danger); border-color:var(--danger); font-weight:700;" onclick="window.store.logout()">
-          🔒 Logout
+          🔒
         </button>
       </div>
     `;
   }
 
   switchView(viewId) {
+    this.closeMobileSidebar();
     store.setView(viewId);
   }
 
