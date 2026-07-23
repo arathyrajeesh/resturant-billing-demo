@@ -819,6 +819,7 @@ class App {
     this.selectedPaymentMethod = 'UPI';
     this.uploadedImageDataUrl = null;
     this.selectedImagePreset = 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&auto=format&fit=crop&q=80';
+    this.uploadedReceiptLogoUrl = null;
     this.staffSubTab = 'pos';
     this.isMobileSidebarOpen = false;
     this.customerCart = [];
@@ -1307,8 +1308,21 @@ class App {
                 </div>
 
                 <div class="form-group-std">
-                  <label>Logo Image URL (Optional)</label>
-                  <input type="url" id="rc-logo-url" value="${store.receiptSettings.logoUrl || ''}" placeholder="https://example.com/logo.png" />
+                  <label>Logo Image (Upload File from System or Paste URL)</label>
+                  
+                  <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                    <input type="file" id="rc-logo-file-input" accept="image/*" style="display:none;" onchange="window.app.handleReceiptLogoUpload(event)" />
+                    <button type="button" class="btn-enterprise" style="flex:1; justify-content:center;" onclick="document.getElementById('rc-logo-file-input').click()">
+                      📁 Browse & Upload Logo File...
+                    </button>
+                  </div>
+
+                  <div id="rc-logo-upload-preview" style="${store.receiptSettings.logoUrl ? 'display:block;' : 'display:none;'} margin-bottom:8px; text-align:center;">
+                    <img id="rc-logo-preview-img" src="${store.receiptSettings.logoUrl || ''}" style="max-height:80px; border-radius:6px; border:2px solid var(--primary); object-fit:contain; background:#fff; padding:4px;" alt="Logo Preview" />
+                    <p style="font-size:11px; color:var(--success); font-weight:700; margin-top:2px;">✅ Receipt Logo Active!</p>
+                  </div>
+
+                  <input type="url" id="rc-logo-url" value="${store.receiptSettings.logoUrl || ''}" placeholder="Or paste image URL" />
                 </div>
 
                 <div class="form-group-std">
@@ -1365,6 +1379,26 @@ class App {
     `;
   }
 
+  handleReceiptLogoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.uploadedReceiptLogoUrl = e.target.result;
+      const urlInput = document.getElementById('rc-logo-url');
+      if (urlInput) urlInput.value = this.uploadedReceiptLogoUrl;
+
+      const previewBox = document.getElementById('rc-logo-upload-preview');
+      const previewImgTag = document.getElementById('rc-logo-preview-img');
+      if (previewBox && previewImgTag) {
+        previewImgTag.src = this.uploadedReceiptLogoUrl;
+        previewBox.style.display = 'block';
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
   handleReceiptSettingsSubmit(e) {
     e.preventDefault();
     const restaurantName = document.getElementById('rc-restaurant-name').value;
@@ -1372,7 +1406,7 @@ class App {
     const address = document.getElementById('rc-address').value;
     const phone = document.getElementById('rc-phone').value;
     const gstin = document.getElementById('rc-gstin').value;
-    const logoUrl = document.getElementById('rc-logo-url').value;
+    const logoUrl = this.uploadedReceiptLogoUrl || document.getElementById('rc-logo-url').value;
     const footerNote = document.getElementById('rc-footer-note').value;
 
     store.updateReceiptSettings({
