@@ -106,11 +106,14 @@ class RestaurantStore {
     if (data.type === 'NEW_ORDER') {
       soundEffects.playNewOrderChime();
       this.showToast(`New Order #${data.payload.orderNumber} (${data.payload.tableNumber}) received!`, '🔔');
+    } else if (data.type === 'ORDER_STATUS_UPDATED') {
+      soundEffects.playSuccessChime();
+      this.showToast(`Order status updated to ${data.payload.newStatus.toUpperCase()}!`, '👨‍🍳');
     } else if (data.type === 'PAYMENT_COMPLETE') {
       soundEffects.playSuccessChime();
       this.showToast(`Bill settled for Order #${data.payload.orderId}!`, '✅');
     } else if (data.type === 'MENU_UPDATED') {
-      this.showToast(`New dish '${data.payload.name}' added to menu!`, '🍲');
+      this.showToast(`Menu updated!`, '🍲');
     }
     
     this.listeners.forEach((listener) => listener(this));
@@ -333,6 +336,15 @@ class RestaurantStore {
     this.showToast(`Added '${newItem.name}' to Menu Catalog!`, '🍲');
     this.notify('MENU_UPDATED', newItem);
     return newItem;
+  }
+
+  toggleMenuItemAvailability(itemId) {
+    const item = this.menu.find(m => m.id === itemId);
+    if (!item) return;
+    item.available = item.available === false ? true : false;
+    soundEffects.playSuccessChime();
+    this.showToast(`Dish '${item.name}' marked ${item.available ? 'AVAILABLE 🟢' : 'OUT OF STOCK 🔴'}`, item.available ? '🟢' : '🔴');
+    this.notify('MENU_UPDATED', item);
   }
 
   addTable(tableData) {

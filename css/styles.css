@@ -1180,7 +1180,7 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (max-width: 480px) {
   .header-search {
-    max-width: 140px;
+    max-width: 130px;
   }
 
   .metrics-grid {
@@ -1192,7 +1192,58 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .web-menu-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .web-menu-card {
+    padding: 8px;
+  }
+
+  .web-menu-img {
+    height: 85px;
+  }
+
+  .web-menu-info h5 {
+    font-size: 12px;
+  }
+
+  .web-menu-info p {
+    font-size: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .menu-categories {
+    padding-bottom: 8px;
+    gap: 4px;
+  }
+
+  .cat-chip {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  /* Customer portal 4-step tracker mobile optimization */
+  .status-tracker-container {
+    padding: 8px 4px !important;
+    gap: 2px !important;
+  }
+
+  .status-tracker-step {
+    padding: 2px !important;
+  }
+
+  .status-tracker-step div:first-child {
+    font-size: 18px !important;
+  }
+
+  .status-tracker-step div:last-child {
+    font-size: 9px !important;
+    line-height: 1.1;
   }
 }
+
 

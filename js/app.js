@@ -398,7 +398,8 @@ class App {
                     <th>Dish</th>
                     <th>Name</th>
                     <th>Category</th>
-                    <th>Portions & Pricing</th>
+                    <th>Pricing</th>
+                    <th>Live Availability</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -409,6 +410,11 @@ class App {
                       <td>${m.category.toUpperCase()}</td>
                       <td>
                         ${m.portions ? m.portions.map(p => `<span style="font-size:11px; padding:2px 6px; border-radius:4px; background:var(--bg-main); border:1px solid var(--surface-border); margin-right:4px;">${p.size}: <strong>₹${p.price}</strong></span>`).join('') : `<strong style="color:var(--primary)">₹${m.price}</strong>`}
+                      </td>
+                      <td>
+                        <button class="btn-enterprise" style="padding:4px 10px; font-size:11px; font-weight:800; color:${m.available === false ? 'var(--danger)' : 'var(--success)'}; border-color:${m.available === false ? 'var(--danger)' : 'var(--success)'};" onclick="window.store.toggleMenuItemAvailability('${m.id}')">
+                          ${m.available === false ? '🔴 Out of Stock' : '🟢 In Stock'}
+                        </button>
                       </td>
                     </tr>
                   `).join('')}
@@ -946,20 +952,20 @@ class App {
             </div>
 
             <!-- 4-Step Visual Tracker -->
-            <div style="display:flex; justify-content:space-between; margin:16px 0; background:var(--bg-main); padding:14px 10px; border-radius:12px; border:1px solid var(--surface-border); gap:6px;">
-              <div style="flex:1; text-align:center; opacity: ${['placed','preparing','ready','served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'placed' ? '800' : '600'};">
+            <div class="status-tracker-container" style="display:flex; justify-content:space-between; margin:16px 0; background:var(--bg-main); padding:14px 10px; border-radius:12px; border:1px solid var(--surface-border); gap:6px;">
+              <div class="status-tracker-step" style="flex:1; text-align:center; opacity: ${['placed','preparing','ready','served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'placed' ? '800' : '600'};">
                 <div style="font-size:22px;">📝</div>
                 <div style="font-size:11px; margin-top:2px;">1. Order Placed</div>
               </div>
-              <div style="flex:1; text-align:center; opacity: ${['preparing','ready','served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'preparing' ? '800' : '600'}; color:${customerOrder.status === 'preparing' ? 'var(--primary)' : 'inherit'};">
+              <div class="status-tracker-step" style="flex:1; text-align:center; opacity: ${['preparing','ready','served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'preparing' ? '800' : '600'}; color:${customerOrder.status === 'preparing' ? 'var(--primary)' : 'inherit'};">
                 <div style="font-size:22px;">👨‍🍳</div>
                 <div style="font-size:11px; margin-top:2px;">2. Cooking</div>
               </div>
-              <div style="flex:1; text-align:center; opacity: ${['ready','served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'ready' ? '800' : '600'}; color:${customerOrder.status === 'ready' ? 'var(--success)' : 'inherit'};">
+              <div class="status-tracker-step" style="flex:1; text-align:center; opacity: ${['ready','served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'ready' ? '800' : '600'}; color:${customerOrder.status === 'ready' ? 'var(--success)' : 'inherit'};">
                 <div style="font-size:22px;">🔔</div>
                 <div style="font-size:11px; margin-top:2px;">3. Ready</div>
               </div>
-              <div style="flex:1; text-align:center; opacity: ${customerOrder.status === 'served' ? 1 : 0.35}; font-weight:${customerOrder.status === 'served' ? '800' : '600'};">
+              <div class="status-tracker-step" style="flex:1; text-align:center; opacity: ${customerOrder.status === 'served' ? 1 : 0.35}; font-weight:${customerOrder.status === 'served' ? '800' : '600'};">
                 <div style="font-size:22px;">😋</div>
                 <div style="font-size:11px; margin-top:2px;">4. Served</div>
               </div>
@@ -1018,7 +1024,9 @@ class App {
                     <div class="web-menu-footer">
                       <div class="menu-price">₹${item.price}</div>
 
-                      ${qty > 0 ? `
+                      ${item.available === false ? `
+                        <button class="add-cart-btn" disabled style="opacity:0.6; cursor:not-allowed; background:var(--surface-border); color:var(--danger); border-color:var(--surface-border);">Out of Stock 🔴</button>
+                      ` : qty > 0 ? `
                         <div class="counter-stepper">
                           <button class="counter-btn-std" onclick="window.app.updateCustomerCartQty('${item.id}', -1)">-</button>
                           <span style="font-weight:800; padding:0 8px;">${qty}</span>
