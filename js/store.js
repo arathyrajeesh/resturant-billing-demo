@@ -24,6 +24,17 @@ class RestaurantStore {
     this.orders = this.load('malabar_orders', INITIAL_ORDERS);
     this.menu = this.load('malabar_menu', MENU_ITEMS);
 
+    this.receiptSettings = this.load('malabar_receipt_settings', {
+      restaurantName: 'MALABAR TABLE',
+      tagline: 'Fine Dining Restaurant',
+      address: 'Beach Road, Calicut, Kerala - 673001',
+      phone: '+91 98765 43210',
+      gstin: '32ABCDE1234F1Z5',
+      fssai: '11223344556677',
+      footerNote: 'Thank you for dining with us! Please visit again.',
+      logoUrl: ''
+    });
+
     this.searchQuery = '';
     this.selectedCategory = 'all';
     this.activeView = this.currentUser.isLoggedIn ? (this.currentUser.role === 'owner' ? 'owner' : 'staff-ops') : 'login';
@@ -64,6 +75,7 @@ class RestaurantStore {
       localStorage.setItem('malabar_orders', JSON.stringify(this.orders));
       localStorage.setItem('malabar_menu', JSON.stringify(this.menu));
       localStorage.setItem('malabar_user', JSON.stringify(this.currentUser));
+      localStorage.setItem('malabar_receipt_settings', JSON.stringify(this.receiptSettings));
       localStorage.setItem('malabar_theme', this.theme);
     } catch (e) {
       console.warn('Storage save failed:', e);
@@ -79,6 +91,12 @@ class RestaurantStore {
     this.save();
     this.listeners.forEach((listener) => listener(this));
     this.channel.postMessage({ type: actionType, payload, timestamp: Date.now() });
+  }
+
+  updateReceiptSettings(newSettings) {
+    this.receiptSettings = { ...this.receiptSettings, ...newSettings };
+    this.showToast('Billing receipt customization saved!');
+    this.notify('RECEIPT_SETTINGS_UPDATED', this.receiptSettings);
   }
 
   toggleTheme() {
@@ -102,6 +120,7 @@ class RestaurantStore {
     this.tables = this.load('malabar_tables', this.tables);
     this.orders = this.load('malabar_orders', this.orders);
     this.menu = this.load('malabar_menu', this.menu);
+    this.receiptSettings = this.load('malabar_receipt_settings', this.receiptSettings);
 
     if (data.type === 'NEW_ORDER') {
       soundEffects.playNewOrderChime();

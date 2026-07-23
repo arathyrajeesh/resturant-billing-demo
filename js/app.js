@@ -483,10 +483,80 @@ class App {
                 `).join('')}
               </div>
             </div>
+
+            <!-- Receipt & Billing Customization Panel -->
+            <div class="panel-card" style="margin-top:20px;">
+              <div class="section-header" style="margin-bottom:14px;">
+                <div class="panel-title">Billing & Receipt Customization</div>
+                <span class="status-tag tag-available" style="font-size:11px;">Live Branding</span>
+              </div>
+              
+              <form onsubmit="window.app.handleReceiptSettingsSubmit(event)">
+                <div class="form-group-std">
+                  <label>Restaurant Name</label>
+                  <input type="text" id="rc-restaurant-name" value="${store.receiptSettings.restaurantName || ''}" required placeholder="MALABAR TABLE" />
+                </div>
+
+                <div class="form-group-std">
+                  <label>Tagline / Subtitle</label>
+                  <input type="text" id="rc-tagline" value="${store.receiptSettings.tagline || ''}" placeholder="Fine Dining Restaurant" />
+                </div>
+
+                <div class="form-group-std">
+                  <label>Address / Location</label>
+                  <input type="text" id="rc-address" value="${store.receiptSettings.address || ''}" placeholder="Beach Road, Calicut, Kerala" />
+                </div>
+
+                <div class="form-group-std">
+                  <label>Contact Phone Number</label>
+                  <input type="text" id="rc-phone" value="${store.receiptSettings.phone || ''}" placeholder="+91 98765 43210" />
+                </div>
+
+                <div class="form-group-std">
+                  <label>GSTIN Number</label>
+                  <input type="text" id="rc-gstin" value="${store.receiptSettings.gstin || ''}" placeholder="32ABCDE1234F1Z5" />
+                </div>
+
+                <div class="form-group-std">
+                  <label>Logo Image URL (Optional)</label>
+                  <input type="url" id="rc-logo-url" value="${store.receiptSettings.logoUrl || ''}" placeholder="https://example.com/logo.png" />
+                </div>
+
+                <div class="form-group-std">
+                  <label>Thermal Receipt Footer Greeting</label>
+                  <textarea id="rc-footer-note" rows="2" style="width:100%; padding:8px; border-radius:8px; border:1px solid var(--surface-border); background:var(--bg-main); color:var(--text-dark); font-family:inherit; font-size:12px;">${store.receiptSettings.footerNote || ''}</textarea>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:11px; margin-top:8px;">
+                  Save Receipt Settings
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
     `;
+  }
+
+  handleReceiptSettingsSubmit(e) {
+    e.preventDefault();
+    const restaurantName = document.getElementById('rc-restaurant-name').value;
+    const tagline = document.getElementById('rc-tagline').value;
+    const address = document.getElementById('rc-address').value;
+    const phone = document.getElementById('rc-phone').value;
+    const gstin = document.getElementById('rc-gstin').value;
+    const logoUrl = document.getElementById('rc-logo-url').value;
+    const footerNote = document.getElementById('rc-footer-note').value;
+
+    store.updateReceiptSettings({
+      restaurantName,
+      tagline,
+      address,
+      phone,
+      gstin,
+      logoUrl,
+      footerNote
+    });
   }
 
   // ================= ➕ ADD TABLE MODAL =================
@@ -732,8 +802,12 @@ class App {
                 <div style="display:grid; grid-template-columns: 1fr 340px; gap:20px;">
                   <div class="receipt-paper">
                     <div class="receipt-header">
-                      <h2>MALABAR TABLE</h2>
-                      <p style="font-size:11px;">Fine Dining Restaurant</p>
+                      ${store.receiptSettings.logoUrl ? `<img src="${store.receiptSettings.logoUrl}" style="max-height:48px; margin:0 auto 8px auto; display:block; object-fit:contain;" alt="Logo" />` : ''}
+                      <h2>${store.receiptSettings.restaurantName || 'MALABAR TABLE'}</h2>
+                      <p style="font-size:11px; font-weight:700;">${store.receiptSettings.tagline || 'Fine Dining Restaurant'}</p>
+                      ${store.receiptSettings.address ? `<p style="font-size:10px; color:var(--text-muted); margin-top:2px;">${store.receiptSettings.address}</p>` : ''}
+                      ${store.receiptSettings.phone ? `<p style="font-size:10px; color:var(--text-muted);">Ph: ${store.receiptSettings.phone}</p>` : ''}
+                      ${store.receiptSettings.gstin ? `<p style="font-size:10px; color:var(--text-muted); font-weight:600;">GSTIN: ${store.receiptSettings.gstin}</p>` : ''}
                     </div>
 
                     <div class="receipt-row">
@@ -765,6 +839,12 @@ class App {
                       <span>TOTAL:</span>
                       <span>₹${selectedOrder.total}</span>
                     </div>
+
+                    ${store.receiptSettings.footerNote ? `
+                      <div style="text-align:center; font-size:10px; margin-top:12px; border-top:1px dashed var(--surface-border); padding-top:8px; color:var(--text-muted); font-weight:600;">
+                        ${store.receiptSettings.footerNote}
+                      </div>
+                    ` : ''}
                   </div>
 
                   <div class="panel-card">
