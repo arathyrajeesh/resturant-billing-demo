@@ -1567,7 +1567,7 @@ class App {
               `).join('')}
             </div>
 
-            <div class="web-menu-grid">
+            <div class="swiggy-menu-list">
               ${filteredMenu.map(item => {
                 const activePortion = this.selectedPortions[item.id] || (item.portions ? item.portions[0].size : null);
                 let price = item.price;
@@ -1581,42 +1581,41 @@ class App {
                 const qty = cartEntry ? cartEntry.quantity : 0;
 
                 return `
-                  <div class="web-menu-card">
-                    <div>
-                      <img src="${item.image}" class="web-menu-img" alt="${item.name}" />
-                      <div class="web-menu-info">
-                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2px;">
-                          <h5>${item.name}</h5>
-                          <span style="font-size:10px; font-weight:800; color:${item.isVeg ? 'var(--success)' : 'var(--danger)'};">${item.isVeg ? 'Veg' : 'Non-Veg'}</span>
+                  <div class="swiggy-item-card">
+                    <div class="swiggy-item-left">
+                      <div class="swiggy-badge-row">
+                        <div class="item-veg-tag ${item.isVeg ? 'veg' : ''}">
+                          <span class="dot"></span>
                         </div>
-                        <p>${item.description}</p>
-                        
-                        ${item.portions ? `
-                          <div style="display:flex; gap:4px; margin-top:8px; flex-wrap:wrap;">
-                            ${item.portions.map(p => `
-                              <button class="btn-enterprise" style="padding:3px 7px; font-size:10px; font-weight:800; border-radius:12px; ${activePortion === p.size ? 'background:var(--primary); color:#FFF; border-color:var(--primary);' : ''}" onclick="window.app.setPortion('${item.id}', '${p.size}')">
-                                ${p.size} ₹${p.price}
-                              </button>
-                            `).join('')}
-                          </div>
-                        ` : ''}
+                        ${item.popular ? `<span class="reordered-badge">🔥 Highly reordered</span>` : ''}
+                      </div>
+
+                      <h4 class="swiggy-item-name" onclick="window.app.openItemCustomizationModal('${item.id}')" style="cursor:pointer;">${item.name}</h4>
+                      <div class="swiggy-item-price">₹${price}</div>
+                      <p class="swiggy-item-desc">${item.description}</p>
+
+                      <div class="swiggy-action-icons">
+                        <button class="icon-btn-circle" title="Bookmark" onclick="window.store.showToast('Saved to favorites!', '🔖')">🔖</button>
+                        <button class="icon-btn-circle" title="Share" onclick="navigator.clipboard ? navigator.clipboard.writeText(window.location.href) : null; window.store.showToast('Dish link copied!', '🔗')">🔗</button>
                       </div>
                     </div>
 
-                    <div class="web-menu-footer" style="margin-top:8px;">
-                      <div class="menu-price">₹${price}</div>
-
-                      ${item.available === false ? `
-                        <button class="add-cart-btn" disabled style="opacity:0.6; cursor:not-allowed; background:var(--surface-border); color:var(--danger); border-color:var(--surface-border);">Out of Stock</button>
-                      ` : qty > 0 ? `
-                        <div class="counter-stepper">
-                          <button class="counter-btn-std" onclick="window.app.updateCustomerCartQty('${item.id}', -1, '${activePortion}')">-</button>
-                          <span style="font-weight:800; padding:0 8px;">${qty}</span>
-                          <button class="counter-btn-std" onclick="window.app.updateCustomerCartQty('${item.id}', 1, '${activePortion}')">+</button>
-                        </div>
-                      ` : `
-                        <button class="add-cart-btn" onclick="window.app.updateCustomerCartQty('${item.id}', 1, '${activePortion}')">+ Add ${item.portions ? `(${activePortion})` : ''}</button>
-                      `}
+                    <div class="swiggy-item-right">
+                      <img src="${item.image}" class="swiggy-item-img" alt="${item.name}" onclick="window.app.openItemCustomizationModal('${item.id}')" />
+                      <div class="swiggy-add-btn-box">
+                        ${item.available === false ? `
+                          <button class="swiggy-add-btn" disabled style="opacity:0.6; cursor:not-allowed; color:var(--danger); border-color:var(--surface-border);">Out of Stock</button>
+                        ` : qty > 0 ? `
+                          <div class="counter-stepper-lg" style="width:104px;">
+                            <button type="button" class="counter-btn-lg" onclick="window.app.updateCustomerCartQty('${cartItemId}', -1)">-</button>
+                            <span class="counter-val-lg">${qty}</span>
+                            <button type="button" class="counter-btn-lg" onclick="window.app.updateCustomerCartQty('${cartItemId}', 1)">+</button>
+                          </div>
+                        ` : `
+                          <button type="button" class="swiggy-add-btn" onclick="window.app.openItemCustomizationModal('${item.id}')">ADD +</button>
+                          ${item.portions ? `<span class="customisable-text">customisable</span>` : ''}
+                        `}
+                      </div>
                     </div>
                   </div>
                 `;
@@ -1625,7 +1624,7 @@ class App {
           </div>
 
           <!-- Customer Cart Summary & Submit Order Drawer -->
-          <div class="web-pos-cart-panel">
+          <div class="web-pos-cart-panel" id="customer-cart-panel">
             <div>
               <div style="padding-bottom:14px; border-bottom:1px solid var(--surface-border); margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;">
                 <h3>Your Order</h3>
@@ -1636,7 +1635,7 @@ class App {
                 ${(!this.customerCart || this.customerCart.length === 0) ? `
                   <div style="text-align:center; padding:40px 10px; color:var(--text-muted);">
                     <p style="font-size:13px; font-weight:600;">Your Cart is Empty</p>
-                    <p style="font-size:11px; margin-top:4px;">Tap '+ Add' on dishes to start your order</p>
+                    <p style="font-size:11px; margin-top:4px;">Tap 'ADD +' on dishes to start your order</p>
                   </div>
                 ` : ''}
 
@@ -1644,6 +1643,7 @@ class App {
                   <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--surface-border);">
                     <div>
                       <strong style="font-size:13px;">${item.name}</strong>
+                      ${item.notes ? `<p style="font-size:10px; color:#E11D48; font-weight:700; margin-top:2px;">Note: "${item.notes}"</p>` : ''}
                       <p style="font-size:11px; color:var(--text-muted);">₹${item.price} each</p>
                     </div>
                     <div style="display:flex; align-items:center; gap:8px;">
@@ -1679,6 +1679,25 @@ class App {
             </div>
           </div>
         </div>
+
+        ${(this.customerCart && this.customerCart.length > 0) ? `
+          <div class="swiggy-sticky-bottom-bar" onclick="const p = document.getElementById('customer-cart-panel'); if (p) p.scrollIntoView({behavior:'smooth'});">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:32px; height:32px; background:rgba(255,255,255,0.2); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px;">🛍️</div>
+              <div>
+                <strong style="font-size:14px; color:#FFF;">${this.customerCart.reduce((sum, i) => sum + i.quantity, 0)} ${this.customerCart.reduce((sum, i) => sum + i.quantity, 0) === 1 ? 'item' : 'items'} added</strong>
+                <p style="font-size:11px; opacity:0.9;">Total ₹${grandTotal}</p>
+              </div>
+            </div>
+            <div style="font-weight:800; font-size:14px; display:flex; align-items:center; gap:4px;">
+              Continue & Checkout ➔
+            </div>
+          </div>
+        ` : ''}
+
+        <button class="floating-menu-pill" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+          🍴 Menu
+        </button>
       </div>
     `;
   }

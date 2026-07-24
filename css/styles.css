@@ -1776,6 +1776,191 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: space-between;
 }
 
+/* Swiggy Style Mobile Food Card Layout */
+.swiggy-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.swiggy-item-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px dashed var(--surface-border);
+  position: relative;
+}
+
+.swiggy-item-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.swiggy-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.reordered-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #15803D;
+  background: #DCFCE7;
+  padding: 1px 8px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.swiggy-item-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-dark);
+  line-height: 1.3;
+}
+
+.swiggy-item-price {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-top: 2px;
+}
+
+.swiggy-item-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-top: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.swiggy-action-icons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.icon-btn-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--surface-border);
+  background: var(--surface-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.swiggy-item-right {
+  width: 125px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.swiggy-item-img {
+  width: 120px;
+  height: 110px;
+  border-radius: 16px;
+  object-fit: cover;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+
+.swiggy-add-btn-box {
+  margin-top: -22px;
+  position: relative;
+  z-index: 10;
+  text-align: center;
+}
+
+.swiggy-add-btn {
+  background: var(--surface-white);
+  color: #E11D48;
+  border: 1.5px solid #FFE4E6;
+  padding: 8px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.15);
+  transition: all 0.15s ease;
+  min-width: 96px;
+}
+
+.swiggy-add-btn:hover {
+  background: #FFF1F2;
+  transform: translateY(-1px);
+}
+
+.customisable-text {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 3px;
+  display: block;
+}
+
+/* Swiggy Red Bottom Sticky Bar matching Screenshot 1 */
+.swiggy-sticky-bottom-bar {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 24px);
+  max-width: 480px;
+  background: linear-gradient(135deg, #E11D48, #BE123C);
+  color: #FFFFFF;
+  padding: 12px 18px;
+  border-radius: 16px;
+  z-index: 900;
+  box-shadow: 0 8px 24px rgba(225, 29, 72, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.swiggy-sticky-bottom-bar:hover {
+  transform: translateX(-50%) scale(1.01);
+}
+
+/* Floating Menu Pill Button */
+.floating-menu-pill {
+  position: fixed;
+  bottom: 74px;
+  right: 20px;
+  background: #18181B;
+  color: #FFFFFF;
+  padding: 10px 16px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+  z-index: 890;
+  cursor: pointer;
+  border: none;
+}
+
 @media (max-width: 900px) {
   .mobile-sticky-cart-bar {
     display: flex;
