@@ -314,10 +314,10 @@ class RestaurantStore {
     }
     this.orders = this.load('malabar_orders', INITIAL_ORDERS);
     // Ensure menu items always have master image URLs restored
-    const loadedMenu = this.load('malabar_menu', MENU_ITEMS);
-    this.menu = (loadedMenu && loadedMenu.length > 0 ? loadedMenu : MENU_ITEMS).map(m => {
-      const master = MENU_ITEMS.find(i => i.id === m.id);
-      return { ...m, image: (m.image && m.image.length > 10 ? m.image : (master ? master.image : '')) };
+    const loadedMenu = this.load('malabar_menu', null);
+    this.menu = MENU_ITEMS.map(master => {
+      const stored = loadedMenu ? loadedMenu.find(i => i.id === master.id) : null;
+      return { ...master, ...stored, image: master.image || (stored ? stored.image : '') };
     });
     localStorage.setItem('malabar_menu', JSON.stringify(this.menu));
 
@@ -2366,8 +2366,8 @@ class App {
                 const cartEntry = (this.customerCart || []).find(c => c.itemId === cartItemId);
                 const qty = cartEntry ? cartEntry.quantity : 0;
                 const masterItem = MENU_ITEMS.find(m => m.id === item.id);
-                const svgFallback = "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%2290%22%20viewBox%3D%220%200%20100%2090%22%3E%3Crect%20width%3D%22100%22%20height%3D%2290%22%20fill%3D%22%23334155%22%20rx%3D%2212%22%3E%3C%2Frect%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2255%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20font-size%3D%2238%22%3E%F0%9F%8D%9B%3C%2Ftext%3E%3C%2Fsvg%3E";
-                const itemImg = item.image || (masterItem ? masterItem.image : '') || svgFallback;
+                const defaultSvg = "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%2290%22%20viewBox%3D%220%200%20100%2090%22%3E%3Crect%20width%3D%22100%22%20height%3D%2290%22%20fill%3D%22%23334155%22%20rx%3D%2212%22%3E%3C%2Frect%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2255%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20font-size%3D%2238%22%3E%F0%9F%8D%9B%3C%2Ftext%3E%3C%2Fsvg%3E";
+                const itemImg = item.image || (masterItem ? masterItem.image : '') || defaultSvg;
 
                 return `
                   <div class="swiggy-item-card" style="display:flex !important; flex-direction:row !important; justify-content:space-between !important; align-items:flex-start !important; width:100% !important; box-sizing:border-box !important; gap:8px !important;">
@@ -2389,7 +2389,7 @@ class App {
                     </div>
 
                     <div class="swiggy-item-right" style="width:92px !important; min-width:92px !important; max-width:92px !important; flex:0 0 92px !important; display:flex !important; flex-direction:column !important; align-items:center !important; position:relative !important;">
-                      <img src="${itemImg}" class="swiggy-item-img" alt="${item.name}" onclick="window.app.openItemCustomizationModal('${item.id}')" style="width:86px !important; height:80px !important; border-radius:12px !important; object-fit:cover !important; display:block !important; cursor:pointer !important;" onerror="this.onerror=null; this.src='${svgFallback}';" />
+                      <img src="${itemImg}" class="swiggy-item-img" alt="${item.name}" referrerpolicy="no-referrer" onclick="window.app.openItemCustomizationModal('${item.id}')" style="width:86px !important; height:80px !important; border-radius:12px !important; object-fit:cover !important; display:block !important; cursor:pointer !important;" onerror="this.onerror=null; this.src='${defaultSvg}';" />
                       <div class="swiggy-add-btn-box" style="margin-top:-16px !important; position:relative !important; z-index:10 !important; text-align:center !important;">
                         ${item.available === false ? `
                           <button class="swiggy-add-btn" disabled style="opacity:0.6; cursor:not-allowed; color:var(--danger); border-color:var(--surface-border);">Out of Stock</button>

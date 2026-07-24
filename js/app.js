@@ -1594,7 +1594,7 @@ class App {
                     </div>
 
                     <div class="swiggy-item-right" style="width:92px !important; min-width:92px !important; max-width:92px !important; flex:0 0 92px !important; display:flex !important; flex-direction:column !important; align-items:center !important; position:relative !important;">
-                      <img src="${itemImg}" class="swiggy-item-img" alt="${item.name}" onclick="window.app.openItemCustomizationModal('${item.id}')" style="width:86px !important; height:80px !important; border-radius:12px !important; object-fit:cover !important; display:block !important; cursor:pointer !important;" onerror="this.onerror=null; this.src='${svgFallback}';" />
+                      <img src="${itemImg}" class="swiggy-item-img" alt="${item.name}" referrerpolicy="no-referrer" onclick="window.app.openItemCustomizationModal('${item.id}')" style="width:86px !important; height:80px !important; border-radius:12px !important; object-fit:cover !important; display:block !important; cursor:pointer !important;" onerror="this.onerror=null; this.src='${svgFallback}';" />
                       <div class="swiggy-add-btn-box" style="margin-top:-16px !important; position:relative !important; z-index:10 !important; text-align:center !important;">
                         ${item.available === false ? `
                           <button class="swiggy-add-btn" disabled style="opacity:0.6; cursor:not-allowed; color:var(--danger); border-color:var(--surface-border);">Out of Stock</button>
