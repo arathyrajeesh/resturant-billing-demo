@@ -659,125 +659,124 @@ class App {
           </div>
         </div>
 
-        <div class="dashboard-grid-2col">
-          <div>
-            <div class="panel-card">
-              <div class="section-header">
-                <div class="panel-title">Table QR Code Generator (${store.tables.length} Tables)</div>
-                <button class="btn-enterprise" onclick="window.app.openAddTableModal()">Add New Table</button>
-              </div>
+        <!-- Expanded Table QR Code Generator Section -->
+        <div class="panel-card">
+          <div class="section-header">
+            <div class="panel-title">Table QR Code Generator (${store.tables.length} Tables)</div>
+            <button class="btn-enterprise" onclick="window.app.openAddTableModal()">Add New Table</button>
+          </div>
 
-              <div class="tables-floor-grid">
-                ${(this.showAllAdminTables ? store.tables : store.tables.slice(0, 5)).map(t => {
-                  const tableOrder = store.orders.find(o => o.tableId === t.id && o.paymentStatus === 'unpaid' && o.status !== 'completed');
-                  return `
-                    <div class="table-card-std table-card-compact ${t.status}">
-                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                        <div class="table-title" style="margin-bottom:0;">${t.number}</div>
-                        <div style="display:flex; align-items:center; gap:6px;">
-                          ${tableOrder ? `
-                            <button class="btn-table-edit" onclick="window.app.openEditOrderModal('${tableOrder.id}')" title="Edit Order #${tableOrder.orderNumber}">
-                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                            </button>
-                          ` : ''}
-                          <button class="btn-table-delete" onclick="window.app.deleteTable(${t.id})" title="Delete ${t.number}">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                          </button>
-                        </div>
-                      </div>
-                      <div style="font-size:11px; color:var(--text-muted); font-weight:600;">${t.seats} Seats • ${t.section || 'Main'}</div>
-                      <button class="table-qr-btn" onclick="window.app.openQRModal(${t.id})">Real QR Sticker</button>
+          <div class="tables-floor-grid">
+            ${(this.showAllAdminTables ? store.tables : store.tables.slice(0, 6)).map(t => {
+              const tableOrder = store.orders.find(o => o.tableId === t.id && o.paymentStatus === 'unpaid' && o.status !== 'completed');
+              return `
+                <div class="table-card-std table-card-compact ${t.status}">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <div class="table-title" style="margin-bottom:0;">${t.number}</div>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                      ${tableOrder ? `
+                        <button class="btn-table-edit" onclick="window.app.openEditOrderModal('${tableOrder.id}')" title="Edit Order #${tableOrder.orderNumber}">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                      ` : ''}
+                      <button class="btn-table-delete" onclick="window.app.deleteTable(${t.id})" title="Delete ${t.number}">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                      </button>
                     </div>
-                  `;
-                }).join('')}
-              </div>
-              ${store.tables.length > 6 ? `
-                <div style="text-align:center; margin-top:14px;">
-                  <button class="btn-enterprise" style="padding:8px 18px; font-weight:700; color:var(--primary); border-color:var(--primary);" onclick="window.app.toggleAdminTablesExpand()">
-                    ${this.showAllAdminTables ? '▲ Show Fewer Tables (Collapse to 6)' : `▼ Show More Tables (${store.tables.length - 6} More)`}
-                  </button>
+                  </div>
+                  <div style="font-size:11px; color:var(--text-muted); font-weight:600;">${t.seats} Seats • ${t.section || 'Main'}</div>
+                  <button class="table-qr-btn" onclick="window.app.openQRModal(${t.id})">Real QR Sticker</button>
                 </div>
-              ` : ''}
+              `;
+            }).join('')}
+          </div>
+          ${store.tables.length > 6 ? `
+            <div style="text-align:center; margin-top:14px;">
+              <button class="btn-enterprise" style="padding:8px 18px; font-weight:700; color:var(--primary); border-color:var(--primary);" onclick="window.app.toggleAdminTablesExpand()">
+                ${this.showAllAdminTables ? '▲ Show Fewer Tables (Collapse to 6)' : `▼ Show More Tables (${store.tables.length - 6} More)`}
+              </button>
             </div>
+          ` : ''}
+        </div>
 
-            <div class="panel-card">
-              <div class="section-header">
-                <div class="panel-title">Admin Menu Management (${store.menu.length} Dishes)</div>
-                <button class="btn-enterprise" onclick="window.app.openAddMenuModal()">Add Dish</button>
-              </div>
+        <!-- Full Width Admin Menu Management Section -->
+        <div class="panel-card">
+          <div class="section-header">
+            <div class="panel-title">Admin Menu Management (${store.menu.length} Dishes)</div>
+            <button class="btn-enterprise" onclick="window.app.openAddMenuModal()">Add Dish</button>
+          </div>
 
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Dish</th>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Pricing</th>
-                    <th>Live Availability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${store.menu.map(m => `
-                    <tr>
-                      <td style="width:48px;"><img src="${m.image}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;" alt="${m.name}" /></td>
-                      <td><strong>${m.name}</strong></td>
-                      <td>${m.category.toUpperCase()}</td>
-                      <td>
-                        ${m.portions ? m.portions.map(p => `<span style="font-size:11px; padding:2px 6px; border-radius:4px; background:var(--bg-main); border:1px solid var(--surface-border); margin-right:4px;">${p.size}: <strong>₹${p.price}</strong></span>`).join('') : `<strong style="color:var(--primary)">₹${m.price}</strong>`}
-                      </td>
-                      <td>
-                        <div style="display:flex; gap:6px; align-items:center;">
-                          <button class="btn-enterprise" style="padding:4px 10px; font-size:11px; font-weight:800; color:${m.available === false ? 'var(--danger)' : 'var(--success)'}; border-color:${m.available === false ? 'var(--danger)' : 'var(--success)'};" onclick="window.store.toggleMenuItemAvailability('${m.id}')">
-                            ${m.available === false ? 'Out of Stock' : 'In Stock'}
-                          </button>
-                          <button class="btn-enterprise" style="padding:4px 8px; font-size:11px; font-weight:700; color:var(--primary); border-color:var(--primary);" onclick="window.app.openEditDishImageModal('${m.id}')">
-                            📷 Upload Photo
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Dish</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Pricing</th>
+                <th>Live Availability</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${store.menu.map(m => `
+                <tr>
+                  <td style="width:48px;"><img src="${m.image}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;" alt="${m.name}" /></td>
+                  <td><strong>${m.name}</strong></td>
+                  <td>${m.category.toUpperCase()}</td>
+                  <td>
+                    ${m.portions ? m.portions.map(p => `<span style="font-size:11px; padding:2px 6px; border-radius:4px; background:var(--bg-main); border:1px solid var(--surface-border); margin-right:4px;">${p.size}: <strong>₹${p.price}</strong></span>`).join('') : `<strong style="color:var(--primary)">₹${m.price}</strong>`}
+                  </td>
+                  <td>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                      <button class="btn-enterprise" style="padding:4px 10px; font-size:11px; font-weight:800; color:${m.available === false ? 'var(--danger)' : 'var(--success)'}; border-color:${m.available === false ? 'var(--danger)' : 'var(--success)'};" onclick="window.store.toggleMenuItemAvailability('${m.id}')">
+                        ${m.available === false ? 'Out of Stock' : 'In Stock'}
+                      </button>
+                      <button class="btn-enterprise" style="padding:4px 8px; font-size:11px; font-weight:700; color:var(--primary); border-color:var(--primary);" onclick="window.app.openEditDishImageModal('${m.id}')">
+                        📷 Upload Photo
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- End Section: Revenue & Live Task Monitor Grid -->
+        <div style="display:grid; grid-template-columns: 1fr 340px; gap:20px; margin-top:20px;">
+          <div class="panel-card" style="margin-bottom:0;">
+            <div class="panel-title">Live Orders Task Monitor</div>
+            <div class="orders-list">
+              ${store.orders.slice(0, 5).map(o => `
+                <div class="order-card ${o.source}" style="padding:12px;">
+                  <div>
+                    <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
+                      <strong style="font-size:13px;">#${o.orderNumber} - ${o.tableNumber}</strong>
+                      <span class="source-tag ${o.source === 'qr-customer' ? 'tag-qr-customer' : o.source === 'swiggy' ? 'tag-swiggy' : o.source === 'zomato' ? 'tag-zomato' : 'tag-dinein'}">
+                        ${o.source === 'qr-customer' ? 'QR Self-Order' : o.source === 'swiggy' ? 'Swiggy' : o.source === 'zomato' ? 'Zomato' : 'Staff POS'}
+                      </span>
+                    </div>
+                    <p style="font-size:11px; color:var(--text-muted);">${o.items.length} items • ₹${o.total}</p>
+                  </div>
+                  <span class="status-tag ${o.status === 'ready' ? 'tag-available' : 'tag-occupied'}">${o.status}</span>
+                </div>
+              `).join('')}
             </div>
           </div>
 
-          <div>
-            <div class="panel-card">
-              <div class="panel-title">Revenue by Channel</div>
-              <div style="display:flex; flex-direction:column; gap:12px;">
-                <div class="ranking-item">
-                  <span>Dine-in Revenue</span>
-                  <strong>₹${dineInRevenue}</strong>
-                </div>
-                <div class="ranking-item">
-                  <span style="color:var(--swiggy-orange)">Swiggy Revenue</span>
-                  <strong>₹${swiggyRevenue}</strong>
-                </div>
-                <div class="ranking-item">
-                  <span style="color:var(--zomato-red)">Zomato Revenue</span>
-                  <strong>₹${zomatoRevenue}</strong>
-                </div>
+          <div class="panel-card" style="margin-bottom:0;">
+            <div class="panel-title">Revenue by Channel</div>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div class="ranking-item">
+                <span>Dine-in Revenue</span>
+                <strong>₹${dineInRevenue}</strong>
               </div>
-            </div>
-
-            <div class="panel-card">
-              <div class="panel-title">Live Orders Task Monitor</div>
-              <div class="orders-list">
-                ${store.orders.slice(0, 5).map(o => `
-                  <div class="order-card ${o.source}" style="padding:12px;">
-                    <div>
-                      <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
-                        <strong style="font-size:13px;">#${o.orderNumber} - ${o.tableNumber}</strong>
-                        <span class="source-tag ${o.source === 'qr-customer' ? 'tag-qr-customer' : o.source === 'swiggy' ? 'tag-swiggy' : o.source === 'zomato' ? 'tag-zomato' : 'tag-dinein'}">
-                          ${o.source === 'qr-customer' ? 'QR Self-Order' : o.source === 'swiggy' ? 'Swiggy' : o.source === 'zomato' ? 'Zomato' : 'Staff POS'}
-                        </span>
-                      </div>
-                      <p style="font-size:11px; color:var(--text-muted);">${o.items.length} items • ₹${o.total}</p>
-                    </div>
-                    <span class="status-tag ${o.status === 'ready' ? 'tag-available' : 'tag-occupied'}">${o.status}</span>
-                  </div>
-                `).join('')}
+              <div class="ranking-item">
+                <span style="color:var(--swiggy-orange)">Swiggy Revenue</span>
+                <strong>₹${swiggyRevenue}</strong>
+              </div>
+              <div class="ranking-item">
+                <span style="color:var(--zomato-red)">Zomato Revenue</span>
+                <strong>₹${zomatoRevenue}</strong>
               </div>
             </div>
           </div>
