@@ -2953,21 +2953,54 @@ class App {
     this.render();
   }
 
-  handleDishFileUpload(event) {
+  compressImageFile(file, maxWidth = 500, maxHeight = 500, quality = 0.82) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => resolve(e.target.result);
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve('');
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async handleDishFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      this.uploadedImageDataUrl = e.target.result;
-      const previewBox = document.getElementById('image-upload-preview');
-      const previewImgTag = document.getElementById('preview-img-tag');
-      if (previewBox && previewImgTag) {
-        previewImgTag.src = this.uploadedImageDataUrl;
-        previewBox.style.display = 'block';
-      }
-    };
-    reader.readAsDataURL(file);
+    const compressedDataUrl = await this.compressImageFile(file, 500, 500, 0.85);
+    this.uploadedImageDataUrl = compressedDataUrl;
+    const previewBox = document.getElementById('image-upload-preview');
+    const previewImgTag = document.getElementById('preview-img-tag');
+    if (previewBox && previewImgTag) {
+      previewImgTag.src = this.uploadedImageDataUrl;
+      previewBox.style.display = 'block';
+    }
   }
 
   toggleCustomCategoryInput(val) {

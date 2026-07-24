@@ -2045,7 +2045,8 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .swiggy-action-icons {
-    display: none !important;
+    display: flex !important;
+    margin-top: 6px !important;
   }
 
   .swiggy-add-btn {
