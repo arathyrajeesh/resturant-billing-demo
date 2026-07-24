@@ -715,6 +715,7 @@ h1, h2, h3, h4, h5, h6 {
   display: grid;
   grid-template-columns: 1fr 360px;
   gap: 20px;
+  align-items: start; /* Required for position:sticky to work in CSS Grid */
 }
 
 .web-pos-cart-panel {
@@ -727,7 +728,9 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 480px;
+  min-height: 320px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
 }
 
 .menu-categories {
