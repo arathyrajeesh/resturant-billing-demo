@@ -1285,9 +1285,9 @@ class App {
       <div class="login-wrapper">
         <div class="login-card-std" style="max-width:440px;">
           <div style="text-align:center; margin-bottom:24px;">
-            <div style="width:48px; height:48px; background:var(--primary); color:#fff; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; margin:0 auto 12px auto; font-weight:800;">TC</div>
-            <h2 style="font-size:22px; font-weight:800;">T Clock POS</h2>
-            <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">Select Dashboard Workspace to Continue</p>
+            <img src="assets/tclock-logo.jpg" alt="T Clock Resto Cafe Logo" style="width:96px; height:96px; border-radius:50%; object-fit:cover; border:3px solid var(--primary); box-shadow:0 8px 24px rgba(52, 20, 13, 0.35); margin:0 auto 14px auto; display:block;" />
+            <h2 style="font-size:24px; font-weight:800; color:var(--text-dark); margin:0;">T CLOCK RESTO CAFE</h2>
+            <p style="color:var(--primary); font-size:12px; font-weight:800; letter-spacing:0.5px; margin-top:4px;">Time for Tea, Time for Taste</p>
           </div>
 
           <form onsubmit="window.app.handleLoginSubmit(event)">
