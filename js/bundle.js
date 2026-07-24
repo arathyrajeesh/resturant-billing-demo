@@ -2405,6 +2405,10 @@ class App {
       </div>
     `;
   }
+<<<<<<< HEAD
+=======
+  }
+>>>>>>> 9cbe3c3ab714097bb0008ebfca7c15b619aa79d2
 
   updateCustomerCartQty(itemId, delta, portion = null) {
     const item = store.menu.find(m => m.id === itemId || m.id === itemId.split('_')[0]);
