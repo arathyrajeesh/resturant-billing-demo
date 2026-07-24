@@ -238,6 +238,9 @@ class RestaurantStore {
         const match = existingOrder.items.find(i => i.itemId === newItem.itemId || i.name === newItem.name);
         if (match) {
           match.quantity += newItem.quantity;
+          if (newItem.notes) {
+            match.notes = match.notes ? (match.notes.includes(newItem.notes) ? match.notes : `${match.notes}; ${newItem.notes}`) : newItem.notes;
+          }
         } else {
           existingOrder.items.push({ ...newItem });
         }

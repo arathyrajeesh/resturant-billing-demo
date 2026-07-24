@@ -1780,20 +1780,23 @@ h1, h2, h3, h4, h5, h6 {
 .swiggy-menu-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .swiggy-item-card {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 14px;
-  padding: 16px 0;
+  gap: 12px;
+  padding: 14px 0;
   border-bottom: 1px dashed var(--surface-border);
   position: relative;
+  width: 100%;
 }
 
 .swiggy-item-left {
   flex: 1;
+  min-width: 0; /* Prevents text overflow from pushing right column out of screen on mobile */
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -1804,6 +1807,7 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   gap: 8px;
   margin-bottom: 2px;
+  flex-wrap: wrap;
 }
 
 .reordered-badge {
@@ -1823,6 +1827,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 800;
   color: var(--text-dark);
   line-height: 1.3;
+  word-break: break-word;
 }
 
 .swiggy-item-price {
@@ -1846,7 +1851,7 @@ h1, h2, h3, h4, h5, h6 {
 .swiggy-action-icons {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   margin-top: 8px;
 }
 
@@ -1865,7 +1870,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .swiggy-item-right {
-  width: 125px;
+  width: 110px;
+  min-width: 110px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -1874,16 +1880,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .swiggy-item-img {
-  width: 120px;
-  height: 110px;
-  border-radius: 16px;
+  width: 100px;
+  height: 95px;
+  border-radius: 14px;
   object-fit: cover;
   box-shadow: var(--shadow-sm);
   cursor: pointer;
 }
 
 .swiggy-add-btn-box {
-  margin-top: -22px;
+  margin-top: -20px;
   position: relative;
   z-index: 10;
   text-align: center;
@@ -1893,14 +1899,14 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--surface-white);
   color: #E11D48;
   border: 1.5px solid #FFE4E6;
-  padding: 8px 24px;
-  border-radius: 10px;
-  font-size: 14px;
+  padding: 6px 18px;
+  border-radius: 8px;
+  font-size: 13px;
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(225, 29, 72, 0.15);
   transition: all 0.15s ease;
-  min-width: 96px;
+  min-width: 82px;
 }
 
 .swiggy-add-btn:hover {
@@ -1918,6 +1924,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Swiggy Red Bottom Sticky Bar matching Screenshot 1 */
 .swiggy-sticky-bottom-bar {
+  display: none;
   position: fixed;
   bottom: 12px;
   left: 50%;
@@ -1930,7 +1937,6 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 16px;
   z-index: 900;
   box-shadow: 0 8px 24px rgba(225, 29, 72, 0.35);
-  display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
@@ -1941,27 +1947,15 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateX(-50%) scale(1.01);
 }
 
-/* Floating Menu Pill Button */
-.floating-menu-pill {
-  position: fixed;
-  bottom: 74px;
-  right: 20px;
-  background: #18181B;
-  color: #FFFFFF;
-  padding: 10px 16px;
-  border-radius: 24px;
-  font-size: 13px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-  z-index: 890;
-  cursor: pointer;
-  border: none;
-}
-
 @media (max-width: 900px) {
+  .swiggy-sticky-bottom-bar {
+    display: flex !important;
+  }
+  
+  .desktop-only-submit-btn {
+    display: none !important;
+  }
+  
   .mobile-sticky-cart-bar {
     display: flex;
   }

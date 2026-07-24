@@ -1419,11 +1419,17 @@ class App {
 
                 <div class="kds-items">
                   ${o.items.map(item => `
-                    <div class="kds-item-row">
-                      <div>
+                    <div class="kds-item-row" style="flex-direction:column; align-items:flex-start; margin-bottom:8px; padding-bottom:6px; border-bottom:1px dashed var(--surface-border);">
+                      <div style="display:flex; align-items:center; width:100%; gap:8px;">
                         <span class="kds-item-qty">${item.quantity}</span>
-                        <span>${item.name}</span>
+                        <span style="font-weight:700; font-size:14px; color:var(--text-dark);">${item.name}</span>
                       </div>
+                      ${item.notes ? `
+                        <div style="margin-left:32px; margin-top:4px; font-size:12px; font-weight:800; color:#C2410C; background:#FFF7ED; padding:4px 10px; border-radius:8px; border:1.5px solid #FDBA74; display:inline-flex; align-items:center; gap:4px;">
+                          <span>⚠️ Special Request:</span>
+                          <span>"${item.notes}"</span>
+                        </div>
+                      ` : ''}
                     </div>
                   `).join('')}
                 </div>
@@ -1474,20 +1480,6 @@ class App {
 
     this.container.innerHTML = `
       <div class="view-container">
-        <!-- Header Banner -->
-        <div style="background:linear-gradient(135deg, var(--primary), var(--primary-hover)); border-radius:var(--radius-lg); padding:20px; color:#FFF; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; box-shadow:var(--shadow-md);">
-          <div>
-            <h2 style="color:#FFF; font-size:22px;">Malabar Table - Self Ordering</h2>
-            <p style="opacity:0.95; font-size:13px; margin-top:2px;">Table ${table.number} (${table.section || 'Main Hall'})</p>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:12px; background:rgba(255,255,255,0.2); padding:6px 12px; border-radius:20px; font-weight:700;">Simulate Table:</span>
-            <select style="background:#FFF; color:#0F172A; border:none; padding:6px 10px; border-radius:8px; font-weight:800; cursor:pointer;" onchange="window.store.setView('customer', {tableId: Number(this.value)})">
-              ${store.tables.map(t => `<option value="${t.id}" ${t.id === table.id ? 'selected' : ''}>Table ${t.number}</option>`).join('')}
-            </select>
-          </div>
-        </div>
-
         <!-- Live Order Status Tracker (If table has an active order) -->
         ${customerOrder ? `
           <div class="panel-card" style="border-left: 5px solid ${customerOrder.status === 'ready' ? 'var(--success)' : customerOrder.status === 'preparing' ? 'var(--primary)' : customerOrder.status === 'served' ? '#8B5CF6' : 'var(--warning)'}; margin-bottom:24px;">
@@ -1544,11 +1536,7 @@ class App {
             </div>
             <p style="font-size:11px; color:var(--text-muted); margin-top:10px; text-align:center;">Want to order extra food or drinks? Select items below and tap <strong>'Submit Order'</strong>.</p>
           </div>
-        ` : `
-          <div class="panel-card" style="background:var(--primary-light); border:1px solid var(--primary); margin-bottom:20px; text-align:center; padding:14px;">
-            <p style="font-size:13px; font-weight:700; color:var(--primary);">Ready to order? Select your dishes below & tap <strong>'Submit Order'</strong>.</p>
-          </div>
-        `}
+        ` : ''}
 
         <!-- Main Order Interface Grid -->
         <div class="web-pos-grid">
@@ -1579,6 +1567,7 @@ class App {
                 const cartItemId = item.portions ? `${item.id}_${activePortion}` : item.id;
                 const cartEntry = (this.customerCart || []).find(c => c.itemId === cartItemId);
                 const qty = cartEntry ? cartEntry.quantity : 0;
+                const itemImg = item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80';
 
                 return `
                   <div class="swiggy-item-card">
@@ -1594,14 +1583,15 @@ class App {
                       <div class="swiggy-item-price">₹${price}</div>
                       <p class="swiggy-item-desc">${item.description}</p>
 
-                      <div class="swiggy-action-icons">
-                        <button class="icon-btn-circle" title="Bookmark" onclick="window.store.showToast('Saved to favorites!', '🔖')">🔖</button>
+                      <div class="swiggy-action-icons" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:10px;">
+                        <button class="btn-primary" style="padding:6px 14px; font-size:12px; font-weight:800; border-radius:8px;" onclick="window.app.openItemCustomizationModal('${item.id}')">+ Add to Order</button>
+                        <button class="icon-btn-circle" title="Bookmark" onclick="window.store.showToast('Saved to favorites!', '🔖')">🤍</button>
                         <button class="icon-btn-circle" title="Share" onclick="navigator.clipboard ? navigator.clipboard.writeText(window.location.href) : null; window.store.showToast('Dish link copied!', '🔗')">🔗</button>
                       </div>
                     </div>
 
                     <div class="swiggy-item-right">
-                      <img src="${item.image}" class="swiggy-item-img" alt="${item.name}" onclick="window.app.openItemCustomizationModal('${item.id}')" />
+                      <img src="${itemImg}" class="swiggy-item-img" alt="${item.name}" onclick="window.app.openItemCustomizationModal('${item.id}')" />
                       <div class="swiggy-add-btn-box">
                         ${item.available === false ? `
                           <button class="swiggy-add-btn" disabled style="opacity:0.6; cursor:not-allowed; color:var(--danger); border-color:var(--surface-border);">Out of Stock</button>
@@ -1673,7 +1663,7 @@ class App {
                 <span>₹${grandTotal}</span>
               </div>
 
-              <button class="btn-primary" style="width:100%; justify-content:center; padding:12px; font-size:14px; font-weight:800;" ${(!this.customerCart || this.customerCart.length === 0) ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="window.app.submitCustomerOrder()">
+              <button class="btn-primary desktop-only-submit-btn" style="width:100%; justify-content:center; padding:12px; font-size:14px; font-weight:800;" ${(!this.customerCart || this.customerCart.length === 0) ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="window.app.submitCustomerOrder()">
                 Submit Order to Kitchen
               </button>
             </div>
@@ -1681,7 +1671,7 @@ class App {
         </div>
 
         ${(this.customerCart && this.customerCart.length > 0) ? `
-          <div class="swiggy-sticky-bottom-bar" onclick="const p = document.getElementById('customer-cart-panel'); if (p) p.scrollIntoView({behavior:'smooth'});">
+          <div class="swiggy-sticky-bottom-bar" onclick="window.app.submitCustomerOrder()">
             <div style="display:flex; align-items:center; gap:10px;">
               <div style="width:32px; height:32px; background:rgba(255,255,255,0.2); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px;">🛍️</div>
               <div>
@@ -1694,10 +1684,6 @@ class App {
             </div>
           </div>
         ` : ''}
-
-        <button class="floating-menu-pill" onclick="window.scrollTo({top:0, behavior:'smooth'})">
-          🍴 Menu
-        </button>
       </div>
     `;
   }
