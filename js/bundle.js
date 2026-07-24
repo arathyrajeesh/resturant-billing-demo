@@ -2402,13 +2402,13 @@ class App {
                       </div>
                     </div>
 
-                    <div class="swiggy-item-right">
-                      <img src="${itemImg}" class="swiggy-item-img" alt="${item.name}" onclick="window.app.openItemCustomizationModal('${item.id}')" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80';" />
-                      <div class="swiggy-add-btn-box">
+                    <div class="swiggy-item-right" style="width:90px;min-width:90px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;position:relative;">
+                      <img src="${itemImg}" class="swiggy-item-img" alt="${item.name}" onclick="window.app.openItemCustomizationModal('${item.id}')" style="width:82px;height:78px;border-radius:12px;object-fit:cover;display:block;cursor:pointer;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80';" />
+                      <div class="swiggy-add-btn-box" style="margin-top:-16px;position:relative;z-index:10;text-align:center;">
                         ${item.available === false ? `
                           <button class="swiggy-add-btn" disabled style="opacity:0.6; cursor:not-allowed; color:var(--danger); border-color:var(--surface-border);">Out of Stock</button>
                         ` : qty > 0 ? `
-                          <div class="counter-stepper-lg" style="width:104px;">
+                          <div class="counter-stepper-lg" style="width:88px;">
                             <button type="button" class="counter-btn-lg" onclick="window.app.updateCustomerCartQty('${cartItemId}', -1)">-</button>
                             <span class="counter-val-lg">${qty}</span>
                             <button type="button" class="counter-btn-lg" onclick="window.app.updateCustomerCartQty('${cartItemId}', 1)">+</button>
