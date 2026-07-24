@@ -672,7 +672,9 @@ class App {
                   <div class="table-card-std ${t.status}">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                       <div class="table-title" style="margin-bottom:0;">${t.number}</div>
-                      <button class="btn-enterprise" style="padding:2px 6px; font-size:11px; color:var(--danger); border-color:var(--danger);" onclick="window.app.deleteTable(${t.id})" title="Delete ${t.number}">🗑️</button>
+                      <button class="btn-table-delete" onclick="window.app.deleteTable(${t.id})" title="Delete ${t.number}">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                      </button>
                     </div>
                     <div style="font-size:11px; color:var(--text-muted); font-weight:600;">${t.seats} Seats • ${t.section || 'Main'}</div>
                     <button class="table-qr-btn" onclick="window.app.openQRModal(${t.id})">Real QR Sticker</button>
@@ -1123,7 +1125,9 @@ class App {
                   <div class="table-card-std ${t.status}">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                       <div class="table-title" style="margin-bottom:0;">${t.number}</div>
-                      <button class="btn-enterprise" style="padding:2px 6px; font-size:11px; color:var(--danger); border-color:var(--danger);" onclick="window.app.deleteTable(${t.id})" title="Delete ${t.number}">🗑️</button>
+                      <button class="btn-table-delete" onclick="window.app.deleteTable(${t.id})" title="Delete ${t.number}">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                      </button>
                     </div>
                     <div style="font-size:12px; color:var(--text-muted); font-weight:600;">${t.seats} Seats</div>
                     <span class="status-tag ${t.status === 'available' ? 'tag-available' : t.status === 'occupied' ? 'tag-occupied' : 'tag-bill'}">
@@ -1647,7 +1651,7 @@ class App {
           </div>
 
           <!-- Customer Cart Summary & Submit Order Drawer -->
-          <div class="web-pos-cart-panel" id="customer-cart-panel">
+          <div class="web-pos-cart-panel ${(!this.customerCart || this.customerCart.length === 0) ? 'empty-cart-mobile' : ''}" id="customer-cart-panel">
             <div>
               <div style="padding-bottom:14px; border-bottom:1px solid var(--surface-border); margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;">
                 <h3>Your Order</h3>

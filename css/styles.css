@@ -480,6 +480,26 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 4px;
 }
 
+.btn-table-delete {
+  background: rgba(225, 29, 72, 0.08);
+  border: 1px solid rgba(225, 29, 72, 0.25);
+  color: #E11D48;
+  border-radius: 6px;
+  padding: 4px 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-table-delete:hover {
+  background: #E11D48;
+  color: #FFFFFF;
+  border-color: #E11D48;
+  transform: scale(1.06);
+}
+
 /* High Contrast Available Table (Green) */
 .table-card-std.available {
   border-color: #10B981;
@@ -2057,6 +2077,10 @@ h1, h2, h3, h4, h5, h6 {
 
   .swiggy-add-btn-box {
     margin-top: -16px !important;
+  }
+
+  .empty-cart-mobile {
+    display: none !important;
   }
 }
 
