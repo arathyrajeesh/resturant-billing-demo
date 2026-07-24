@@ -1966,8 +1966,62 @@ h1, h2, h3, h4, h5, h6 {
     flex-direction: column;
     justify-content: space-between;
   }
+}/* ================= MOBILE IMAGE DISPLAY FOR SWIGGY CARDS ================= */
+
+/* Ensure image always shows on mobile */
+@media (max-width: 640px) {
+  .swiggy-item-card {
+    gap: 8px !important;
+    padding: 12px 0 !important;
+  }
+
+  .swiggy-item-right {
+    width: 90px !important;
+    min-width: 90px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+  }
+
+  .swiggy-item-img {
+    width: 82px !important;
+    height: 78px !important;
+    border-radius: 12px !important;
+    object-fit: cover !important;
+    display: block !important;
+  }
+
+  .swiggy-item-name {
+    font-size: 14px !important;
+  }
+
+  .swiggy-item-price {
+    font-size: 13px !important;
+  }
+
+  .swiggy-item-desc {
+    font-size: 11px !important;
+  }
+
+  .swiggy-add-btn {
+    padding: 5px 12px !important;
+    font-size: 12px !important;
+    min-width: 72px !important;
+  }
+
+  .swiggy-add-btn-box {
+    margin-top: -16px !important;
+  }
 }
 
+@media (max-width: 380px) {
+  .swiggy-item-right {
+    width: 80px !important;
+    min-width: 80px !important;
+  }
 
-
+  .swiggy-item-img {
+    width: 72px !important;
+    height: 68px !important;
+  }
+}
 
