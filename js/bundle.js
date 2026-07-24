@@ -1587,7 +1587,7 @@ class App {
                 ${(this.showAllAdminTables ? store.tables : store.tables.slice(0, 5)).map(t => {
                   const tableOrder = store.orders.find(o => o.tableId === t.id && o.paymentStatus === 'unpaid' && o.status !== 'completed');
                   return `
-                    <div class="table-card-std ${t.status}">
+                    <div class="table-card-std table-card-compact ${t.status}">
                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                         <div class="table-title" style="margin-bottom:0;">${t.number}</div>
                         <div style="display:flex; align-items:center; gap:6px;">
