@@ -2366,8 +2366,6 @@ class App {
 
                       <div class="swiggy-action-icons" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:10px;">
                         <button class="btn-primary" style="padding:6px 14px; font-size:12px; font-weight:800; border-radius:8px;" onclick="window.app.openItemCustomizationModal('${item.id}')">+ Add to Order</button>
-                        <button class="icon-btn-circle" title="Bookmark" onclick="window.store.showToast('Saved to favorites!', '🔖')">🤍</button>
-                        <button class="icon-btn-circle" title="Share" onclick="navigator.clipboard ? navigator.clipboard.writeText(window.location.href) : null; window.store.showToast('Dish link copied!', '🔗')">🔗</button>
                       </div>
                     </div>
 
