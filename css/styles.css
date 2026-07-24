@@ -24,7 +24,7 @@
   --warning: #E5A84B;
   --danger: #DC2626;
   --purple: #7C3AED;
-  --blue: #2563EB;
+  --blue: #280E09;
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -553,8 +553,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .table-qr-btn {
   margin-top: 8px;
-  background: var(--primary);
-  border: none;
+  background: #280E09;
+  border: 1px solid #4D2117;
   color: #FFFFFF !important;
   width: 100%;
   padding: 7px 0;
@@ -562,6 +562,12 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.table-qr-btn:hover {
+  background: #42180F;
+  border-color: var(--primary);
 }
 
 .table-qr-btn:hover {
