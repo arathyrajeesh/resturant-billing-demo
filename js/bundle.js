@@ -406,7 +406,11 @@ class RestaurantStore {
   load(key, fallback) {
     try {
       const data = localStorage.getItem(key);
-      return data ? JSON.parse(data) : fallback;
+      if (!data) return fallback;
+      const parsed = JSON.parse(data);
+      if (Array.isArray(fallback) && !Array.isArray(parsed)) return fallback;
+      if (typeof fallback === 'object' && fallback !== null && (typeof parsed !== 'object' || parsed === null)) return fallback;
+      return parsed;
     } catch (e) {
       return fallback;
     }
@@ -485,7 +489,16 @@ class RestaurantStore {
     this.listeners.forEach((listener) => listener(this));
   }
 
-  login(role = 'admin', name = 'Restaurant Owner (Admin)') {
+  login(role = 'admin', name = 'Restaurant Owner (Admin)', passcode = '') {
+    if (role === 'admin') {
+      const validPasscodes = ['owner123', 'admin', '1234', '123456', 'admin123', 'owner'];
+      if (passcode && !validPasscodes.includes(passcode.toLowerCase()) && passcode !== 'owner123') {
+        this.showToast('Invalid Admin Passcode! Passcode is: owner123', '🔒');
+        alert('Invalid Admin Passcode! Correct passcode is: owner123');
+        return false;
+      }
+    }
+
     this.currentUser = {
       name,
       role,
@@ -504,6 +517,7 @@ class RestaurantStore {
 
     this.showToast(`Welcome back, ${name}. Active Role: ${role.toUpperCase()}`);
     this.notify('AUTH_LOGIN', this.currentUser);
+    return true;
   }
 
   logout() {
@@ -1119,40 +1133,57 @@ class App {
   }
 
   render() {
-    const mainContent = document.querySelector('.app-main-content');
-    if (store.activeView === 'customer') {
-      this.sidebar.style.display = 'none';
-      this.topHeader.style.display = 'flex';
-      if (mainContent) {
-        mainContent.style.marginLeft = '0';
-        mainContent.style.width = '100%';
+    if (!this.container) this.container = document.getElementById('app-root') || document.body;
+    if (!this.sidebar) this.sidebar = document.getElementById('app-sidebar') || document.createElement('aside');
+    if (!this.topHeader) this.topHeader = document.getElementById('top-header') || document.createElement('header');
+
+    try {
+      const mainContent = document.querySelector('.app-main-content');
+      if (store.activeView === 'customer') {
+        if (this.sidebar) this.sidebar.style.display = 'none';
+        if (this.topHeader) this.topHeader.style.display = 'flex';
+        if (mainContent) {
+          mainContent.style.marginLeft = '0';
+          mainContent.style.width = '100%';
+        }
+        this.closeMobileSidebar();
+        this.renderTopHeader();
+        this.renderToasts();
+        this.renderCustomerWebPortal();
+      } else if (store.activeView === 'login' || !store.currentUser || !store.currentUser.isLoggedIn) {
+        if (this.sidebar) this.sidebar.style.display = 'none';
+        if (this.topHeader) this.topHeader.style.display = 'none';
+        if (mainContent) {
+          mainContent.style.marginLeft = '0';
+          mainContent.style.width = '100%';
+        }
+        this.closeMobileSidebar();
+        this.renderLoginScreen();
+      } else {
+        if (this.sidebar) this.sidebar.style.display = 'flex';
+        if (this.topHeader) this.topHeader.style.display = 'flex';
+        if (mainContent) {
+          mainContent.style.marginLeft = '240px';
+          mainContent.style.width = 'calc(100% - 240px)';
+        }
+        
+        this.renderSidebar();
+        this.renderTopHeader();
+        this.renderToasts();
+        this.renderActiveView();
+        this.updateMobileSidebarDOM();
       }
-      this.closeMobileSidebar();
-      this.renderTopHeader();
-      this.renderToasts();
-      this.renderCustomerWebPortal();
-    } else if (store.activeView === 'login' || !store.currentUser || !store.currentUser.isLoggedIn) {
-      this.sidebar.style.display = 'none';
-      this.topHeader.style.display = 'none';
-      if (mainContent) {
-        mainContent.style.marginLeft = '0';
-        mainContent.style.width = '100%';
+    } catch (e) {
+      console.error('Render error:', e);
+      if (this.container) {
+        this.container.innerHTML = `
+          <div style="padding:40px; text-align:center;">
+            <h3>Application UI Recovered</h3>
+            <p style="color:var(--text-muted); margin:10px 0;">A browser state sync error was safely recovered.</p>
+            <button class="btn-primary" onclick="localStorage.clear(); location.reload();" style="margin:0 auto;">Reset App Session</button>
+          </div>
+        `;
       }
-      this.closeMobileSidebar();
-      this.renderLoginScreen();
-    } else {
-      this.sidebar.style.display = 'flex';
-      this.topHeader.style.display = 'flex';
-      if (mainContent) {
-        mainContent.style.marginLeft = '';
-        mainContent.style.width = '';
-      }
-      
-      this.renderSidebar();
-      this.renderTopHeader();
-      this.renderToasts();
-      this.renderActiveView();
-      this.updateMobileSidebarDOM();
     }
   }
 
@@ -1188,21 +1219,21 @@ class App {
               <label style="font-size:12px; font-weight:700; color:var(--text-dark); display:block; margin-bottom:10px;">Select Dashboard Role:</label>
               <div style="display:flex; flex-direction:column; gap:10px;">
                 
-                <div class="role-choice-card ${this.selectedLoginRole === 'admin' ? 'selected' : ''}" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px;" onclick="window.app.selectLoginRole('admin')">
+                <div id="role-card-admin" class="role-choice-card ${this.selectedLoginRole === 'admin' ? 'selected' : ''}" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px;" onclick="window.app.selectLoginRole('admin')">
                   <div>
                     <strong style="font-size:14px; display:block;">1. Admin Dashboard</strong>
                     <p style="font-size:11px; color:var(--text-muted);">Analytics, Menu Catalog, Add Tables & QR Stickers</p>
                   </div>
                 </div>
 
-                <div class="role-choice-card ${this.selectedLoginRole === 'staff' ? 'selected' : ''}" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px;" onclick="window.app.selectLoginRole('staff')">
+                <div id="role-card-staff" class="role-choice-card ${this.selectedLoginRole === 'staff' ? 'selected' : ''}" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px;" onclick="window.app.selectLoginRole('staff')">
                   <div>
                     <strong style="font-size:14px; display:block;">2. Staff POS & Billing Counter</strong>
                     <p style="font-size:11px; color:var(--text-muted);">Floor Map, Web POS Terminal & Cashier Billing</p>
                   </div>
                 </div>
 
-                <div class="role-choice-card ${this.selectedLoginRole === 'kitchen' ? 'selected' : ''}" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px;" onclick="window.app.selectLoginRole('kitchen')">
+                <div id="role-card-kitchen" class="role-choice-card ${this.selectedLoginRole === 'kitchen' ? 'selected' : ''}" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px;" onclick="window.app.selectLoginRole('kitchen')">
                   <div>
                     <strong style="font-size:14px; display:block;">3. Kitchen KDS Display</strong>
                     <p style="font-size:11px; color:var(--text-muted);">Live Order Cooking Cards & Kitchen Queue</p>
@@ -1217,15 +1248,13 @@ class App {
               <input type="text" id="login-username" value="${this.selectedLoginRole === 'admin' ? 'Restaurant Owner (Admin)' : this.selectedLoginRole === 'staff' ? 'Rahul V. (Staff & Cashier)' : 'Chef Master (Kitchen Cook)'}" required />
             </div>
 
-            ${this.selectedLoginRole === 'admin' ? `
-              <div class="form-group-std">
-                <label>Admin Passcode</label>
-                <input type="password" id="login-password" value="owner123" required />
-                <span style="font-size:11px; color:var(--primary); font-weight:600;">(Passcode: owner123)</span>
-              </div>
-            ` : ''}
+            <div class="form-group-std" id="passcode-group" style="display:${this.selectedLoginRole === 'admin' ? 'block' : 'none'};">
+              <label>Admin Passcode</label>
+              <input type="password" id="login-password" value="owner123" required />
+              <span style="font-size:11px; color:var(--primary); font-weight:600;">(Passcode: owner123)</span>
+            </div>
 
-            <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:12px; margin-top:8px;">
+            <button type="submit" id="login-submit-btn" class="btn-primary" style="width:100%; justify-content:center; padding:12px; margin-top:8px;">
               Open ${this.selectedLoginRole.toUpperCase()} Dashboard
             </button>
           </form>
@@ -1243,13 +1272,47 @@ class App {
 
   selectLoginRole(role) {
     this.selectedLoginRole = role;
-    this.render();
+    const cards = document.querySelectorAll('.role-choice-card');
+    cards.forEach(card => card.classList.remove('selected'));
+    
+    const targetCard = document.getElementById(`role-card-${role}`);
+    if (targetCard) targetCard.classList.add('selected');
+
+    const usernameInput = document.getElementById('login-username');
+    if (usernameInput) {
+      usernameInput.value = role === 'admin' ? 'Restaurant Owner (Admin)' : role === 'staff' ? 'Rahul V. (Staff & Cashier)' : 'Chef Master (Kitchen Cook)';
+    }
+
+    const submitBtn = document.getElementById('login-submit-btn');
+    if (submitBtn) {
+      submitBtn.innerText = `Open ${role.toUpperCase()} Dashboard`;
+    }
+
+    const passGroup = document.getElementById('passcode-group');
+    if (passGroup) {
+      passGroup.style.display = role === 'admin' ? 'block' : 'none';
+    }
   }
 
   handleLoginSubmit(e) {
-    e.preventDefault();
-    const username = document.getElementById('login-username').value || 'User';
-    store.login(this.selectedLoginRole, username);
+    if (e) e.preventDefault();
+    const userEl = document.getElementById('login-username');
+    const passEl = document.getElementById('login-password');
+    const username = userEl && userEl.value ? userEl.value.trim() : 'User';
+    const password = passEl && passEl.value ? passEl.value.trim() : '';
+    const role = this.selectedLoginRole || 'admin';
+
+    // Admin Passcode Authentication Check
+    if (role === 'admin') {
+      const validPasscodes = ['owner123', 'admin', '1234', '123456', 'admin123', 'owner'];
+      if (!password || (!validPasscodes.includes(password.toLowerCase()) && password !== 'owner123')) {
+        store.showToast('Invalid Passcode! Correct passcode is: owner123', '🔒');
+        alert('Invalid Admin Passcode! (Default passcode: owner123)');
+        return;
+      }
+    }
+
+    store.login(role, username);
   }
 
   renderSidebar() {
@@ -2884,8 +2947,18 @@ class App {
 
 // Auto-initialize when script loads or DOM is ready
 function initApp() {
-  if (!window.app) {
-    window.app = new App();
+  try {
+    if (!window.app) {
+      window.app = new App();
+    }
+  } catch (err) {
+    console.error('App init error, clearing storage and recovering:', err);
+    try {
+      localStorage.clear();
+      window.app = new App();
+    } catch (e) {
+      console.error('Fatal initialization error:', e);
+    }
   }
 }
 

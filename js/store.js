@@ -63,7 +63,11 @@ class RestaurantStore {
   load(key, fallback) {
     try {
       const data = localStorage.getItem(key);
-      return data ? JSON.parse(data) : fallback;
+      if (!data) return fallback;
+      const parsed = JSON.parse(data);
+      if (Array.isArray(fallback) && !Array.isArray(parsed)) return fallback;
+      if (typeof fallback === 'object' && fallback !== null && (typeof parsed !== 'object' || parsed === null)) return fallback;
+      return parsed;
     } catch (e) {
       return fallback;
     }
@@ -473,6 +477,50 @@ class RestaurantStore {
       customerName: `${customer} (${isSwiggy ? 'Swiggy' : 'Zomato'})`,
       items: randomItems
     });
+  }
+
+  login(role = 'admin', name = 'Restaurant Owner (Admin)', passcode = '') {
+    if (role === 'admin') {
+      const validPasscodes = ['owner123', 'admin', '1234', '123456', 'admin123', 'owner'];
+      if (passcode && !validPasscodes.includes(passcode.toLowerCase()) && passcode !== 'owner123') {
+        this.showToast('Invalid Admin Passcode! Passcode is: owner123', '🔒');
+        alert('Invalid Admin Passcode! Correct passcode is: owner123');
+        return false;
+      }
+    }
+
+    this.currentUser = {
+      name,
+      role,
+      isLoggedIn: true
+    };
+
+    if (role === 'admin' || role === 'owner') {
+      this.activeView = 'admin';
+    } else if (role === 'kitchen') {
+      this.activeView = 'kitchen';
+    } else if (role === 'customer') {
+      this.activeView = 'customer';
+    } else {
+      this.activeView = 'staff';
+    }
+
+    this.save();
+    this.showToast(`Welcome back, ${name}. Active Role: ${role.toUpperCase()}`);
+    this.notify('AUTH_LOGIN', this.currentUser);
+    return true;
+  }
+
+  logout() {
+    this.currentUser = {
+      name: '',
+      role: '',
+      isLoggedIn: false
+    };
+    this.activeView = 'login';
+    this.save();
+    this.showToast('Logged out successfully.');
+    this.notify('AUTH_LOGOUT');
   }
 
   resetDemoData() {
