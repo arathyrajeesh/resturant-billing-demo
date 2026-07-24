@@ -1978,7 +1978,7 @@ h1, h2, h3, h4, h5, h6 {
   }
 }/* ================= MOBILE IMAGE DISPLAY FOR SWIGGY CARDS ================= */
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .view-container {
     padding: 10px 8px !important;
   }
@@ -2036,12 +2036,11 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .swiggy-item-desc {
-    font-size: 11px !important;
-    line-height: 1.35 !important;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 2 !important;
-    -webkit-box-orient: vertical !important;
-    overflow: hidden !important;
+    display: none !important;
+  }
+
+  .swiggy-action-icons {
+    display: none !important;
   }
 
   .swiggy-add-btn {

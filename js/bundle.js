@@ -859,7 +859,7 @@ class App {
     this.uploadedImageDataUrl = null;
     this.selectedImagePreset = 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&auto=format&fit=crop&q=80';
     this.uploadedReceiptLogoUrl = null;
-    this.staffSubTab = 'pos';
+    this.staffSubTab = 'floor';
     this.isMobileSidebarOpen = false;
     this.customerCart = [];
     this.selectedPortions = {};
@@ -1263,7 +1263,7 @@ class App {
                 <div id="role-card-staff" class="role-choice-card ${this.selectedLoginRole === 'staff' ? 'selected' : ''}" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px;" onclick="window.app.selectLoginRole('staff')">
                   <div>
                     <strong style="font-size:14px; display:block;">2. Staff POS & Billing Counter</strong>
-                    <p style="font-size:11px; color:var(--text-muted);">Floor Map, Web POS Terminal & Cashier Billing</p>
+                    <p style="font-size:11px; color:var(--text-muted);">Floor Map, Take Table Order & Cashier Billing</p>
                   </div>
                 </div>
 
@@ -1833,11 +1833,11 @@ class App {
     this.container.innerHTML = `
       <div class="view-container">
         <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
-          <button class="btn-enterprise ${this.staffSubTab === 'pos' ? 'btn-primary' : ''}" onclick="window.app.setStaffSubTab('pos')">
-            💻 Web POS Terminal
-          </button>
           <button class="btn-enterprise ${this.staffSubTab === 'floor' ? 'btn-primary' : ''}" onclick="window.app.setStaffSubTab('floor')">
             📍 Floor Map (${activeTablesCount}/${store.tables.length})
+          </button>
+          <button class="btn-enterprise ${this.staffSubTab === 'pos' ? 'btn-primary' : ''}" onclick="window.app.setStaffSubTab('pos')">
+            📝 Take Table Order
           </button>
           <button class="btn-enterprise ${this.staffSubTab === 'billing' ? 'btn-primary' : ''}" onclick="window.app.setStaffSubTab('billing')">
             💳 Cashier Billing (${unpaidOrders.length} Unpaid)
