@@ -1571,8 +1571,8 @@ class App {
                 const itemImg = item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80';
 
                 return `
-                  <div class="swiggy-item-card">
-                    <div class="swiggy-item-left">
+                  <div class="swiggy-item-card" style="display:flex !important; flex-direction:row !important; justify-content:space-between !important; align-items:flex-start !important; width:100% !important; box-sizing:border-box !important; gap:8px !important;">
+                    <div class="swiggy-item-left" style="flex:1 1 auto !important; width:calc(100% - 100px) !important; max-width:calc(100% - 100px) !important; min-width:0 !important; overflow:hidden !important; word-break:break-word !important;">
                       <div class="swiggy-badge-row">
                         <div class="item-veg-tag ${item.isVeg ? 'veg' : ''}">
                           <span class="dot"></span>
@@ -1589,13 +1589,13 @@ class App {
                       </div>
                     </div>
 
-                    <div class="swiggy-item-right">
-                      <img src="${itemImg}" class="swiggy-item-img" alt="${item.name}" onclick="window.app.openItemCustomizationModal('${item.id}')" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80';" />
-                      <div class="swiggy-add-btn-box">
+                    <div class="swiggy-item-right" style="width:92px !important; min-width:92px !important; max-width:92px !important; flex:0 0 92px !important; display:flex !important; flex-direction:column !important; align-items:center !important; position:relative !important;">
+                      <img src="${itemImg}" class="swiggy-item-img" alt="${item.name}" onclick="window.app.openItemCustomizationModal('${item.id}')" style="width:86px !important; height:80px !important; border-radius:12px !important; object-fit:cover !important; display:block !important; cursor:pointer !important;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80';" />
+                      <div class="swiggy-add-btn-box" style="margin-top:-16px !important; position:relative !important; z-index:10 !important; text-align:center !important;">
                         ${item.available === false ? `
                           <button class="swiggy-add-btn" disabled style="opacity:0.6; cursor:not-allowed; color:var(--danger); border-color:var(--surface-border);">Out of Stock</button>
                         ` : qty > 0 ? `
-                          <div class="counter-stepper-lg" style="width:104px;">
+                          <div class="counter-stepper-lg" style="width:84px !important;">
                             <button type="button" class="counter-btn-lg" onclick="window.app.updateCustomerCartQty('${cartItemId}', -1)">-</button>
                             <span class="counter-val-lg">${qty}</span>
                             <button type="button" class="counter-btn-lg" onclick="window.app.updateCustomerCartQty('${cartItemId}', 1)">+</button>
