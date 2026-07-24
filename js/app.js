@@ -668,18 +668,21 @@ class App {
               </div>
 
               <div class="tables-floor-grid">
-                ${(this.showAllAdminTables ? store.tables : store.tables.slice(0, 6)).map(t => `
+                ${(this.showAllAdminTables ? store.tables : store.tables.slice(0, 5)).map(t => `
                   <div class="table-card-std ${t.status}">
-                    <div class="table-title">${t.number}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                      <div class="table-title" style="margin-bottom:0;">${t.number}</div>
+                      <button class="btn-enterprise" style="padding:2px 6px; font-size:11px; color:var(--danger); border-color:var(--danger);" onclick="window.app.deleteTable(${t.id})" title="Delete ${t.number}">🗑️</button>
+                    </div>
                     <div style="font-size:11px; color:var(--text-muted); font-weight:600;">${t.seats} Seats • ${t.section || 'Main'}</div>
                     <button class="table-qr-btn" onclick="window.app.openQRModal(${t.id})">Real QR Sticker</button>
                   </div>
                 `).join('')}
               </div>
-              ${store.tables.length > 6 ? `
+              ${store.tables.length > 5 ? `
                 <div style="text-align:center; margin-top:14px;">
                   <button class="btn-enterprise" style="padding:8px 18px; font-weight:700; color:var(--primary); border-color:var(--primary);" onclick="window.app.toggleAdminTablesExpand()">
-                    ${this.showAllAdminTables ? '▲ Show Fewer Tables (Collapse to 6)' : `▼ Show More Tables (${store.tables.length - 6} More)`}
+                    ${this.showAllAdminTables ? '▲ Show Fewer Tables (Collapse to 5)' : `▼ Show More Tables (${store.tables.length - 5} More)`}
                   </button>
                 </div>
               ` : ''}
@@ -1118,7 +1121,10 @@ class App {
                 const tableOrder = store.orders.find(o => o.tableId === t.id && o.paymentStatus === 'unpaid' && o.status !== 'completed');
                 return `
                   <div class="table-card-std ${t.status}">
-                    <div class="table-title">${t.number}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                      <div class="table-title" style="margin-bottom:0;">${t.number}</div>
+                      <button class="btn-enterprise" style="padding:2px 6px; font-size:11px; color:var(--danger); border-color:var(--danger);" onclick="window.app.deleteTable(${t.id})" title="Delete ${t.number}">🗑️</button>
+                    </div>
                     <div style="font-size:12px; color:var(--text-muted); font-weight:600;">${t.seats} Seats</div>
                     <span class="status-tag ${t.status === 'available' ? 'tag-available' : t.status === 'occupied' ? 'tag-occupied' : 'tag-bill'}">
                       ${t.status.toUpperCase()}
@@ -1890,6 +1896,15 @@ class App {
   toggleStaffTablesExpand() {
     this.showAllStaffTables = !this.showAllStaffTables;
     this.render();
+  }
+
+  deleteTable(tableId) {
+    const table = store.tables.find(t => t.id === Number(tableId));
+    if (!table) return;
+    if (confirm(`Are you sure you want to delete Table ${table.number}?`)) {
+      store.deleteTable(tableId);
+      this.render();
+    }
   }
 
   handleDishFileUpload(event) {

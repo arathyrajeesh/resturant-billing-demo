@@ -1,14 +1,14 @@
 // Malabar Table - Master Centralized JavaScript Bundle (Offline & HTTP Client Demo)
 
 // ================= 1. INITIAL DATA =================
-const INITIAL_TABLES = Array.from({ length: 12 }, (_, i) => {
+const INITIAL_TABLES = Array.from({ length: 5 }, (_, i) => {
   const id = i + 1;
   return {
     id,
     number: `T-${id.toString().padStart(2, '0')}`,
     seats: id % 3 === 0 ? 6 : id % 2 === 0 ? 4 : 2,
-    status: id === 3 || id === 7 ? 'occupied' : id === 5 ? 'bill-requested' : 'available',
-    currentOrderId: id === 3 ? 'ORD-1002' : id === 7 ? 'ORD-1004' : id === 5 ? 'ORD-1001' : null,
+    status: id === 3 ? 'occupied' : id === 5 ? 'bill-requested' : 'available',
+    currentOrderId: id === 3 ? 'ORD-1002' : id === 5 ? 'ORD-1001' : null,
     qrUrl: `${window.location.origin}${window.location.pathname}?table=${id}`
   };
 });
@@ -829,10 +829,22 @@ class RestaurantStore {
     };
 
     this.tables.push(newTable);
+    this.save();
     soundEffects.playSuccessChime();
-    this.showToast(`Added Table ${newTable.number} with real QR Code!`, '📍');
+    this.showToast(`Added '${newTable.number}' (${newTable.seats} Seats)!`, '🪑');
     this.notify('TABLES_UPDATED', newTable);
     return newTable;
+  }
+
+  deleteTable(tableId) {
+    const tableIndex = this.tables.findIndex(t => t.id === Number(tableId));
+    if (tableIndex === -1) return;
+    const table = this.tables[tableIndex];
+    this.tables.splice(tableIndex, 1);
+    this.save();
+    soundEffects.playSuccessChime();
+    this.showToast(`Table '${table.number}' deleted!`, '🗑️');
+    this.notify('TABLES_UPDATED', { tableId });
   }
 
   simulateOnlineOrder(aggregator = 'swiggy') {
@@ -1572,18 +1584,21 @@ class App {
               </div>
 
               <div class="tables-floor-grid">
-                ${(this.showAllAdminTables ? store.tables : store.tables.slice(0, 6)).map(t => `
+                ${(this.showAllAdminTables ? store.tables : store.tables.slice(0, 5)).map(t => `
                   <div class="table-card-std ${t.status}">
-                    <div class="table-title">${t.number}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                      <div class="table-title" style="margin-bottom:0;">${t.number}</div>
+                      <button class="btn-enterprise" style="padding:2px 6px; font-size:11px; color:var(--danger); border-color:var(--danger);" onclick="window.app.deleteTable(${t.id})" title="Delete ${t.number}">🗑️</button>
+                    </div>
                     <div style="font-size:11px; color:var(--text-muted); font-weight:600;">${t.seats} Seats • ${t.section || 'Main'}</div>
                     <button class="table-qr-btn" onclick="window.app.openQRModal(${t.id})">Real QR Sticker</button>
                   </div>
                 `).join('')}
               </div>
-              ${store.tables.length > 6 ? `
+              ${store.tables.length > 5 ? `
                 <div style="text-align:center; margin-top:14px;">
                   <button class="btn-enterprise" style="padding:8px 18px; font-weight:700; color:var(--primary); border-color:var(--primary);" onclick="window.app.toggleAdminTablesExpand()">
-                    ${this.showAllAdminTables ? '▲ Show Fewer Tables (Collapse to 6)' : `▼ Show More Tables (${store.tables.length - 6} More)`}
+                    ${this.showAllAdminTables ? '▲ Show Fewer Tables (Collapse to 5)' : `▼ Show More Tables (${store.tables.length - 5} More)`}
                   </button>
                 </div>
               ` : ''}
@@ -2044,7 +2059,10 @@ class App {
                 const tableOrder = store.orders.find(o => o.tableId === t.id && o.paymentStatus === 'unpaid' && o.status !== 'completed');
                 return `
                   <div class="table-card-std ${t.status}">
-                    <div class="table-title">${t.number}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                      <div class="table-title" style="margin-bottom:0;">${t.number}</div>
+                      <button class="btn-enterprise" style="padding:2px 6px; font-size:11px; color:var(--danger); border-color:var(--danger);" onclick="window.app.deleteTable(${t.id})" title="Delete ${t.number}">🗑️</button>
+                    </div>
                     <div style="font-size:12px; color:var(--text-muted); font-weight:600;">${t.seats} Seats</div>
                     <span class="status-tag ${t.status === 'available' ? 'tag-available' : t.status === 'occupied' ? 'tag-occupied' : 'tag-bill'}">
                       ${t.status.toUpperCase()}
@@ -2951,6 +2969,15 @@ class App {
   toggleStaffTablesExpand() {
     this.showAllStaffTables = !this.showAllStaffTables;
     this.render();
+  }
+
+  deleteTable(tableId) {
+    const table = store.tables.find(t => t.id === Number(tableId));
+    if (!table) return;
+    if (confirm(`Are you sure you want to delete Table ${table.number}?`)) {
+      store.deleteTable(tableId);
+      this.render();
+    }
   }
 
   compressImageFile(file, maxWidth = 500, maxHeight = 500, quality = 0.82) {
