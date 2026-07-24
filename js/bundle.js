@@ -1260,7 +1260,7 @@ class App {
                 <div id="role-card-staff" class="role-choice-card ${this.selectedLoginRole === 'staff' ? 'selected' : ''}" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px;" onclick="window.app.selectLoginRole('staff')">
                   <div>
                     <strong style="font-size:14px; display:block;">2. Staff Ordering & Billing Counter</strong>
-                    <p style="font-size:11px; color:var(--text-muted);">Dining Tables, Take Table Order & Billing Section</p>
+                    <p style="font-size:11px; color:var(--text-muted);">Dining Tables, Take Order & Billing Section</p>
                   </div>
                 </div>
 
@@ -1574,9 +1574,14 @@ class App {
                         ${m.portions ? m.portions.map(p => `<span style="font-size:11px; padding:2px 6px; border-radius:4px; background:var(--bg-main); border:1px solid var(--surface-border); margin-right:4px;">${p.size}: <strong>₹${p.price}</strong></span>`).join('') : `<strong style="color:var(--primary)">₹${m.price}</strong>`}
                       </td>
                       <td>
-                        <button class="btn-enterprise" style="padding:4px 10px; font-size:11px; font-weight:800; color:${m.available === false ? 'var(--danger)' : 'var(--success)'}; border-color:${m.available === false ? 'var(--danger)' : 'var(--success)'};" onclick="window.store.toggleMenuItemAvailability('${m.id}')">
-                          ${m.available === false ? 'Out of Stock' : 'In Stock'}
-                        </button>
+                        <div style="display:flex; gap:6px; align-items:center;">
+                          <button class="btn-enterprise" style="padding:4px 10px; font-size:11px; font-weight:800; color:${m.available === false ? 'var(--danger)' : 'var(--success)'}; border-color:${m.available === false ? 'var(--danger)' : 'var(--success)'};" onclick="window.store.toggleMenuItemAvailability('${m.id}')">
+                            ${m.available === false ? 'Out of Stock' : 'In Stock'}
+                          </button>
+                          <button class="btn-enterprise" style="padding:4px 8px; font-size:11px; font-weight:700; color:var(--primary); border-color:var(--primary);" onclick="window.app.openEditDishImageModal('${m.id}')">
+                            📷 Upload Photo
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   `).join('')}
@@ -1821,7 +1826,7 @@ class App {
             📍 Dining Tables (${activeTablesCount}/${store.tables.length})
           </button>
           <button class="btn-enterprise ${this.staffSubTab === 'pos' ? 'btn-primary' : ''}" onclick="window.app.setStaffSubTab('pos')">
-            📝 Take Table Order
+            📝 Take Order
           </button>
           <button class="btn-enterprise ${this.staffSubTab === 'billing' ? 'btn-primary' : ''}" onclick="window.app.setStaffSubTab('billing')">
             💳 Billing Section (${unpaidOrders.length} Unpaid)
@@ -2366,8 +2371,17 @@ class App {
                 const cartEntry = (this.customerCart || []).find(c => c.itemId === cartItemId);
                 const qty = cartEntry ? cartEntry.quantity : 0;
                 const masterItem = MENU_ITEMS.find(m => m.id === item.id);
-                const defaultSvg = "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%2290%22%20viewBox%3D%220%200%20100%2090%22%3E%3Crect%20width%3D%22100%22%20height%3D%2290%22%20fill%3D%22%23334155%22%20rx%3D%2212%22%3E%3C%2Frect%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2255%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20font-size%3D%2238%22%3E%F0%9F%8D%9B%3C%2Ftext%3E%3C%2Fsvg%3E";
-                const itemImg = item.image || (masterItem ? masterItem.image : '') || defaultSvg;
+                const cat = item.category || (masterItem ? masterItem.category : 'mains');
+                let catEmoji = '🍛', c1 = '%23F97316', c2 = '%23EA580C';
+                if (cat === 'biryani') { catEmoji = '🍛'; c1 = '%23F97316'; c2 = '%23DC2626'; }
+                else if (cat === 'mains') { catEmoji = '🍲'; c1 = '%2310B981'; c2 = '%23047857'; }
+                else if (cat === 'starters') { catEmoji = '🍗'; c1 = '%23D97706'; c2 = '%23B45309'; }
+                else if (cat === 'breads') { catEmoji = '🫓'; c1 = '%23EAB308'; c2 = '%23CA8A04'; }
+                else if (cat === 'beverages') { catEmoji = '🍹'; c1 = '%2306B6D4'; c2 = '%230E7490'; }
+                else if (cat === 'desserts') { catEmoji = '🍧'; c1 = '%23EC4899'; c2 = '%23BE185D'; }
+
+                const defaultSvg = `data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%2290%22%20viewBox%3D%220%200%20100%2090%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22${c1}%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22${c2}%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22100%22%20height%3D%2290%22%20rx%3D%2214%22%20fill%3D%22url(%23g)%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2242%22%20r%3D%2226%22%20fill%3D%22rgba(255%2C255%2C255%2C0.2)%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22central%22%20text-anchor%3D%22middle%22%20font-size%3D%2230%22%3E${encodeURIComponent(catEmoji)}%3C%2Ftext%3E%3C%2Fsvg%3E`;
+                const itemImg = (item.image && item.image.length > 10 ? item.image : '') || (masterItem && masterItem.image ? masterItem.image : '') || defaultSvg;
 
                 return `
                   <div class="swiggy-item-card" style="display:flex !important; flex-direction:row !important; justify-content:space-between !important; align-items:flex-start !important; width:100% !important; box-sizing:border-box !important; gap:8px !important;">
@@ -2933,6 +2947,69 @@ class App {
     });
 
     const modal = document.getElementById('add-menu-modal');
+    if (modal) modal.remove();
+  }
+
+  openEditDishImageModal(itemId) {
+    const item = store.menu.find(m => m.id === itemId);
+    if (!item) return;
+
+    this.editingDishId = itemId;
+    this.uploadedImageDataUrl = null;
+
+    const modalHtml = `
+      <div class="modal-overlay" id="edit-dish-image-modal">
+        <div class="modal-card" style="max-width:460px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <h3 style="font-size:16px;">📁 Upload Photo for ${item.name}</h3>
+            <button class="modal-close" onclick="document.getElementById('edit-dish-image-modal').remove()">✕</button>
+          </div>
+
+          <form onsubmit="window.app.handleEditDishImageSubmit(event)">
+            <div class="form-group-std">
+              <label>Select Image File (Upload from Computer / Folder)</label>
+              
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                <input type="file" id="edit-dish-file-input" accept="image/*" style="display:none;" onchange="window.app.handleDishFileUpload(event)" />
+                <button type="button" class="btn-enterprise" style="flex:1; justify-content:center; padding:12px; font-weight:700; background:var(--bg-main);" onclick="document.getElementById('edit-dish-file-input').click()">
+                  📂 Browse Computer & Select Dish Image...
+                </button>
+              </div>
+
+              <div id="image-upload-preview" style="margin-bottom:12px; text-align:center;">
+                <img id="preview-img-tag" src="${item.image || ''}" style="max-height:140px; border-radius:12px; border:2px solid var(--primary); object-fit:cover;" alt="${item.name}" />
+                <p style="font-size:11px; color:var(--text-muted); font-weight:700; margin-top:4px;">Live Image Preview</p>
+              </div>
+
+              <input type="url" id="edit-dish-img-url" placeholder="Or paste image URL" value="${item.image || ''}" />
+            </div>
+
+            <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:11px; background:#059669; margin-top:10px;">
+              <span>💾</span> Save Dish Photo to Menu
+            </button>
+          </form>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  }
+
+  handleEditDishImageSubmit(e) {
+    e.preventDefault();
+    const itemId = this.editingDishId;
+    const item = store.menu.find(m => m.id === itemId);
+    if (!item) return;
+
+    const newUrl = this.uploadedImageDataUrl || document.getElementById('edit-dish-img-url').value;
+    if (newUrl) {
+      item.image = newUrl;
+      localStorage.setItem('malabar_menu', JSON.stringify(store.menu));
+      store.showToast(`Updated photo for ${item.name}!`, '🖼️');
+      store.notifyListeners();
+    }
+
+    const modal = document.getElementById('edit-dish-image-modal');
     if (modal) modal.remove();
   }
 
