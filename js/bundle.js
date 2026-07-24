@@ -401,6 +401,9 @@ class RestaurantStore {
         this.listeners.forEach((listener) => listener(this));
       }
     });
+
+    // Init Supabase real-time cross-device sync
+    setTimeout(() => this._initSupabase(), 500);
   }
 
   load(key, fallback) {
@@ -467,6 +470,62 @@ class RestaurantStore {
       this.toasts = this.toasts.filter(t => t.id !== toast.id);
       this.notify('TOAST_REMOVED');
     }, 3500);
+  }
+
+  async _initSupabase() {
+    if (typeof initSupabase === 'undefined') return;
+    initSupabase();
+
+    // Fetch all orders from Supabase and merge with local
+    const remoteOrders = await fetchOrdersFromSupabase();
+    if (remoteOrders && remoteOrders.length > 0) {
+      remoteOrders.forEach(ro => {
+        const localIdx = this.orders.findIndex(o => o.id === ro.id);
+        if (localIdx >= 0) {
+          this.orders[localIdx] = ro; // remote wins
+        } else {
+          this.orders.push(ro);
+        }
+      });
+      // Sort by order number descending
+      this.orders.sort((a, b) => (b.orderNumber || 0) - (a.orderNumber || 0));
+      // Update next order number
+      const maxNum = this.orders.reduce((max, o) => Math.max(max, o.orderNumber || 1000), 1000);
+      this.nextOrderNumber = maxNum + 1;
+      this.save();
+      this.listeners.forEach(l => l(this));
+    }
+
+    // Subscribe to real-time Supabase changes
+    subscribeToSupabaseOrders(
+      // onInsert — new order from another device
+      (order) => {
+        const exists = this.orders.find(o => o.id === order.id);
+        if (!exists) {
+          this.orders.unshift(order);
+          if (order.orderNumber >= this.nextOrderNumber) this.nextOrderNumber = order.orderNumber + 1;
+          soundEffects.playNewOrderChime();
+          this.showToast(`New Order #${order.orderNumber} (${order.tableNumber}) received!`, '🚀');
+          this.save();
+          this.listeners.forEach(l => l(this));
+        }
+      },
+      // onUpdate — order status changed on another device
+      (order) => {
+        const idx = this.orders.findIndex(o => o.id === order.id);
+        if (idx >= 0) {
+          this.orders[idx] = order;
+          this.save();
+          this.listeners.forEach(l => l(this));
+        }
+      },
+      // onDelete — order cleared on another device
+      (orderId) => {
+        this.orders = this.orders.filter(o => o.id !== orderId);
+        this.save();
+        this.listeners.forEach(l => l(this));
+      }
+    );
   }
 
   handleRemoteAction(data) {
@@ -592,6 +651,8 @@ class RestaurantStore {
       soundEffects.playNewOrderChime();
       this.showToast(`Order #${existingOrder.orderNumber} (Table ${tableNumber}) updated & dispatched to Kitchen!`, '🚀');
       this.notify('NEW_ORDER', existingOrder);
+      // Push to Supabase for cross-device sync
+      if (typeof syncOrderToSupabase !== 'undefined') syncOrderToSupabase(existingOrder);
       return existingOrder;
     }
 
@@ -630,6 +691,8 @@ class RestaurantStore {
     soundEffects.playNewOrderChime();
     this.showToast(`Order #${newOrder.orderNumber} dispatched to Kitchen & Billing!`, '🚀');
     this.notify('NEW_ORDER', newOrder);
+    // Push to Supabase for cross-device sync
+    if (typeof syncOrderToSupabase !== 'undefined') syncOrderToSupabase(newOrder);
     return newOrder;
   }
 
@@ -648,6 +711,8 @@ class RestaurantStore {
       this.orders = this.orders.filter(o => o.id !== orderId);
       this.showToast(`Order #${order.orderNumber} cleared.`, '🗑️');
       this.notify('ORDER_DELETED', orderId);
+      // Delete from Supabase for cross-device sync
+      if (typeof deleteOrderFromSupabase !== 'undefined') deleteOrderFromSupabase(orderId);
       return;
     }
 
@@ -669,6 +734,8 @@ class RestaurantStore {
     soundEffects.playNewOrderChime();
     this.showToast(`Order #${order.orderNumber} updated and dispatched to Kitchen!`, '✏️');
     this.notify('ORDER_UPDATED', order);
+    // Push to Supabase for cross-device sync
+    if (typeof syncOrderToSupabase !== 'undefined') syncOrderToSupabase(order);
   }
 
   updateOrderStatus(orderId, newStatus) {
@@ -694,6 +761,8 @@ class RestaurantStore {
 
     this.showToast(`Order #${order.orderNumber} ${order.status === 'completed' ? 'Cleared & Completed' : 'Status: ' + order.status.toUpperCase()}`, '👨‍🍳');
     this.notify('ORDER_STATUS_UPDATED', { orderId, newStatus: order.status });
+    // Push to Supabase for cross-device sync
+    if (typeof syncOrderToSupabase !== 'undefined') syncOrderToSupabase(order);
   }
 
   settleBill(orderId, paymentMethod = 'UPI') {
@@ -715,6 +784,8 @@ class RestaurantStore {
     soundEffects.playSuccessChime();
     this.showToast(`Table ${order.tableNumber} bill cleared via ${paymentMethod}!`, '💵');
     this.notify('PAYMENT_COMPLETE', { orderId, paymentMethod });
+    // Push to Supabase for cross-device sync
+    if (typeof syncOrderToSupabase !== 'undefined') syncOrderToSupabase(order);
   }
 
   addMenuItem(itemData) {
