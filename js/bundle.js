@@ -2515,6 +2515,7 @@ class App {
 
     this.customerCart = [];
     this.render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   openEditOrderModal(orderId) {
