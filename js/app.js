@@ -1124,9 +1124,9 @@ class App {
                       ${t.status.toUpperCase()}
                     </span>
                     <div style="display:flex; flex-direction:column; gap:4px; width:100%; margin-top:8px;">
-                      <div style="display:flex; gap:4px; width:100%;">
-                        <button class="table-qr-btn" style="flex:1; padding:6px 4px; font-size:11px;" onclick="window.app.openStaffOrderForTable(${t.id})">➕ ${tableOrder ? 'Add Items' : 'Take Order'}</button>
-                        <button class="table-qr-btn" style="background:#0284C7; color:#FFF; padding:6px 6px; font-size:11px; white-space:nowrap;" onclick="window.app.openQRModal(${t.id})" title="Show QR Code for ${t.number}">📱 QR Code</button>
+                      <div style="display:flex; gap:6px; width:100%; align-items:center;">
+                        <button class="table-qr-btn" style="flex:1 1 0%; min-width:0; padding:7px 4px; font-size:11px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" onclick="window.app.openStaffOrderForTable(${t.id})">➕ ${tableOrder ? 'Add Items' : 'Take Order'}</button>
+                        <button class="table-qr-btn" style="flex:1 1 0%; min-width:0; background:#0284C7; color:#FFF; padding:7px 4px; font-size:11px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" onclick="window.app.openQRModal(${t.id})" title="Show QR Code for ${t.number}">📱 QR Code</button>
                       </div>
                       ${tableOrder ? `
                         <button class="table-qr-btn" style="background:var(--blue); color:#FFF;" onclick="window.app.openEditOrderModal('${tableOrder.id}')">✏️ Edit Order</button>

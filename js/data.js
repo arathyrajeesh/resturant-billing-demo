@@ -1,13 +1,13 @@
 // Malabar Table - Master Menu & Initial State Data
 
-export const INITIAL_TABLES = Array.from({ length: 12 }, (_, i) => {
+export const INITIAL_TABLES = Array.from({ length: 5 }, (_, i) => {
   const id = i + 1;
   return {
     id,
     number: `T-${id.toString().padStart(2, '0')}`,
     seats: id % 3 === 0 ? 6 : id % 2 === 0 ? 4 : 2,
-    status: id === 3 || id === 7 ? 'occupied' : id === 5 ? 'bill-requested' : 'available',
-    currentOrderId: id === 3 ? 'ORD-1002' : id === 7 ? 'ORD-1004' : id === 5 ? 'ORD-1001' : null,
+    status: id === 3 ? 'occupied' : id === 5 ? 'bill-requested' : 'available',
+    currentOrderId: id === 3 ? 'ORD-1002' : id === 5 ? 'ORD-1001' : null,
     qrUrl: `${window.location.origin}${window.location.pathname}?table=${id}`
   };
 });

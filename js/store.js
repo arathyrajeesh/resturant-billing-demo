@@ -200,6 +200,17 @@ class RestaurantStore {
     return newItem;
   }
 
+  deleteTable(tableId) {
+    const tableIndex = this.tables.findIndex(t => t.id === Number(tableId));
+    if (tableIndex === -1) return;
+    const table = this.tables[tableIndex];
+    this.tables.splice(tableIndex, 1);
+    this.save();
+    soundEffects.playSuccessChime();
+    this.showToast(`Table '${table.number}' deleted!`, '🗑️');
+    this.notify('TABLES_UPDATED', { tableId });
+  }
+
   // --- CORE ACTIONS ---
 
   setView(viewName, params = {}) {

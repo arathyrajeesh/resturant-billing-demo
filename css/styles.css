@@ -459,8 +459,8 @@ h1, h2, h3, h4, h5, h6 {
 /* ================= 100% High-Contrast Crisp Table Cards ================= */
 .tables-floor-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+  gap: 14px;
 }
 
 .table-card-std {
@@ -1113,8 +1113,8 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .tables-floor-grid {
-    grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
   }
 
   .table-card-std {
