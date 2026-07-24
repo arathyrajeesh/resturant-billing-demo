@@ -510,6 +510,26 @@ h1, h2, h3, h4, h5, h6 {
   transform: scale(1.06);
 }
 
+.btn-table-edit {
+  background: rgba(229, 168, 75, 0.14);
+  border: 1px solid rgba(229, 168, 75, 0.4);
+  color: #E5A84B;
+  border-radius: 6px;
+  padding: 4px 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-table-edit:hover {
+  background: #E5A84B;
+  color: #280E09;
+  border-color: #E5A84B;
+  transform: scale(1.06);
+}
+
 /* High Contrast Available Table (Green) */
 .table-card-std.available {
   border-color: #10B981;
