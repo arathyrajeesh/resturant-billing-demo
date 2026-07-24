@@ -1826,7 +1826,7 @@ class App {
                 `).join('')}
               </div>
 
-              <div class="web-menu-grid">
+              <div class="swiggy-menu-list">
                 ${filteredMenu.map(item => {
                   const activePortion = this.selectedPortions[item.id] || (item.portions ? item.portions[0].size : null);
                   let price = item.price;
@@ -1838,41 +1838,44 @@ class App {
                   const cartItemId = item.portions ? `${item.id}_${activePortion}` : item.id;
                   const cartEntry = this.staffCart.find(c => c.itemId === cartItemId);
                   const qty = cartEntry ? cartEntry.quantity : 0;
+                  const itemImg = item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80';
 
                   return `
-                    <div class="web-menu-card">
-                      <div>
-                        <img src="${item.image}" class="web-menu-img" alt="${item.name}" />
-                        <div class="web-menu-info">
-                          <h5>${item.name}</h5>
-                          <p>${item.description}</p>
+                    <div class="swiggy-item-card">
+                      <div class="swiggy-item-left">
+                        <div class="swiggy-badge-row">
+                          <div class="item-veg-tag ${item.isVeg ? 'veg' : ''}"><span class="dot"></span></div>
+                          ${item.popular ? `<span class="reordered-badge">🔥 Highly reordered</span>` : ''}
+                        </div>
+                        <h4 class="swiggy-item-name">${item.name}</h4>
+                        <div class="swiggy-item-price">₹${price}</div>
+                        <p class="swiggy-item-desc">${item.description}</p>
 
-                          ${item.portions ? `
-                            <div style="display:flex; gap:4px; margin-top:8px; flex-wrap:wrap;">
-                              ${item.portions.map(p => `
-                                <button class="btn-enterprise" style="padding:3px 7px; font-size:10px; font-weight:800; border-radius:12px; ${activePortion === p.size ? 'background:var(--primary); color:#FFF; border-color:var(--primary);' : ''}" onclick="window.app.setPortion('${item.id}', '${p.size}')">
-                                  ${p.size} ₹${p.price}
-                                </button>
-                              `).join('')}
+                        ${item.portions ? `
+                          <div style="display:flex; gap:4px; margin-top:8px; flex-wrap:wrap;">
+                            ${item.portions.map(p => `
+                              <button class="btn-enterprise" style="padding:3px 7px; font-size:10px; font-weight:800; border-radius:12px; ${activePortion === p.size ? 'background:var(--primary); color:#FFF; border-color:var(--primary);' : ''}" onclick="window.app.setPortion('${item.id}', '${p.size}')">
+                                ${p.size} ₹${p.price}
+                              </button>
+                            `).join('')}
+                          </div>
+                        ` : ''}
+
+                        <div style="margin-top:10px;">
+                          ${qty > 0 ? `
+                            <div class="counter-stepper-lg" style="width:104px;">
+                              <button type="button" class="counter-btn-lg" onclick="window.app.updateStaffCartQty('${item.id}', -1, '${activePortion}')">-</button>
+                              <span class="counter-val-lg">${qty}</span>
+                              <button type="button" class="counter-btn-lg" onclick="window.app.updateStaffCartQty('${item.id}', 1, '${activePortion}')">+</button>
                             </div>
-                          ` : ''}
+                          ` : `
+                            <button class="swiggy-add-btn" onclick="window.app.updateStaffCartQty('${item.id}', 1, '${activePortion}')">+ Add${item.portions ? ` (${activePortion})` : ''}</button>
+                          `}
                         </div>
                       </div>
 
-                      <div class="web-menu-footer" style="margin-top:8px;">
-                        <div>
-                          <div class="menu-price">₹${price}</div>
-                        </div>
-
-                        ${qty > 0 ? `
-                          <div class="counter-stepper">
-                            <button class="counter-btn-std" onclick="window.app.updateStaffCartQty('${item.id}', -1, '${activePortion}')">-</button>
-                            <span style="font-weight:800; padding:0 8px;">${qty}</span>
-                            <button class="counter-btn-std" onclick="window.app.updateStaffCartQty('${item.id}', 1, '${activePortion}')">+</button>
-                          </div>
-                        ` : `
-                          <button class="add-cart-btn" onclick="window.app.updateStaffCartQty('${item.id}', 1, '${activePortion}')">+ Add ${item.portions ? `(${activePortion})` : ''}</button>
-                        `}
+                      <div class="swiggy-item-right">
+                        <img src="${itemImg}" class="swiggy-item-img" alt="${item.name}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80';" />
                       </div>
                     </div>
                   `;
