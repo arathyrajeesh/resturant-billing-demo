@@ -1584,18 +1584,28 @@ class App {
               </div>
 
               <div class="tables-floor-grid">
-                ${(this.showAllAdminTables ? store.tables : store.tables.slice(0, 5)).map(t => `
-                  <div class="table-card-std ${t.status}">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                      <div class="table-title" style="margin-bottom:0;">${t.number}</div>
-                      <button class="btn-table-delete" onclick="window.app.deleteTable(${t.id})" title="Delete ${t.number}">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                      </button>
+                ${(this.showAllAdminTables ? store.tables : store.tables.slice(0, 5)).map(t => {
+                  const tableOrder = store.orders.find(o => o.tableId === t.id && o.paymentStatus === 'unpaid' && o.status !== 'completed');
+                  return `
+                    <div class="table-card-std ${t.status}">
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <div class="table-title" style="margin-bottom:0;">${t.number}</div>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                          ${tableOrder ? `
+                            <button class="btn-table-edit" onclick="window.app.openEditOrderModal('${tableOrder.id}')" title="Edit Order #${tableOrder.orderNumber}">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </button>
+                          ` : ''}
+                          <button class="btn-table-delete" onclick="window.app.deleteTable(${t.id})" title="Delete ${t.number}">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                          </button>
+                        </div>
+                      </div>
+                      <div style="font-size:11px; color:var(--text-muted); font-weight:600;">${t.seats} Seats • ${t.section || 'Main'}</div>
+                      <button class="table-qr-btn" onclick="window.app.openQRModal(${t.id})">Real QR Sticker</button>
                     </div>
-                    <div style="font-size:11px; color:var(--text-muted); font-weight:600;">${t.seats} Seats • ${t.section || 'Main'}</div>
-                    <button class="table-qr-btn" onclick="window.app.openQRModal(${t.id})">Real QR Sticker</button>
-                  </div>
-                `).join('')}
+                  `;
+                }).join('')}
               </div>
               ${store.tables.length > 5 ? `
                 <div style="text-align:center; margin-top:14px;">
@@ -2060,27 +2070,31 @@ class App {
               ${store.tables.map(t => {
                 const tableOrder = store.orders.find(o => o.tableId === t.id && o.paymentStatus === 'unpaid' && o.status !== 'completed');
                 return `
-                  <div class="table-card-std ${t.status}">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                      <div class="table-title" style="margin-bottom:0;">${t.number}</div>
-                      <button class="btn-table-delete" onclick="window.app.deleteTable(${t.id})" title="Delete ${t.number}">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                      </button>
-                    </div>
-                    <div style="font-size:12px; color:var(--text-muted); font-weight:600;">${t.seats} Seats</div>
-                    <span class="status-tag ${t.status === 'available' ? 'tag-available' : t.status === 'occupied' ? 'tag-occupied' : 'tag-bill'}">
-                      ${t.status.toUpperCase()}
-                    </span>
-                    <div style="display:flex; flex-direction:column; gap:4px; width:100%; margin-top:8px;">
-                      <div style="display:flex; gap:6px; width:100%; align-items:center;">
-                        <button class="table-qr-btn" style="flex:1 1 0%; min-width:0; padding:7px 4px; font-size:11px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" onclick="window.app.openStaffOrderForTable(${t.id})">➕ ${tableOrder ? 'Add Items' : 'Take Order'}</button>
-                        <button class="table-qr-btn" style="flex:1 1 0%; min-width:0; background:#280E09; color:#FFF; padding:7px 4px; font-size:11px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" onclick="window.app.openQRModal(${t.id})" title="Show QR Code for ${t.number}">📱 QR Code</button>
+                    <div class="table-card-std ${t.status}">
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <div class="table-title" style="margin-bottom:0;">${t.number}</div>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                          ${tableOrder ? `
+                            <button class="btn-table-edit" onclick="window.app.openEditOrderModal('${tableOrder.id}')" title="Edit Order #${tableOrder.orderNumber}">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </button>
+                          ` : ''}
+                          <button class="btn-table-delete" onclick="window.app.deleteTable(${t.id})" title="Delete ${t.number}">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                          </button>
+                        </div>
                       </div>
-                      ${tableOrder ? `
-                        <button class="table-qr-btn" style="background:var(--blue); color:#FFF;" onclick="window.app.openEditOrderModal('${tableOrder.id}')">✏️ Edit Order</button>
-                      ` : ''}
+                      <div style="font-size:12px; color:var(--text-muted); font-weight:600;">${t.seats} Seats</div>
+                      <span class="status-tag ${t.status === 'available' ? 'tag-available' : t.status === 'occupied' ? 'tag-occupied' : 'tag-bill'}">
+                        ${t.status.toUpperCase()}
+                      </span>
+                      <div style="display:flex; flex-direction:column; gap:4px; width:100%; margin-top:8px;">
+                        <div style="display:flex; gap:6px; width:100%; align-items:center;">
+                          <button class="table-qr-btn" style="flex:1 1 0%; min-width:0; padding:7px 4px; font-size:11px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" onclick="window.app.openStaffOrderForTable(${t.id})">➕ ${tableOrder ? 'Add Items' : 'Take Order'}</button>
+                          <button class="table-qr-btn" style="flex:1 1 0%; min-width:0; background:#280E09; color:#FFF; padding:7px 4px; font-size:11px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" onclick="window.app.openQRModal(${t.id})" title="Show QR Code for ${t.number}">📱 QR Code</button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
                 `;
               }).join('')}
             </div>
