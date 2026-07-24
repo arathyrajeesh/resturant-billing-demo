@@ -196,6 +196,7 @@ class RestaurantStore {
     soundEffects.playSuccessChime();
     this.showToast(`Added '${newItem.name}' (₹${newItem.price}) to Menu!`, '🍲');
     this.notify('MENU_UPDATED', newItem);
+    if (typeof syncMenuToSupabase !== 'undefined') syncMenuToSupabase(this.menu);
     return newItem;
   }
 

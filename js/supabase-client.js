@@ -116,6 +116,69 @@ function subscribeToSupabaseOrders(onInsert, onUpdate, onDelete) {
       onDelete(payload.old.id);
     })
     .subscribe((status) => {
-      console.log('[Supabase] Realtime:', status);
+      console.log('[Supabase Orders] Realtime:', status);
+    });
+}
+
+// --- SUPABASE MENU SYNC ---
+async function syncMenuToSupabase(menuArray) {
+  if (!supabaseDb) return;
+  try {
+    const rows = (menuArray || []).map(item => ({
+      id: item.id,
+      name: item.name,
+      category: item.category || 'mains',
+      price: item.price || 0,
+      portions: item.portions || [],
+      is_veg: item.isVeg || false,
+      spice_level: item.spiceLevel || 1,
+      description: item.description || '',
+      image: item.image || '',
+      popular: item.popular || false,
+      available: item.available !== false,
+      updated_at: new Date().toISOString()
+    }));
+    const { error } = await supabaseDb.from('menu').upsert(rows, { onConflict: 'id' });
+    if (error) console.warn('[Supabase Menu] Upsert warning:', error.message);
+  } catch (e) {
+    console.warn('[Supabase Menu] syncMenu error:', e);
+  }
+}
+
+async function fetchMenuFromSupabase() {
+  if (!supabaseDb) return null;
+  try {
+    const { data, error } = await supabaseDb
+      .from('menu')
+      .select('*');
+    if (error || !data || data.length === 0) return null;
+    return data.map(row => ({
+      id: row.id,
+      name: row.name,
+      category: row.category,
+      price: row.price,
+      portions: row.portions,
+      isVeg: row.is_veg,
+      spiceLevel: row.spice_level,
+      description: row.description,
+      image: row.image,
+      popular: row.popular,
+      available: row.available
+    }));
+  } catch (e) {
+    console.warn('[Supabase Menu] fetchMenu error:', e);
+    return null;
+  }
+}
+
+function subscribeToSupabaseMenu(onMenuChange) {
+  if (!supabaseDb) return;
+  supabaseDb
+    .channel('menu-realtime-channel')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'menu' }, (payload) => {
+      if (onMenuChange) onMenuChange(payload);
+    })
+    .subscribe((status) => {
+      console.log('[Supabase Menu] Realtime:', status);
     });
 }

@@ -481,6 +481,34 @@ class RestaurantStore {
         this.listeners.forEach(l => l(this));
       }
     );
+
+    // Fetch and subscribe to Supabase Menu Realtime Sync
+    if (typeof fetchMenuFromSupabase !== 'undefined') {
+      const remoteMenu = await fetchMenuFromSupabase();
+      if (remoteMenu && remoteMenu.length > 0) {
+        remoteMenu.forEach(rm => {
+          const idx = this.menu.findIndex(m => m.id === rm.id);
+          if (idx >= 0) {
+            this.menu[idx] = { ...this.menu[idx], ...rm };
+          } else {
+            this.menu.unshift(rm);
+          }
+        });
+        localStorage.setItem('malabar_menu', JSON.stringify(this.menu));
+        this.listeners.forEach(l => l(this));
+      }
+    }
+
+    if (typeof subscribeToSupabaseMenu !== 'undefined') {
+      subscribeToSupabaseMenu(async () => {
+        const freshMenu = await fetchMenuFromSupabase();
+        if (freshMenu && freshMenu.length > 0) {
+          this.menu = freshMenu;
+          localStorage.setItem('malabar_menu', JSON.stringify(this.menu));
+          this.listeners.forEach(l => l(this));
+        }
+      });
+    }
   }
 
   handleRemoteAction(data) {
@@ -768,6 +796,7 @@ class RestaurantStore {
     soundEffects.playSuccessChime();
     this.showToast(`Added '${newItem.name}' to Menu Catalog!`, '🍲');
     this.notify('MENU_UPDATED', newItem);
+    if (typeof syncMenuToSupabase !== 'undefined') syncMenuToSupabase(this.menu);
     return newItem;
   }
 
@@ -778,6 +807,7 @@ class RestaurantStore {
     soundEffects.playSuccessChime();
     this.showToast(`Dish '${item.name}' marked ${item.available ? 'AVAILABLE 🟢' : 'OUT OF STOCK 🔴'}`, item.available ? '🟢' : '🔴');
     this.notify('MENU_UPDATED', item);
+    if (typeof syncMenuToSupabase !== 'undefined') syncMenuToSupabase(this.menu);
   }
 
   addTable(tableData) {
@@ -3049,6 +3079,7 @@ class App {
       localStorage.setItem('malabar_menu', JSON.stringify(store.menu));
       store.showToast(`Updated photo for ${item.name}!`, '🖼️');
       store.notifyListeners();
+      if (typeof syncMenuToSupabase !== 'undefined') syncMenuToSupabase(store.menu);
     }
 
     const modal = document.getElementById('edit-dish-image-modal');
