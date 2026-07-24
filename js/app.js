@@ -514,7 +514,7 @@ class App {
       const table = store.tables.find(t => t.id === store.customerTableId) || store.tables[3];
       this.topHeader.innerHTML = `
         <div class="header-left" style="display:flex; align-items:center; gap:12px;">
-          <div style="width:36px; height:36px; background:var(--primary); color:#FFF; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px;">MT</div>
+          <img src="assets/tclock-logo.jpg" alt="T Clock Resto Cafe Logo" style="width:46px; height:46px; border-radius:50%; object-fit:cover; border:2px solid var(--primary); box-shadow: 0 4px 10px rgba(52, 20, 13, 0.3); flex-shrink:0;" onerror="this.style.display='none';" />
           <div>
             <h3 style="font-size:15px; font-weight:800; margin:0; line-height:1.2;">Malabar Table</h3>
             <span style="font-size:11px; color:var(--primary); font-weight:700;">Customer Self-Order • Table ${table.number}</span>
