@@ -470,7 +470,7 @@ h1, h2, h3, h4, h5, h6 {
 .tables-floor-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
-  gap: 14px;
+  gap: 24px;
 }
 
 .table-card-std {
