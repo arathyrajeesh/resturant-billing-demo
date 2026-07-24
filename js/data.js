@@ -1,6 +1,6 @@
 // Malabar Table - Master Menu & Initial State Data
 
-export const INITIAL_TABLES = Array.from({ length: 5 }, (_, i) => {
+export const INITIAL_TABLES = Array.from({ length: 6 }, (_, i) => {
   const id = i + 1;
   return {
     id,

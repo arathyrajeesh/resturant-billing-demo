@@ -25,14 +25,14 @@ class RestaurantStore {
     this.menu = this.load('malabar_menu', MENU_ITEMS);
 
     this.receiptSettings = this.load('malabar_receipt_settings', {
-      restaurantName: 'MALABAR TABLE',
-      tagline: 'Fine Dining Restaurant',
-      address: 'Beach Road, Calicut, Kerala - 673001',
+      restaurantName: 'T CLOCK RESTO CAFE',
+      tagline: 'Time for Tea, Time for Taste',
+      address: 'Main Road, Calicut, Kerala',
       phone: '+91 98765 43210',
       gstin: '32ABCDE1234F1Z5',
       fssai: '11223344556677',
-      footerNote: 'Thank you for dining with us! Please visit again.',
-      logoUrl: ''
+      footerNote: 'Thank you for visiting T Clock Resto Cafe!',
+      logoUrl: 'assets/tclock-logo.jpg'
     });
 
     this.searchQuery = '';

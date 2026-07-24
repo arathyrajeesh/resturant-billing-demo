@@ -475,11 +475,11 @@ class App {
 
     this.sidebar.innerHTML = `
       <div>
-        <a href="#" class="sidebar-brand" onclick="return false;">
-          <div class="sidebar-brand-logo">MT</div>
+        <a href="#" class="sidebar-brand" onclick="return false;" style="display:flex; align-items:center; gap:12px; text-decoration:none;">
+          <img src="assets/tclock-logo.jpg" alt="T Clock Resto Cafe Logo" style="width:46px; height:46px; border-radius:50%; object-fit:cover; border:2px solid var(--primary); box-shadow: 0 4px 10px rgba(52, 20, 13, 0.3); flex-shrink:0;" onerror="this.style.display='none';" />
           <div class="sidebar-brand-info">
-            <h1>Malabar Table</h1>
-            <p style="font-size:10px; color:var(--primary); font-weight:700;">${role.toUpperCase()} DASHBOARD</p>
+            <h1 style="font-size:15px; font-weight:800; color:var(--text-dark); line-height:1.2; margin:0;">T CLOCK</h1>
+            <p style="font-size:10px; color:var(--primary); font-weight:800; letter-spacing:0.5px; margin-top:2px;">RESTO CAFE</p>
           </div>
         </a>
 
@@ -691,10 +691,10 @@ class App {
                   `;
                 }).join('')}
               </div>
-              ${store.tables.length > 5 ? `
+              ${store.tables.length > 6 ? `
                 <div style="text-align:center; margin-top:14px;">
                   <button class="btn-enterprise" style="padding:8px 18px; font-weight:700; color:var(--primary); border-color:var(--primary);" onclick="window.app.toggleAdminTablesExpand()">
-                    ${this.showAllAdminTables ? '▲ Show Fewer Tables (Collapse to 5)' : `▼ Show More Tables (${store.tables.length - 5} More)`}
+                    ${this.showAllAdminTables ? '▲ Show Fewer Tables (Collapse to 6)' : `▼ Show More Tables (${store.tables.length - 6} More)`}
                   </button>
                 </div>
               ` : ''}
