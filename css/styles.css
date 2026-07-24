@@ -491,6 +491,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-table-delete {
+  position: relative;
   background: rgba(225, 29, 72, 0.08);
   border: 1px solid rgba(225, 29, 72, 0.25);
   color: #E11D48;
@@ -510,7 +511,36 @@ h1, h2, h3, h4, h5, h6 {
   transform: scale(1.06);
 }
 
+.btn-table-delete::after {
+  content: "Delete Table";
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #280E09;
+  color: #EF4444;
+  border: 1px solid #59271C;
+  padding: 3px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 5px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  z-index: 100;
+}
+
+.btn-table-delete:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
 .btn-table-edit {
+  position: relative;
   background: rgba(229, 168, 75, 0.14);
   border: 1px solid rgba(229, 168, 75, 0.4);
   color: #E5A84B;
@@ -528,6 +558,34 @@ h1, h2, h3, h4, h5, h6 {
   color: #280E09;
   border-color: #E5A84B;
   transform: scale(1.06);
+}
+
+.btn-table-edit::after {
+  content: "Edit Order";
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #280E09;
+  color: #E5A84B;
+  border: 1px solid #59271C;
+  padding: 3px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 5px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  z-index: 100;
+}
+
+.btn-table-edit:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
 }
 
 /* High Contrast Available Table (Green) */
