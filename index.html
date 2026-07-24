@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>T Clock - Restaurant OS & Enterprise POS</title>
-  <meta name="description" content="Standard Enterprise Restaurant OS featuring Owner Analytics, Floor Map, Web POS, Kitchen KDS, Billing POS & Swiggy/Zomato integrations.">
-  <link rel="stylesheet" href="css/styles.css?v=8">
+  <meta name="description" content="Standard Enterprise Restaurant OS featuring Owner Analytics, Dining Tables, Web POS, Kitchen KDS, Billing POS & Swiggy/Zomato integrations.">
+  <link rel="stylesheet" href="css/styles.css?v=9">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌴</text></svg>">
 </head>
 <body>
@@ -34,28 +34,47 @@
               <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">Select Dashboard Workspace to Continue</p>
             </div>
 
-            <form onsubmit="if(window.app) { window.app.handleLoginSubmit(event); } else if(window.store) { window.store.login('admin', document.getElementById('login-username').value); } return false;">
+            <script>
+              function selectRole(role) {
+                if (window.app) {
+                  window.app.selectLoginRole(role);
+                } else {
+                  window._selectedRole = role;
+                  document.querySelectorAll('.role-choice-card').forEach(function(c) { c.classList.remove('selected'); });
+                  var target = document.getElementById('role-card-' + role);
+                  if (target) target.classList.add('selected');
+                  var nameEl = document.getElementById('login-username');
+                  if (nameEl) nameEl.value = role === 'admin' ? 'Restaurant Owner (Admin)' : role === 'staff' ? 'Rahul V. (Staff & Cashier)' : 'Chef Master (Kitchen Cook)';
+                  var passEl = document.getElementById('passcode-group');
+                  if (passEl) passEl.style.display = role === 'admin' ? 'block' : 'none';
+                  var btn = document.getElementById('login-submit-btn');
+                  if (btn) btn.innerText = 'Open ' + role.toUpperCase() + ' Dashboard';
+                }
+              }
+            </script>
+
+            <form onsubmit="if(window.app) { window.app.handleLoginSubmit(event); } else if(window.store) { var r = window._selectedRole || 'admin'; var u = (document.getElementById('login-username') || {}).value || 'Restaurant Owner (Admin)'; window.store.login(r, u); } return false;">
               <div style="margin-bottom:20px;">
                 <label style="font-size:12px; font-weight:700; color:var(--text-dark); display:block; margin-bottom:10px;">Select Dashboard Role:</label>
                 <div style="display:flex; flex-direction:column; gap:10px;">
                   
-                  <div id="role-card-admin" class="role-choice-card selected" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px;" onclick="if(window.app) window.app.selectLoginRole('admin')">
+                  <div id="role-card-admin" class="role-choice-card selected" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px; cursor:pointer;" onclick="selectRole('admin')">
                     <div>
                       <strong style="font-size:14px; display:block;">1. Admin Dashboard</strong>
                       <p style="font-size:11px; color:var(--text-muted);">Analytics, Menu Catalog, Add Tables & QR Stickers</p>
                     </div>
                   </div>
 
-                  <div id="role-card-staff" class="role-choice-card" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px;" onclick="if(window.app) window.app.selectLoginRole('staff')">
+                  <div id="role-card-staff" class="role-choice-card" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px; cursor:pointer;" onclick="selectRole('staff')">
                     <div>
-                      <strong style="font-size:14px; display:block;">2. Staff POS & Billing Counter</strong>
-                      <p style="font-size:11px; color:var(--text-muted);">Floor Map, Take Table Order & Cashier Billing</p>
+                      <strong style="font-size:14px; display:block;">2. Staff Ordering & Billing Counter</strong>
+                      <p style="font-size:11px; color:var(--text-muted);">Dining Tables, Take Table Order & Billing Section</p>
                     </div>
                   </div>
 
-                  <div id="role-card-kitchen" class="role-choice-card" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px;" onclick="if(window.app) window.app.selectLoginRole('kitchen')">
+                  <div id="role-card-kitchen" class="role-choice-card" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px; cursor:pointer;" onclick="selectRole('kitchen')">
                     <div>
-                      <strong style="font-size:14px; display:block;">3. Kitchen KDS Display</strong>
+                      <strong style="font-size:14px; display:block;">3. Kitchen Order Screen</strong>
                       <p style="font-size:11px; color:var(--text-muted);">Live Order Cooking Cards & Kitchen Queue</p>
                     </div>
                   </div>
@@ -93,8 +112,8 @@
 
   <!-- Supabase Real-Time Sync (cross-device order sync) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="js/supabase-client.js?v=8"></script>
+  <script src="js/supabase-client.js?v=9"></script>
   <!-- App Master Bundle Entry (Works Offline & HTTP) -->
-  <script src="js/bundle.js?v=8"></script>
+  <script src="js/bundle.js?v=9"></script>
 </body>
 </html>

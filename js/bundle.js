@@ -312,11 +312,12 @@ class RestaurantStore {
     if (stored && stored.some(o => ['ORD-1001','ORD-1002','ORD-1003'].includes(o.id))) {
       localStorage.removeItem('malabar_orders');
     }
+    this.orders = this.load('malabar_orders', INITIAL_ORDERS);
     // Ensure menu items always have master image URLs restored
     const loadedMenu = this.load('malabar_menu', MENU_ITEMS);
     this.menu = (loadedMenu && loadedMenu.length > 0 ? loadedMenu : MENU_ITEMS).map(m => {
       const master = MENU_ITEMS.find(i => i.id === m.id);
-      return { ...m, image: (master ? master.image : m.image) || m.image };
+      return { ...m, image: (m.image && m.image.length > 10 ? m.image : (master ? master.image : '')) };
     });
     localStorage.setItem('malabar_menu', JSON.stringify(this.menu));
 
@@ -505,17 +506,8 @@ class RestaurantStore {
   }
 
   login(role = 'admin', name = 'Restaurant Owner (Admin)', passcode = '') {
-    if (role === 'admin') {
-      const validPasscodes = ['owner123', 'admin', '1234', '123456', 'admin123', 'owner'];
-      if (passcode && !validPasscodes.includes(passcode.toLowerCase()) && passcode !== 'owner123') {
-        this.showToast('Invalid Admin Passcode! Passcode is: owner123', '🔒');
-        alert('Invalid Admin Passcode! Correct passcode is: owner123');
-        return false;
-      }
-    }
-
     this.currentUser = {
-      name,
+      name: name || (role === 'admin' ? 'Restaurant Owner (Admin)' : role === 'staff' ? 'Rahul V. (Staff & Cashier)' : 'Chef Master'),
       role,
       isLoggedIn: true
     };
@@ -1267,14 +1259,14 @@ class App {
 
                 <div id="role-card-staff" class="role-choice-card ${this.selectedLoginRole === 'staff' ? 'selected' : ''}" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px;" onclick="window.app.selectLoginRole('staff')">
                   <div>
-                    <strong style="font-size:14px; display:block;">2. Staff POS & Billing Counter</strong>
-                    <p style="font-size:11px; color:var(--text-muted);">Floor Map, Take Table Order & Cashier Billing</p>
+                    <strong style="font-size:14px; display:block;">2. Staff Ordering & Billing Counter</strong>
+                    <p style="font-size:11px; color:var(--text-muted);">Dining Tables, Take Table Order & Billing Section</p>
                   </div>
                 </div>
 
                 <div id="role-card-kitchen" class="role-choice-card ${this.selectedLoginRole === 'kitchen' ? 'selected' : ''}" style="display:flex; align-items:center; gap:12px; text-align:left; padding:14px;" onclick="window.app.selectLoginRole('kitchen')">
                   <div>
-                    <strong style="font-size:14px; display:block;">3. Kitchen KDS Display</strong>
+                    <strong style="font-size:14px; display:block;">3. Kitchen Order Screen</strong>
                     <p style="font-size:11px; color:var(--text-muted);">Live Order Cooking Cards & Kitchen Queue</p>
                   </div>
                 </div>
@@ -1336,21 +1328,8 @@ class App {
   handleLoginSubmit(e) {
     if (e) e.preventDefault();
     const userEl = document.getElementById('login-username');
-    const passEl = document.getElementById('login-password');
-    const username = userEl && userEl.value ? userEl.value.trim() : 'User';
-    const password = passEl && passEl.value ? passEl.value.trim() : '';
-    const role = this.selectedLoginRole || 'admin';
-
-    // Admin Passcode Authentication Check
-    if (role === 'admin') {
-      const validPasscodes = ['owner123', 'admin', '1234', '123456', 'admin123', 'owner'];
-      if (!password || (!validPasscodes.includes(password.toLowerCase()) && password !== 'owner123')) {
-        store.showToast('Invalid Passcode! Correct passcode is: owner123', '🔒');
-        alert('Invalid Admin Passcode! (Default passcode: owner123)');
-        return;
-      }
-    }
-
+    const username = userEl && userEl.value ? userEl.value.trim() : 'Restaurant Owner (Admin)';
+    const role = this.selectedLoginRole || window._selectedRole || 'admin';
     store.login(role, username);
   }
 
@@ -1359,8 +1338,8 @@ class App {
 
     const allNavItems = [
       { id: 'admin', label: 'Admin Dashboard', roles: ['admin'] },
-      { id: 'staff', label: 'Staff POS & Billing', roles: ['admin', 'staff'] },
-      { id: 'kitchen', label: 'Kitchen KDS Screen', roles: ['admin', 'staff', 'kitchen'] },
+      { id: 'staff', label: 'Staff Ordering & Billing', roles: ['admin', 'staff'] },
+      { id: 'kitchen', label: 'Kitchen Order Screen', roles: ['admin', 'staff', 'kitchen'] },
       { id: 'customer', label: 'Customer Portal', roles: ['admin', 'staff', 'kitchen', 'customer'] }
     ];
 
@@ -1839,13 +1818,13 @@ class App {
       <div class="view-container">
         <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
           <button class="btn-enterprise ${this.staffSubTab === 'floor' ? 'btn-primary' : ''}" onclick="window.app.setStaffSubTab('floor')">
-            📍 Floor Map (${activeTablesCount}/${store.tables.length})
+            📍 Dining Tables (${activeTablesCount}/${store.tables.length})
           </button>
           <button class="btn-enterprise ${this.staffSubTab === 'pos' ? 'btn-primary' : ''}" onclick="window.app.setStaffSubTab('pos')">
             📝 Take Table Order
           </button>
           <button class="btn-enterprise ${this.staffSubTab === 'billing' ? 'btn-primary' : ''}" onclick="window.app.setStaffSubTab('billing')">
-            💳 Cashier Billing (${unpaidOrders.length} Unpaid)
+            💳 Billing Section (${unpaidOrders.length} Unpaid)
           </button>
         </div>
 
@@ -1988,7 +1967,7 @@ class App {
         ` : this.staffSubTab === 'floor' ? `
           <div class="panel-card">
             <div class="section-header">
-              <div class="panel-title">Restaurant Floor Map (${store.tables.length} Tables)</div>
+              <div class="panel-title">Restaurant Dining Tables (${store.tables.length} Tables)</div>
               <div style="display:flex; gap:12px;">
                 <span class="status-tag tag-available">Free: ${store.tables.length - activeTablesCount}</span>
                 <span class="status-tag tag-occupied">Occupied: ${activeTablesCount}</span>
@@ -2208,7 +2187,7 @@ class App {
       <div class="view-container">
         <div class="section-header" style="margin-bottom:20px;">
           <div>
-            <h2>Kitchen Display System (KDS)</h2>
+            <h2>Kitchen Order Screen</h2>
             <p style="color:var(--text-muted); font-size:13px;">Dedicated cooking queue for kitchen chefs</p>
           </div>
           <div style="display:flex; gap:10px;">
@@ -2387,8 +2366,8 @@ class App {
                 const cartEntry = (this.customerCart || []).find(c => c.itemId === cartItemId);
                 const qty = cartEntry ? cartEntry.quantity : 0;
                 const masterItem = MENU_ITEMS.find(m => m.id === item.id);
-                const itemImg = item.image || (masterItem ? masterItem.image : '') || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="90" viewBox="0 0 100 90"><rect width="100" height="90" fill="%23334155" rx="12"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="38">🍛</text></svg>';
-                const svgFallback = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='90' viewBox='0 0 100 90'><rect width='100' height='90' fill='%23334155' rx='12'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-size='38'>🍛</text></svg>";
+                const svgFallback = "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%2290%22%20viewBox%3D%220%200%20100%2090%22%3E%3Crect%20width%3D%22100%22%20height%3D%2290%22%20fill%3D%22%23334155%22%20rx%3D%2212%22%3E%3C%2Frect%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2255%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20font-size%3D%2238%22%3E%F0%9F%8D%9B%3C%2Ftext%3E%3C%2Fsvg%3E";
+                const itemImg = item.image || (masterItem ? masterItem.image : '') || svgFallback;
 
                 return `
                   <div class="swiggy-item-card" style="display:flex !important; flex-direction:row !important; justify-content:space-between !important; align-items:flex-start !important; width:100% !important; box-sizing:border-box !important; gap:8px !important;">
