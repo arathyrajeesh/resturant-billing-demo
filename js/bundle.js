@@ -312,8 +312,13 @@ class RestaurantStore {
     if (stored && stored.some(o => ['ORD-1001','ORD-1002','ORD-1003'].includes(o.id))) {
       localStorage.removeItem('malabar_orders');
     }
-    this.orders = this.load('malabar_orders', INITIAL_ORDERS);
-    this.menu = this.load('malabar_menu', MENU_ITEMS);
+    // Ensure menu items always have master image URLs restored
+    const loadedMenu = this.load('malabar_menu', MENU_ITEMS);
+    this.menu = (loadedMenu && loadedMenu.length > 0 ? loadedMenu : MENU_ITEMS).map(m => {
+      const master = MENU_ITEMS.find(i => i.id === m.id);
+      return { ...m, image: (master ? master.image : m.image) || m.image };
+    });
+    localStorage.setItem('malabar_menu', JSON.stringify(this.menu));
 
     this.receiptSettings = this.load('malabar_receipt_settings', {
       restaurantName: 'T CLOCK',
@@ -2381,7 +2386,9 @@ class App {
                 const cartItemId = item.portions ? `${item.id}_${activePortion}` : item.id;
                 const cartEntry = (this.customerCart || []).find(c => c.itemId === cartItemId);
                 const qty = cartEntry ? cartEntry.quantity : 0;
-                const itemImg = item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80';
+                const masterItem = MENU_ITEMS.find(m => m.id === item.id);
+                const itemImg = item.image || (masterItem ? masterItem.image : '') || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="90" viewBox="0 0 100 90"><rect width="100" height="90" fill="%23334155" rx="12"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="38">🍛</text></svg>';
+                const svgFallback = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='90' viewBox='0 0 100 90'><rect width='100' height='90' fill='%23334155' rx='12'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-size='38'>🍛</text></svg>";
 
                 return `
                   <div class="swiggy-item-card" style="display:flex !important; flex-direction:row !important; justify-content:space-between !important; align-items:flex-start !important; width:100% !important; box-sizing:border-box !important; gap:8px !important;">
@@ -2403,7 +2410,7 @@ class App {
                     </div>
 
                     <div class="swiggy-item-right" style="width:92px !important; min-width:92px !important; max-width:92px !important; flex:0 0 92px !important; display:flex !important; flex-direction:column !important; align-items:center !important; position:relative !important;">
-                      <img src="${itemImg}" class="swiggy-item-img" alt="${item.name}" onclick="window.app.openItemCustomizationModal('${item.id}')" style="width:86px !important; height:80px !important; border-radius:12px !important; object-fit:cover !important; display:block !important; cursor:pointer !important;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80';" />
+                      <img src="${itemImg}" class="swiggy-item-img" alt="${item.name}" onclick="window.app.openItemCustomizationModal('${item.id}')" style="width:86px !important; height:80px !important; border-radius:12px !important; object-fit:cover !important; display:block !important; cursor:pointer !important;" onerror="this.onerror=null; this.src='${svgFallback}';" />
                       <div class="swiggy-add-btn-box" style="margin-top:-16px !important; position:relative !important; z-index:10 !important; text-align:center !important;">
                         ${item.available === false ? `
                           <button class="swiggy-add-btn" disabled style="opacity:0.6; cursor:not-allowed; color:var(--danger); border-color:var(--surface-border);">Out of Stock</button>
