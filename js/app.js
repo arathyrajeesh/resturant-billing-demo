@@ -1117,7 +1117,10 @@ class App {
                       ${t.status.toUpperCase()}
                     </span>
                     <div style="display:flex; flex-direction:column; gap:4px; width:100%; margin-top:8px;">
-                      <button class="table-qr-btn" onclick="window.app.openStaffOrderForTable(${t.id})">➕ ${tableOrder ? 'Add Items' : 'Take Order'}</button>
+                      <div style="display:flex; gap:4px; width:100%;">
+                        <button class="table-qr-btn" style="flex:1; padding:6px 4px; font-size:11px;" onclick="window.app.openStaffOrderForTable(${t.id})">➕ ${tableOrder ? 'Add Items' : 'Take Order'}</button>
+                        <button class="table-qr-btn" style="background:#0284C7; color:#FFF; padding:6px 6px; font-size:11px; white-space:nowrap;" onclick="window.app.openQRModal(${t.id})" title="Show QR Code for ${t.number}">📱 QR Code</button>
+                      </div>
                       ${tableOrder ? `
                         <button class="table-qr-btn" style="background:var(--blue); color:#FFF;" onclick="window.app.openEditOrderModal('${tableOrder.id}')">✏️ Edit Order</button>
                       ` : ''}
