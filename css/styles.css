@@ -486,6 +486,13 @@ h1, h2, h3, h4, h5, h6 {
   transition: all 0.2s ease;
 }
 
+.table-card-std.table-card-compact {
+  min-height: auto !important;
+  padding: 14px 12px !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+}
+
 /* Force Table Title text color to be deep high-contrast dark text */
 .table-title {
   font-size: 22px;
