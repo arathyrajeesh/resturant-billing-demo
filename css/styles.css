@@ -1971,23 +1971,49 @@ h1, h2, h3, h4, h5, h6 {
   }
 }/* ================= MOBILE IMAGE DISPLAY FOR SWIGGY CARDS ================= */
 
-/* Ensure image always shows on mobile */
 @media (max-width: 640px) {
+  .view-container {
+    padding: 10px 8px !important;
+  }
+
+  .panel-card {
+    padding: 14px 10px !important;
+  }
+
   .swiggy-item-card {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
     gap: 8px !important;
     padding: 12px 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .swiggy-item-left {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    max-width: calc(100% - 94px) !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
   }
 
   .swiggy-item-right {
-    width: 90px !important;
-    min-width: 90px !important;
-    flex-shrink: 0 !important;
+    width: 88px !important;
+    min-width: 88px !important;
+    max-width: 88px !important;
+    flex: 0 0 88px !important;
     display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    position: relative !important;
+    margin-left: 4px !important;
   }
 
   .swiggy-item-img {
     width: 82px !important;
-    height: 78px !important;
+    height: 76px !important;
     border-radius: 12px !important;
     object-fit: cover !important;
     display: block !important;
@@ -1995,6 +2021,7 @@ h1, h2, h3, h4, h5, h6 {
 
   .swiggy-item-name {
     font-size: 14px !important;
+    line-height: 1.25 !important;
   }
 
   .swiggy-item-price {
@@ -2003,12 +2030,17 @@ h1, h2, h3, h4, h5, h6 {
 
   .swiggy-item-desc {
     font-size: 11px !important;
+    line-height: 1.35 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
   }
 
   .swiggy-add-btn {
-    padding: 5px 12px !important;
+    padding: 5px 10px !important;
     font-size: 12px !important;
-    min-width: 72px !important;
+    min-width: 68px !important;
   }
 
   .swiggy-add-btn-box {
@@ -2017,14 +2049,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 380px) {
+  .swiggy-item-left {
+    max-width: calc(100% - 80px) !important;
+  }
+
   .swiggy-item-right {
-    width: 80px !important;
-    min-width: 80px !important;
+    width: 76px !important;
+    min-width: 76px !important;
+    max-width: 76px !important;
+    flex: 0 0 76px !important;
   }
 
   .swiggy-item-img {
     width: 72px !important;
-    height: 68px !important;
+    height: 66px !important;
   }
 }
+
 

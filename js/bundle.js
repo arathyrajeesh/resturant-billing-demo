@@ -2384,8 +2384,8 @@ class App {
                 const itemImg = item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80';
 
                 return `
-                  <div class="swiggy-item-card">
-                    <div class="swiggy-item-left">
+                  <div class="swiggy-item-card" style="display:flex; justify-content:space-between; align-items:flex-start; width:100%;">
+                    <div class="swiggy-item-left" style="flex:1 1 auto; min-width:0; word-break:break-word;">
                       <div class="swiggy-badge-row">
                         <div class="item-veg-tag ${item.isVeg ? 'veg' : ''}">
                           <span class="dot"></span>
