@@ -2397,9 +2397,7 @@ class App {
                       <div class="swiggy-item-price">₹${price}</div>
                       <p class="swiggy-item-desc">${item.description}</p>
 
-                      <div class="swiggy-action-icons" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:10px;">
-                        <button class="btn-primary" style="padding:6px 14px; font-size:12px; font-weight:800; border-radius:8px;" onclick="window.app.openItemCustomizationModal('${item.id}')">+ Add to Order</button>
-                      </div>
+
                     </div>
 
                     <div class="swiggy-item-right" style="width:90px;min-width:90px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;position:relative;">
