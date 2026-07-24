@@ -1605,24 +1605,7 @@ class App {
                 const itemImg = (item.image && item.image.length > 10 ? item.image : '') || (masterItem && masterItem.image ? masterItem.image : '') || svgFallback;
 
                 return `
-                  <div class="swiggy-item-card" style="display:flex !important; flex-direction:row !important; justify-content:space-between !important; align-items:flex-start !important; width:100% !important; box-sizing:border-box !important; gap:8px !important;">
-                    <div class="swiggy-item-left" style="flex:1 1 auto !important; width:calc(100% - 100px) !important; max-width:calc(100% - 100px) !important; min-width:0 !important; overflow:hidden !important; word-break:break-word !important;">
-                      <div class="swiggy-badge-row">
-                        <div class="item-veg-tag ${item.isVeg ? 'veg' : ''}">
-                          <span class="dot"></span>
-                        </div>
-                        ${item.popular ? `<span class="reordered-badge">🔥 Highly reordered</span>` : ''}
-                      </div>
-
-                      <h4 class="swiggy-item-name" onclick="window.app.openItemCustomizationModal('${item.id}')" style="cursor:pointer;">${item.name}</h4>
-                      <div class="swiggy-item-price">₹${price}</div>
-                      <p class="swiggy-item-desc">${item.description}</p>
-
-                      <div class="swiggy-action-icons" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:10px;">
-                        <button class="btn-primary" style="padding:6px 14px; font-size:12px; font-weight:800; border-radius:8px;" onclick="window.app.openItemCustomizationModal('${item.id}')">+ Add to Order</button>
-                      </div>
-                    </div>
-
+                  <div class="swiggy-item-card" style="display:flex !important; flex-direction:row !important; justify-content:space-between !important; align-items:flex-start !important; width:100% !important; box-sizing:border-box !important; gap:12px !important;">
                     <div class="swiggy-item-right" style="width:92px !important; min-width:92px !important; max-width:92px !important; flex:0 0 92px !important; display:flex !important; flex-direction:column !important; align-items:center !important; position:relative !important;">
                       <img src="${itemImg}" class="swiggy-item-img" alt="${item.name}" referrerpolicy="no-referrer" onclick="window.app.openItemCustomizationModal('${item.id}')" style="width:86px !important; height:80px !important; border-radius:12px !important; object-fit:cover !important; display:block !important; cursor:pointer !important;" onerror="this.onerror=null; this.src='${svgFallback}';" />
                       <div class="swiggy-add-btn-box" style="margin-top:-16px !important; position:relative !important; z-index:10 !important; text-align:center !important;">
@@ -1638,6 +1621,23 @@ class App {
                           <button type="button" class="swiggy-add-btn" onclick="window.app.openItemCustomizationModal('${item.id}')">ADD +</button>
                           ${item.portions ? `<span class="customisable-text">customisable</span>` : ''}
                         `}
+                      </div>
+                    </div>
+
+                    <div class="swiggy-item-left" style="flex:1 1 auto !important; width:calc(100% - 104px) !important; max-width:calc(100% - 104px) !important; min-width:0 !important; overflow:hidden !important; word-break:break-word !important;">
+                      <div class="swiggy-badge-row">
+                        <div class="item-veg-tag ${item.isVeg ? 'veg' : ''}">
+                          <span class="dot"></span>
+                        </div>
+                        ${item.popular ? `<span class="reordered-badge">🔥 Highly reordered</span>` : ''}
+                      </div>
+
+                      <h4 class="swiggy-item-name" onclick="window.app.openItemCustomizationModal('${item.id}')" style="cursor:pointer;">${item.name}</h4>
+                      <div class="swiggy-item-price">₹${price}</div>
+                      <p class="swiggy-item-desc">${item.description}</p>
+
+                      <div class="swiggy-action-icons" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:10px;">
+                        <button class="btn-primary" style="padding:6px 14px; font-size:12px; font-weight:800; border-radius:8px;" onclick="window.app.openItemCustomizationModal('${item.id}')">+ Add to Order</button>
                       </div>
                     </div>
                   </div>

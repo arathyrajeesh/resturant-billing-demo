@@ -2015,7 +2015,7 @@ h1, h2, h3, h4, h5, h6 {
     flex-direction: column !important;
     align-items: center !important;
     position: relative !important;
-    margin-left: 4px !important;
+    margin-right: 8px !important;
     visibility: visible !important;
     opacity: 1 !important;
   }
