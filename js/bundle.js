@@ -436,6 +436,8 @@ class RestaurantStore {
 
   notify(actionType = 'STATE_CHANGED', payload = null) {
     this.save();
+    // Write a sync timestamp so other tabs/polls detect change immediately
+    try { localStorage.setItem('malabar_sync_ts', String(Date.now())); } catch(e) {}
     this.listeners.forEach((listener) => listener(this));
     if (this.channel && this.channel.postMessage) {
       try {
@@ -852,14 +854,21 @@ class App {
       store.setView('customer', { tableId: tId });
     }
 
+    // Poll localStorage every 1s using sync timestamp for fast cross-tab KDS updates
+    let _lastSyncTs = localStorage.getItem('malabar_sync_ts') || '0';
     setInterval(() => {
-      const freshOrders = store.load('malabar_orders', null);
-      if (freshOrders && JSON.stringify(freshOrders) !== JSON.stringify(store.orders)) {
-        store.orders = freshOrders;
-        store.tables = store.load('malabar_tables', store.tables);
-        this.render();
-      }
-    }, 1500);
+      try {
+        const currentTs = localStorage.getItem('malabar_sync_ts') || '0';
+        if (currentTs !== _lastSyncTs) {
+          _lastSyncTs = currentTs;
+          const freshOrders = store.load('malabar_orders', null);
+          const freshTables = store.load('malabar_tables', null);
+          if (freshOrders) store.orders = freshOrders;
+          if (freshTables) store.tables = freshTables;
+          this.render();
+        }
+      } catch(e) {}
+    }, 1000);
 
     this.render();
   }
