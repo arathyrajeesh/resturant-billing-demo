@@ -2387,6 +2387,22 @@ class App {
 
     this.container.innerHTML = `
       <div class="view-container">
+        <!-- Customer Portal Brand Header with Logo -->
+        <div class="panel-card" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; padding:16px 20px; background:linear-gradient(135deg, var(--surface-card) 0%, var(--surface-hover) 100%); border:1px solid var(--surface-border);">
+          <div style="display:flex; align-items:center; gap:16px;">
+            <img src="assets/tclock-logo.jpg" alt="T Clock Resto Cafe Logo" style="width:58px; height:58px; border-radius:50%; object-fit:cover; border:2.5px solid var(--primary); box-shadow:0 4px 14px rgba(52, 20, 13, 0.3); flex-shrink:0;" />
+            <div>
+              <h2 style="font-size:20px; font-weight:800; color:var(--text-dark); margin:0; line-height:1.2;">T CLOCK RESTO CAFE</h2>
+              <p style="font-size:12px; color:var(--primary); font-weight:800; letter-spacing:0.4px; margin-top:3px;">Time for Tea, Time for Taste • Table ${table.number}</p>
+            </div>
+          </div>
+          <div>
+            <span class="status-tag tag-available" style="font-size:12px; padding:6px 14px; border-radius:20px; font-weight:800;">
+              Table ${table.number}
+            </span>
+          </div>
+        </div>
+
         ${customerOrder ? `
           <div class="panel-card" style="border-left: 5px solid ${customerOrder.status === 'ready' ? 'var(--success)' : customerOrder.status === 'preparing' ? 'var(--primary)' : customerOrder.status === 'served' ? '#8B5CF6' : 'var(--warning)'}; margin-bottom:24px;">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
