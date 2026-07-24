@@ -793,6 +793,7 @@ class RestaurantStore {
     };
 
     this.menu.unshift(newItem);
+    this.save();
     soundEffects.playSuccessChime();
     this.showToast(`Added '${newItem.name}' to Menu Catalog!`, '🍲');
     this.notify('MENU_UPDATED', newItem);
@@ -3018,8 +3019,10 @@ class App {
       description
     });
 
+    this.uploadedImageDataUrl = null;
     const modal = document.getElementById('add-menu-modal');
     if (modal) modal.remove();
+    this.render();
   }
 
   openEditDishImageModal(itemId) {
@@ -3076,14 +3079,16 @@ class App {
     const newUrl = this.uploadedImageDataUrl || document.getElementById('edit-dish-img-url').value;
     if (newUrl) {
       item.image = newUrl;
-      localStorage.setItem('malabar_menu', JSON.stringify(store.menu));
+      store.save();
       store.showToast(`Updated photo for ${item.name}!`, '🖼️');
       store.notifyListeners();
       if (typeof syncMenuToSupabase !== 'undefined') syncMenuToSupabase(store.menu);
     }
 
+    this.uploadedImageDataUrl = null;
     const modal = document.getElementById('edit-dish-image-modal');
     if (modal) modal.remove();
+    this.render();
   }
 
   openQRModal(tableId) {
