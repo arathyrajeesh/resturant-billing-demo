@@ -11,7 +11,7 @@ class App {
     this.container = document.getElementById('app-root');
     this.sidebar = document.getElementById('app-sidebar');
     this.topHeader = document.getElementById('top-header');
-    
+
     // Local states
     this.selectedLoginRole = 'admin'; // 'admin', 'staff', 'kitchen'
     this.staffCart = [];
@@ -26,7 +26,7 @@ class App {
     this.selectedPortions = {}; // { [itemId]: 'Full' | 'Half' | 'Quarter' }
     this.showAllAdminTables = false;
     this.showAllStaffTables = false;
-    
+
     store.subscribe(() => this.render());
 
     // Check URL query for direct QR table scanning (?table=4)
@@ -69,7 +69,7 @@ class App {
     if (!item) return;
 
     const activePortion = this.selectedPortions[item.id] || (item.portions && item.portions.length > 0 ? item.portions[0].size : null);
-    
+
     this.modalState = {
       itemId: item.id,
       selectedPortion: activePortion,
@@ -119,7 +119,7 @@ class App {
     }
     if (current.length > 100) current = current.substring(0, 100);
     this.modalState.notes = current;
-    
+
     const textarea = document.getElementById('modal-cooking-notes');
     if (textarea) textarea.value = current;
     const countEl = document.getElementById('modal-char-count');
@@ -351,7 +351,7 @@ class App {
         mainContent.style.marginLeft = '';
         mainContent.style.width = '';
       }
-      
+
       this.renderSidebar();
       this.renderTopHeader();
       this.renderToasts();
@@ -668,8 +668,8 @@ class App {
 
           <div class="tables-floor-grid">
             ${(this.showAllAdminTables ? store.tables : store.tables.slice(0, 6)).map(t => {
-              const tableOrder = store.orders.find(o => o.tableId === t.id && o.paymentStatus === 'unpaid' && o.status !== 'completed');
-              return `
+      const tableOrder = store.orders.find(o => o.tableId === t.id && o.paymentStatus === 'unpaid' && o.status !== 'completed');
+      return `
                 <div class="table-card-std table-card-compact ${t.status}">
                   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                     <div class="table-title" style="margin-bottom:0;">${t.number}</div>
@@ -688,7 +688,7 @@ class App {
                   <button class="table-qr-btn" onclick="window.app.openQRModal(${t.id})">Real QR Sticker</button>
                 </div>
               `;
-            }).join('')}
+    }).join('')}
           </div>
           ${store.tables.length > 6 ? `
             <div style="text-align:center; margin-top:14px;">
@@ -997,18 +997,18 @@ class App {
 
               <div class="web-menu-grid">
                 ${filteredMenu.map(item => {
-                  const activePortion = this.selectedPortions[item.id] || (item.portions ? item.portions[0].size : null);
-                  let price = item.price;
-                  if (item.portions && activePortion) {
-                    const pObj = item.portions.find(p => p.size === activePortion) || item.portions[0];
-                    price = pObj.price;
-                  }
+      const activePortion = this.selectedPortions[item.id] || (item.portions ? item.portions[0].size : null);
+      let price = item.price;
+      if (item.portions && activePortion) {
+        const pObj = item.portions.find(p => p.size === activePortion) || item.portions[0];
+        price = pObj.price;
+      }
 
-                  const cartItemId = item.portions ? `${item.id}_${activePortion}` : item.id;
-                  const cartEntry = this.staffCart.find(c => c.itemId === cartItemId);
-                  const qty = cartEntry ? cartEntry.quantity : 0;
+      const cartItemId = item.portions ? `${item.id}_${activePortion}` : item.id;
+      const cartEntry = this.staffCart.find(c => c.itemId === cartItemId);
+      const qty = cartEntry ? cartEntry.quantity : 0;
 
-                  return `
+      return `
                     <div class="web-menu-card">
                       <div>
                         <img src="${item.image}" class="web-menu-img" alt="${item.name}" />
@@ -1045,7 +1045,7 @@ class App {
                       </div>
                     </div>
                   `;
-                }).join('')}
+    }).join('')}
               </div>
             </div>
 
@@ -1059,9 +1059,9 @@ class App {
                 </div>
 
                 ${(() => {
-                  const activeTableOrder = store.orders.find(o => o.tableId === this.staffSelectedTable && o.paymentStatus === 'unpaid' && o.status !== 'completed');
-                  if (!activeTableOrder) return '';
-                  return `
+          const activeTableOrder = store.orders.find(o => o.tableId === this.staffSelectedTable && o.paymentStatus === 'unpaid' && o.status !== 'completed');
+          if (!activeTableOrder) return '';
+          return `
                     <div style="background:var(--primary-light); border:1px solid var(--primary); padding:10px 12px; border-radius:10px; margin-bottom:12px;">
                       <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div>
@@ -1074,7 +1074,7 @@ class App {
                       </div>
                     </div>
                   `;
-                })()}
+        })()}
 
                 <div class="orders-list" style="max-height:300px; overflow-y:auto;">
                   ${this.staffCart.length === 0 ? '<p style="color:var(--text-muted); font-size:13px; text-align:center; padding:30px 0;">Cart is empty.<br/><span style="font-size:11px;">Select dishes from menu to add to table order.</span></p>' : ''}
@@ -1129,8 +1129,8 @@ class App {
 
             <div class="tables-floor-grid">
               ${store.tables.map(t => {
-                const tableOrder = store.orders.find(o => o.tableId === t.id && o.paymentStatus === 'unpaid' && o.status !== 'completed');
-                return `
+          const tableOrder = store.orders.find(o => o.tableId === t.id && o.paymentStatus === 'unpaid' && o.status !== 'completed');
+          return `
                     <div class="table-card-std ${t.status}">
                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                         <div class="table-title" style="margin-bottom:0;">${t.number}</div>
@@ -1157,7 +1157,7 @@ class App {
                       </div>
                     </div>
                 `;
-              }).join('')}
+        }).join('')}
             </div>
           </div>
         ` : `
@@ -1341,7 +1341,7 @@ class App {
           </div>
         `}
       </div>
-    `;
+  `;
   }
 
   setStaffSubTab(tab) {
@@ -1366,10 +1366,10 @@ class App {
     if (item.portions && selectedPortion) {
       const pObj = item.portions.find(p => p.size === selectedPortion) || item.portions[0];
       price = pObj.price;
-      name = `${item.name} (${pObj.size})`;
+      name = `${ item.name } (${ pObj.size })`;
     }
 
-    const cartItemId = item.portions ? `${item.id}_${selectedPortion}` : item.id;
+    const cartItemId = item.portions ? `${ item.id }_${ selectedPortion } ` : item.id;
 
     let existing = this.staffCart.find(c => c.itemId === cartItemId);
     if (existing) {
@@ -1392,12 +1392,12 @@ class App {
     store.createOrder({
       tableId: this.staffSelectedTable,
       source: 'staff-mobile',
-      orderedBy: `Staff (${store.currentUser.name})`,
+      orderedBy: `Staff(${ store.currentUser.name })`,
       items: this.staffCart
     });
 
     this.staffCart = [];
-    alert(`Order dispatched to Kitchen & Billing for Table T-0${this.staffSelectedTable}!`);
+    alert(`Order dispatched to Kitchen & Billing for Table T - 0${ this.staffSelectedTable } !`);
     this.render();
   }
 
@@ -1422,7 +1422,7 @@ class App {
     const activeOrders = store.orders.filter(o => o.status !== 'paid' && o.status !== 'served' && o.status !== 'completed');
 
     this.container.innerHTML = `
-      <div class="view-container">
+  < div class="view-container" >
         <div class="section-header" style="margin-bottom:20px;">
           <div>
             <h2>Kitchen Order Screen</h2>
@@ -1494,8 +1494,8 @@ class App {
             </div>
           `).join('')}
         </div>
-      </div>
-    `;
+      </div >
+  `;
   }
 
   // ================= CUSTOMER WEB PORTAL =================
@@ -1520,8 +1520,8 @@ class App {
     const grandTotal = cartTotal + cartTax;
 
     this.container.innerHTML = `
-      <div class="view-container">
-        <!-- Customer Portal Brand Header with Logo -->
+  < div class="view-container" >
+        < !--Customer Portal Brand Header with Logo-- >
         <div class="panel-card" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; padding:16px 20px; background:linear-gradient(135deg, var(--surface-card) 0%, var(--surface-hover) 100%); border:1px solid var(--surface-border);">
           <div style="display:flex; align-items:center; gap:16px;">
             <img src="assets/tclock-logo.jpg" alt="T Clock Resto Cafe Logo" style="width:58px; height:58px; border-radius:50%; object-fit:cover; border:2.5px solid var(--primary); box-shadow:0 4px 14px rgba(52, 20, 13, 0.3); flex-shrink:0;" />
@@ -1537,17 +1537,18 @@ class App {
           </div>
         </div>
 
-        <!-- Live Order Status Tracker (If table has an active order) -->
-        ${customerOrder ? `
+        <!--Live Order Status Tracker(If table has an active order)-- >
+  ${
+    customerOrder ? `
           <div class="panel-card" style="border-left: 5px solid ${customerOrder.status === 'ready' ? 'var(--success)' : customerOrder.status === 'preparing' ? 'var(--primary)' : customerOrder.status === 'served' ? '#8B5CF6' : 'var(--warning)'}; margin-bottom:24px;">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
               <div>
                 <h3 style="font-size:17px; font-weight:800;">Live Order #${customerOrder.orderNumber} Status</h3>
                 <p style="font-size:12px; color:var(--primary); font-weight:700; margin-top:2px;">
                   ${customerOrder.status === 'placed' ? 'Order received. Kitchen chef has received your ticket.' :
-                    customerOrder.status === 'preparing' ? 'Chef master is currently cooking your food live in the kitchen.' :
-                    customerOrder.status === 'ready' ? 'Hot & Ready. Waiter is serving your dishes to your table.' :
-                    'Order Served. Enjoy your meal.'}
+        customerOrder.status === 'preparing' ? 'Chef master is currently cooking your food live in the kitchen.' :
+          customerOrder.status === 'ready' ? 'Hot & Ready. Waiter is serving your dishes to your table.' :
+            'Order Served. Enjoy your meal.'}
                 </p>
               </div>
               <div style="display:flex; align-items:center; gap:8px;">
@@ -1562,15 +1563,15 @@ class App {
 
             <!-- 4-Step Visual Tracker -->
             <div class="status-tracker-container" style="display:flex; justify-content:space-between; margin:16px 0; background:var(--bg-main); padding:14px 10px; border-radius:12px; border:1px solid var(--surface-border); gap:6px;">
-              <div class="status-tracker-step" style="flex:1; text-align:center; opacity: ${['placed','preparing','ready','served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'placed' ? '800' : '600'};">
+              <div class="status-tracker-step" style="flex:1; text-align:center; opacity: ${['placed', 'preparing', 'ready', 'served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'placed' ? '800' : '600'};">
                 <div style="font-size:12px; font-weight:800;">1</div>
                 <div style="font-size:11px; margin-top:2px;">Order Placed</div>
               </div>
-              <div class="status-tracker-step" style="flex:1; text-align:center; opacity: ${['preparing','ready','served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'preparing' ? '800' : '600'}; color:${customerOrder.status === 'preparing' ? 'var(--primary)' : 'inherit'};">
+              <div class="status-tracker-step" style="flex:1; text-align:center; opacity: ${['preparing', 'ready', 'served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'preparing' ? '800' : '600'}; color:${customerOrder.status === 'preparing' ? 'var(--primary)' : 'inherit'};">
                 <div style="font-size:12px; font-weight:800;">2</div>
                 <div style="font-size:11px; margin-top:2px;">In Preparation</div>
               </div>
-              <div class="status-tracker-step" style="flex:1; text-align:center; opacity: ${['ready','served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'ready' ? '800' : '600'}; color:${customerOrder.status === 'ready' ? 'var(--success)' : 'inherit'};">
+              <div class="status-tracker-step" style="flex:1; text-align:center; opacity: ${['ready', 'served'].includes(customerOrder.status) ? 1 : 0.35}; font-weight:${customerOrder.status === 'ready' ? '800' : '600'}; color:${customerOrder.status === 'ready' ? 'var(--success)' : 'inherit'};">
                 <div style="font-size:12px; font-weight:800;">3</div>
                 <div style="font-size:11px; margin-top:2px;">Ready for Pickup</div>
               </div>
@@ -1593,51 +1594,52 @@ class App {
             </div>
             <p style="font-size:11px; color:var(--text-muted); margin-top:10px; text-align:center;">Want to order extra food or drinks? Select items below and tap <strong>'Submit Order'</strong>.</p>
           </div>
-        ` : ''}
+        ` : ''
+}
 
-        <!-- Main Order Interface Grid -->
-        <div class="web-pos-grid">
-          <!-- Menu Catalog Panel -->
-          <div class="panel-card">
-            <div style="margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;">
-              <h3 style="font-size:16px;">Menu Catalog</h3>
-              <span style="font-size:12px; color:var(--text-muted);">${filteredMenu.length} dishes available</span>
-            </div>
+        < !--Main Order Interface Grid-- >
+  <div class="web-pos-grid">
+    <!-- Menu Catalog Panel -->
+    <div class="panel-card">
+      <div style="margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;">
+        <h3 style="font-size:16px;">Menu Catalog</h3>
+        <span style="font-size:12px; color:var(--text-muted);">${filteredMenu.length} dishes available</span>
+      </div>
 
-            <div class="menu-categories">
-              ${CATEGORIES.map(cat => `
+      <div class="menu-categories">
+        ${CATEGORIES.map(cat => `
                 <button class="cat-chip ${store.selectedCategory === cat.id ? 'active' : ''}" onclick="window.store.setSelectedCategory('${cat.id}')">
                   ${cat.name}
                 </button>
               `).join('')}
-            </div>
+      </div>
 
-            <div class="swiggy-menu-list">
-              ${filteredMenu.map(item => {
-                const activePortion = this.selectedPortions[item.id] || (item.portions ? item.portions[0].size : null);
-                let price = item.price;
-                if (item.portions && activePortion) {
-                  const pObj = item.portions.find(p => p.size === activePortion) || item.portions[0];
-                  price = pObj.price;
-                }
+      <div class="swiggy-menu-list">
+        ${filteredMenu.map(item => {
+          const activePortion = this.selectedPortions[item.id] || (item.portions ? item.portions[0].size : null);
+          let price = item.price;
+          if (item.portions && activePortion) {
+            const pObj = item.portions.find(p => p.size === activePortion) || item.portions[0];
+            price = pObj.price;
+          }
 
-                const cartItemId = item.portions ? `${item.id}_${activePortion}` : item.id;
-                const cartEntry = (this.customerCart || []).find(c => c.itemId === cartItemId);
-                const qty = cartEntry ? cartEntry.quantity : 0;
-                const masterItem = MENU_ITEMS.find(m => m.id === item.id);
-                const cat = item.category || (masterItem ? masterItem.category : 'mains');
-                let catEmoji = '🍛', c1 = '%23F97316', c2 = '%23EA580C';
-                if (cat === 'biryani') { catEmoji = '🍛'; c1 = '%23F97316'; c2 = '%23DC2626'; }
-                else if (cat === 'mains') { catEmoji = '🍲'; c1 = '%2310B981'; c2 = '%23047857'; }
-                else if (cat === 'starters') { catEmoji = '🍗'; c1 = '%23D97706'; c2 = '%23B45309'; }
-                else if (cat === 'breads') { catEmoji = '🫓'; c1 = '%23EAB308'; c2 = '%23CA8A04'; }
-                else if (cat === 'beverages') { catEmoji = '🍹'; c1 = '%2306B6D4'; c2 = '%230E7490'; }
-                else if (cat === 'desserts') { catEmoji = '🍧'; c1 = '%23EC4899'; c2 = '%23BE185D'; }
+          const cartItemId = item.portions ? `${item.id}_${activePortion}` : item.id;
+          const cartEntry = (this.customerCart || []).find(c => c.itemId === cartItemId);
+          const qty = cartEntry ? cartEntry.quantity : 0;
+          const masterItem = MENU_ITEMS.find(m => m.id === item.id);
+          const cat = item.category || (masterItem ? masterItem.category : 'mains');
+          let catEmoji = '🍛', c1 = '%23F97316', c2 = '%23EA580C';
+          if (cat === 'biryani') { catEmoji = '🍛'; c1 = '%23F97316'; c2 = '%23DC2626'; }
+          else if (cat === 'mains') { catEmoji = '🍲'; c1 = '%2310B981'; c2 = '%23047857'; }
+          else if (cat === 'starters') { catEmoji = '🍗'; c1 = '%23D97706'; c2 = '%23B45309'; }
+          else if (cat === 'breads') { catEmoji = '🫓'; c1 = '%23EAB308'; c2 = '%23CA8A04'; }
+          else if (cat === 'beverages') { catEmoji = '🍹'; c1 = '%2306B6D4'; c2 = '%230E7490'; }
+          else if (cat === 'desserts') { catEmoji = '🍧'; c1 = '%23EC4899'; c2 = '%23BE185D'; }
 
-                const svgFallback = `data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%2290%22%20viewBox%3D%220%200%20100%2090%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22${c1}%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22${c2}%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22100%22%20height%3D%2290%22%20rx%3D%2214%22%20fill%3D%22url(%23g)%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2242%22%20r%3D%2226%22%20fill%3D%22rgba(255%2C255%2C255%2C0.2)%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22central%22%20text-anchor%3D%22middle%22%20font-size%3D%2230%22%3E${encodeURIComponent(catEmoji)}%3C%2Ftext%3E%3C%2Fsvg%3E`;
-                const itemImg = (item.image && item.image.length > 10 ? item.image : '') || (masterItem && masterItem.image ? masterItem.image : '') || svgFallback;
+          const svgFallback = `data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%2290%22%20viewBox%3D%220%200%20100%2090%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22${c1}%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22${c2}%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22100%22%20height%3D%2290%22%20rx%3D%2214%22%20fill%3D%22url(%23g)%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2242%22%20r%3D%2226%22%20fill%3D%22rgba(255%2C255%2C255%2C0.2)%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22central%22%20text-anchor%3D%22middle%22%20font-size%3D%2230%22%3E${encodeURIComponent(catEmoji)}%3C%2Ftext%3E%3C%2Fsvg%3E`;
+          const itemImg = (item.image && item.image.length > 10 ? item.image : '') || (masterItem && masterItem.image ? masterItem.image : '') || svgFallback;
 
-                return `
+          return `
                   <div class="swiggy-item-card" style="display:flex !important; flex-direction:row !important; justify-content:space-between !important; align-items:flex-start !important; width:100% !important; box-sizing:border-box !important; gap:12px !important;">
                     <div class="swiggy-item-right" style="width:92px !important; min-width:92px !important; max-width:92px !important; flex:0 0 92px !important; display:flex !important; flex-direction:column !important; align-items:center !important; position:relative !important;">
                       <img src="${itemImg}" class="swiggy-item-img" alt="${item.name}" referrerpolicy="no-referrer" onclick="window.app.openItemCustomizationModal('${item.id}')" style="width:86px !important; height:80px !important; border-radius:12px !important; object-fit:cover !important; display:block !important; cursor:pointer !important;" onerror="this.onerror=null; this.src='${svgFallback}';" />
@@ -1669,33 +1671,30 @@ class App {
                       <div class="swiggy-item-price">₹${price}</div>
                       <p class="swiggy-item-desc">${item.description}</p>
 
-                      <div class="swiggy-action-icons" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:10px;">
-                        <button class="btn-primary" style="padding:6px 14px; font-size:12px; font-weight:800; border-radius:8px;" onclick="window.app.openItemCustomizationModal('${item.id}')">+ Add to Order</button>
-                      </div>
                     </div>
                   </div>
                 `;
-              }).join('')}
-            </div>
-          </div>
+        }).join('')}
+      </div>
+    </div>
 
-          <!-- Customer Cart Summary & Submit Order Drawer -->
-          <div class="web-pos-cart-panel ${(!this.customerCart || this.customerCart.length === 0) ? 'empty-cart-mobile' : ''}" id="customer-cart-panel">
-            <div>
-              <div style="padding-bottom:14px; border-bottom:1px solid var(--surface-border); margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;">
-                <h3>Your Order</h3>
-                <span class="status-tag tag-available">Table ${table.number}</span>
-              </div>
+    <!-- Customer Cart Summary & Submit Order Drawer -->
+    <div class="web-pos-cart-panel ${(!this.customerCart || this.customerCart.length === 0) ? 'empty-cart-mobile' : ''}" id="customer-cart-panel">
+      <div>
+        <div style="padding-bottom:14px; border-bottom:1px solid var(--surface-border); margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;">
+          <h3>Your Order</h3>
+          <span class="status-tag tag-available">Table ${table.number}</span>
+        </div>
 
-              <div class="orders-list" style="max-height:280px; overflow-y:auto;">
-                ${(!this.customerCart || this.customerCart.length === 0) ? `
+        <div class="orders-list" style="max-height:280px; overflow-y:auto;">
+          ${(!this.customerCart || this.customerCart.length === 0) ? `
                   <div style="text-align:center; padding:40px 10px; color:var(--text-muted);">
                     <p style="font-size:13px; font-weight:600;">Your Cart is Empty</p>
                     <p style="font-size:11px; margin-top:4px;">Tap 'ADD +' on dishes to start your order</p>
                   </div>
                 ` : ''}
 
-                ${(this.customerCart || []).map(item => `
+          ${(this.customerCart || []).map(item => `
                   <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--surface-border);">
                     <div>
                       <strong style="font-size:13px;">${item.name}</strong>
@@ -1712,31 +1711,32 @@ class App {
                     </div>
                   </div>
                 `).join('')}
-              </div>
-            </div>
+        </div>
+      </div>
 
-            <div style="border-top:1px solid var(--surface-border); padding-top:14px; margin-top:14px;">
-              <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px; color:var(--text-muted);">
-                <span>Subtotal</span>
-                <span>₹${cartTotal}</span>
-              </div>
-              <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:12px; color:var(--text-muted);">
-                <span>GST (5%)</span>
-                <span>₹${cartTax}</span>
-              </div>
-              <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:800; color:var(--primary); margin-bottom:14px;">
-                <span>Total Payable</span>
-                <span>₹${grandTotal}</span>
-              </div>
-
-              <button class="btn-primary desktop-only-submit-btn" style="width:100%; justify-content:center; padding:12px; font-size:14px; font-weight:800;" ${(!this.customerCart || this.customerCart.length === 0) ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="window.app.submitCustomerOrder()">
-                Submit Order to Kitchen
-              </button>
-            </div>
-          </div>
+      <div style="border-top:1px solid var(--surface-border); padding-top:14px; margin-top:14px;">
+        <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px; color:var(--text-muted);">
+          <span>Subtotal</span>
+          <span>₹${cartTotal}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:12px; color:var(--text-muted);">
+          <span>GST (5%)</span>
+          <span>₹${cartTax}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:800; color:var(--primary); margin-bottom:14px;">
+          <span>Total Payable</span>
+          <span>₹${grandTotal}</span>
         </div>
 
-        ${(this.customerCart && this.customerCart.length > 0) ? `
+        <button class="btn-primary desktop-only-submit-btn" style="width:100%; justify-content:center; padding:12px; font-size:14px; font-weight:800;" ${(!this.customerCart || this.customerCart.length === 0) ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="window.app.submitCustomerOrder()">
+          Submit Order to Kitchen
+        </button>
+      </div>
+    </div>
+  </div>
+
+        ${
+  (this.customerCart && this.customerCart.length > 0) ? `
           <div class="swiggy-sticky-bottom-bar" onclick="window.app.submitCustomerOrder()">
             <div style="display:flex; align-items:center; gap:10px;">
               <div style="width:32px; height:32px; background:rgba(255,255,255,0.2); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px;">🛍️</div>
@@ -1749,9 +1749,10 @@ class App {
               Continue & Checkout ➔
             </div>
           </div>
-        ` : ''}
-      </div>
-    `;
+        ` : ''
+}
+      </div >
+  `;
   }
 
   updateCustomerCartQty(itemId, delta, portion = null) {
@@ -1767,10 +1768,10 @@ class App {
     if (item.portions && selectedPortion) {
       const pObj = item.portions.find(p => p.size === selectedPortion) || item.portions[0];
       price = pObj.price;
-      name = `${item.name} (${pObj.size})`;
+      name = `${ item.name } (${ pObj.size })`;
     }
 
-    const cartItemId = item.portions ? `${item.id}_${selectedPortion}` : item.id;
+    const cartItemId = item.portions ? `${ item.id }_${ selectedPortion } ` : item.id;
 
     let existing = this.customerCart.find(c => c.itemId === cartItemId);
     if (existing) {
@@ -1795,7 +1796,7 @@ class App {
     store.createOrder({
       tableId: table.id,
       source: 'qr-customer',
-      orderedBy: `Customer (Table ${table.number})`,
+      orderedBy: `Customer(Table ${ table.number })`,
       items: this.customerCart
     });
 
@@ -1818,105 +1819,105 @@ class App {
     ];
 
     const modalHtml = `
-      <div class="modal-overlay" id="add-menu-modal">
-        <div class="modal-card" style="max-width:540px;">
-          <button class="modal-close" onclick="document.getElementById('add-menu-modal').remove()">✕</button>
-          <h3 style="font-size:20px; margin-bottom:4px;">➕ Add New Menu Dish</h3>
-          <p style="color:var(--text-muted); font-size:13px; margin-bottom:16px;">Set custom category, portion pricing & upload dish photo from computer</p>
+  < div class="modal-overlay" id = "add-menu-modal" >
+    <div class="modal-card" style="max-width:540px;">
+      <button class="modal-close" onclick="document.getElementById('add-menu-modal').remove()">✕</button>
+      <h3 style="font-size:20px; margin-bottom:4px;">➕ Add New Menu Dish</h3>
+      <p style="color:var(--text-muted); font-size:13px; margin-bottom:16px;">Set custom category, portion pricing & upload dish photo from computer</p>
 
-          <form onsubmit="window.app.handleAddMenuSubmit(event)">
-            <div class="form-group-std">
-              <label>Dish Name</label>
-              <input type="text" id="new-dish-name" placeholder="e.g. Thalassery Mutton Curry" required />
+      <form onsubmit="window.app.handleAddMenuSubmit(event)">
+        <div class="form-group-std">
+          <label>Dish Name</label>
+          <input type="text" id="new-dish-name" placeholder="e.g. Thalassery Mutton Curry" required />
+        </div>
+
+        <div class="form-group-std">
+          <label>Category</label>
+          <div style="display:flex; gap:8px;">
+            <select id="new-dish-category" style="flex:1;" onchange="window.app.toggleCustomCategoryInput(this.value)">
+              ${CATEGORIES.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+              <option value="CUSTOM">+ Add New Custom Category...</option>
+            </select>
+            <input type="text" id="new-custom-category" placeholder="Type category name" style="display:none; flex:1;" />
+          </div>
+        </div>
+
+        <div style="background:var(--bg-main); border:1px solid var(--surface-border); padding:12px; border-radius:8px; margin-bottom:14px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-dark); display:block; margin-bottom:8px;">Portion Pricing (₹):</label>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); gap:10px;">
+            <div class="form-group-std" style="margin:0;">
+              <label>Full Portion (₹) *</label>
+              <input type="number" id="price-full" placeholder="380" required />
             </div>
-
-            <div class="form-group-std">
-              <label>Category</label>
-              <div style="display:flex; gap:8px;">
-                <select id="new-dish-category" style="flex:1;" onchange="window.app.toggleCustomCategoryInput(this.value)">
-                  ${CATEGORIES.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
-                  <option value="CUSTOM">+ Add New Custom Category...</option>
-                </select>
-                <input type="text" id="new-custom-category" placeholder="Type category name" style="display:none; flex:1;" />
-              </div>
+            <div class="form-group-std" style="margin:0;">
+              <label>Half Portion (₹)</label>
+              <input type="number" id="price-half" placeholder="220" />
             </div>
-
-            <div style="background:var(--bg-main); border:1px solid var(--surface-border); padding:12px; border-radius:8px; margin-bottom:14px;">
-              <label style="font-size:12px; font-weight:700; color:var(--text-dark); display:block; margin-bottom:8px;">Portion Pricing (₹):</label>
-              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); gap:10px;">
-                <div class="form-group-std" style="margin:0;">
-                  <label>Full Portion (₹) *</label>
-                  <input type="number" id="price-full" placeholder="380" required />
-                </div>
-                <div class="form-group-std" style="margin:0;">
-                  <label>Half Portion (₹)</label>
-                  <input type="number" id="price-half" placeholder="220" />
-                </div>
-                <div class="form-group-std" style="margin:0;">
-                  <label>Quarter (₹)</label>
-                  <input type="number" id="price-quarter" placeholder="130" />
-                </div>
-              </div>
+            <div class="form-group-std" style="margin:0;">
+              <label>Quarter (₹)</label>
+              <input type="number" id="price-quarter" placeholder="130" />
             </div>
+          </div>
+        </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-              <div class="form-group-std">
-                <label>Diet Type</label>
-                <select id="new-dish-veg">
-                  <option value="false">🔴 Non-Veg</option>
-                  <option value="true">🟢 Pure Veg</option>
-                </select>
-              </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group-std">
+            <label>Diet Type</label>
+            <select id="new-dish-veg">
+              <option value="false">🔴 Non-Veg</option>
+              <option value="true">🟢 Pure Veg</option>
+            </select>
+          </div>
 
-              <div class="form-group-std">
-                <label>Spice Level</label>
-                <select id="new-dish-spice">
-                  <option value="1">Mild</option>
-                  <option value="2" selected>Medium</option>
-                  <option value="3">Spicy</option>
-                </select>
-              </div>
-            </div>
+          <div class="form-group-std">
+            <label>Spice Level</label>
+            <select id="new-dish-spice">
+              <option value="1">Mild</option>
+              <option value="2" selected>Medium</option>
+              <option value="3">Spicy</option>
+            </select>
+          </div>
+        </div>
 
-            <div class="form-group-std">
-              <label>Dish Photo (Upload from System / Computer)</label>
-              
-              <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
-                <input type="file" id="dish-file-input" accept="image/*" style="display:none;" onchange="window.app.handleDishFileUpload(event)" />
-                <button type="button" class="btn-enterprise" style="flex:1; justify-content:center;" onclick="document.getElementById('dish-file-input').click()">
-                  📁 Browse & Upload Image File...
-                </button>
-              </div>
+        <div class="form-group-std">
+          <label>Dish Photo (Upload from System / Computer)</label>
 
-              <div id="image-upload-preview" style="display:none; margin-bottom:8px; text-align:center;">
-                <img id="preview-img-tag" src="" style="max-height:120px; border-radius:8px; border:2px solid var(--primary); object-fit:cover;" alt="Upload Preview" />
-                <p style="font-size:11px; color:var(--success); font-weight:700; margin-top:2px;">✅ Image File Loaded!</p>
-              </div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <input type="file" id="dish-file-input" accept="image/*" style="display:none;" onchange="window.app.handleDishFileUpload(event)" />
+            <button type="button" class="btn-enterprise" style="flex:1; justify-content:center;" onclick="document.getElementById('dish-file-input').click()">
+              📁 Browse & Upload Image File...
+            </button>
+          </div>
 
-              <input type="url" id="new-dish-img-url" placeholder="Or paste image URL" value="${this.selectedImagePreset}" />
-              
-              <div style="display:flex; gap:6px; margin-top:8px; overflow-x:auto; padding-bottom:4px;">
-                ${imagePresets.map(preset => `
+          <div id="image-upload-preview" style="display:none; margin-bottom:8px; text-align:center;">
+            <img id="preview-img-tag" src="" style="max-height:120px; border-radius:8px; border:2px solid var(--primary); object-fit:cover;" alt="Upload Preview" />
+            <p style="font-size:11px; color:var(--success); font-weight:700; margin-top:2px;">✅ Image File Loaded!</p>
+          </div>
+
+          <input type="url" id="new-dish-img-url" placeholder="Or paste image URL" value="${this.selectedImagePreset}" />
+
+          <div style="display:flex; gap:6px; margin-top:8px; overflow-x:auto; padding-bottom:4px;">
+            ${imagePresets.map(preset => `
                   <div style="cursor:pointer; border:2px solid ${this.selectedImagePreset === preset.url ? 'var(--primary)' : 'var(--surface-border)'}; border-radius:6px; padding:2px; text-align:center;" onclick="window.app.selectPresetImage('${preset.url}')">
                     <img src="${preset.url}" style="width:40px; height:40px; border-radius:4px; object-fit:cover;" alt="${preset.name}" />
                     <div style="font-size:9px; font-weight:700;">${preset.name}</div>
                   </div>
                 `).join('')}
-              </div>
-            </div>
-
-            <div class="form-group-std">
-              <label>Description</label>
-              <textarea id="new-dish-desc" rows="2" placeholder="Brief description of aromatic ingredients & cooking style..."></textarea>
-            </div>
-
-            <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:11px; background:#D97706;">
-              <span>✅</span> Add Dish to Menu Catalog
-            </button>
-          </form>
+          </div>
         </div>
-      </div>
-    `;
+
+        <div class="form-group-std">
+          <label>Description</label>
+          <textarea id="new-dish-desc" rows="2" placeholder="Brief description of aromatic ingredients & cooking style..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:11px; background:#D97706;">
+          <span>✅</span> Add Dish to Menu Catalog
+        </button>
+      </form>
+    </div>
+      </div >
+  `;
 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
   }
@@ -1934,7 +1935,7 @@ class App {
   deleteTable(tableId) {
     const table = store.tables.find(t => t.id === Number(tableId));
     if (!table) return;
-    if (confirm(`Are you sure you want to delete Table ${table.number}?`)) {
+    if (confirm(`Are you sure you want to delete Table ${ table.number }?`)) {
       store.deleteTable(tableId);
       this.render();
     }
@@ -2020,39 +2021,39 @@ class App {
     this.uploadedImageDataUrl = null;
 
     const modalHtml = `
-      <div class="modal-overlay" id="edit-dish-image-modal">
-        <div class="modal-card" style="max-width:460px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-            <h3 style="font-size:16px;">📁 Upload Photo for ${item.name}</h3>
-            <button class="modal-close" onclick="document.getElementById('edit-dish-image-modal').remove()">✕</button>
+  < div class="modal-overlay" id = "edit-dish-image-modal" >
+    <div class="modal-card" style="max-width:460px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 style="font-size:16px;">📁 Upload Photo for ${item.name}</h3>
+        <button class="modal-close" onclick="document.getElementById('edit-dish-image-modal').remove()">✕</button>
+      </div>
+
+      <form onsubmit="window.app.handleEditDishImageSubmit(event)">
+        <div class="form-group-std">
+          <label>Select Image File (Upload from Computer / Folder)</label>
+
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+            <input type="file" id="edit-dish-file-input" accept="image/*" style="display:none;" onchange="window.app.handleDishFileUpload(event)" />
+            <button type="button" class="btn-enterprise" style="flex:1; justify-content:center; padding:12px; font-weight:700; background:var(--bg-main);" onclick="document.getElementById('edit-dish-file-input').click()">
+              📂 Browse Computer & Select Dish Image...
+            </button>
           </div>
 
-          <form onsubmit="window.app.handleEditDishImageSubmit(event)">
-            <div class="form-group-std">
-              <label>Select Image File (Upload from Computer / Folder)</label>
-              
-              <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-                <input type="file" id="edit-dish-file-input" accept="image/*" style="display:none;" onchange="window.app.handleDishFileUpload(event)" />
-                <button type="button" class="btn-enterprise" style="flex:1; justify-content:center; padding:12px; font-weight:700; background:var(--bg-main);" onclick="document.getElementById('edit-dish-file-input').click()">
-                  📂 Browse Computer & Select Dish Image...
-                </button>
-              </div>
+          <div id="image-upload-preview" style="margin-bottom:12px; text-align:center;">
+            <img id="preview-img-tag" src="${item.image || ''}" style="max-height:140px; border-radius:12px; border:2px solid var(--primary); object-fit:cover;" alt="${item.name}" />
+            <p style="font-size:11px; color:var(--text-muted); font-weight:700; margin-top:4px;">Live Image Preview</p>
+          </div>
 
-              <div id="image-upload-preview" style="margin-bottom:12px; text-align:center;">
-                <img id="preview-img-tag" src="${item.image || ''}" style="max-height:140px; border-radius:12px; border:2px solid var(--primary); object-fit:cover;" alt="${item.name}" />
-                <p style="font-size:11px; color:var(--text-muted); font-weight:700; margin-top:4px;">Live Image Preview</p>
-              </div>
-
-              <input type="url" id="edit-dish-img-url" placeholder="Or paste image URL" value="${item.image || ''}" />
-            </div>
-
-            <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:11px; background:#059669; margin-top:10px;">
-              <span>💾</span> Save Dish Photo to Menu
-            </button>
-          </form>
+          <input type="url" id="edit-dish-img-url" placeholder="Or paste image URL" value="${item.image || ''}" />
         </div>
-      </div>
-    `;
+
+        <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:11px; background:#059669; margin-top:10px;">
+          <span>💾</span> Save Dish Photo to Menu
+        </button>
+      </form>
+    </div>
+      </div >
+  `;
 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
   }
@@ -2067,7 +2068,7 @@ class App {
     if (newUrl) {
       item.image = newUrl;
       store.save();
-      store.showToast(`Updated photo for ${item.name}!`, '🖼️');
+      store.showToast(`Updated photo for ${ item.name }!`, '🖼️');
       store.notifyListeners();
       if (typeof syncMenuToSupabase !== 'undefined') syncMenuToSupabase(store.menu);
     }
@@ -2086,15 +2087,15 @@ class App {
     window.app._currentEditOrderId = orderId;
 
     const modalHtml = `
-      <div class="modal-overlay" id="edit-order-modal">
-        <div class="modal-card" style="max-width:520px;">
-          <button class="modal-close" onclick="document.getElementById('edit-order-modal').remove()">✕</button>
-          <h3 style="font-size:20px; margin-bottom:4px;">✏️ Edit Order #${order.orderNumber} (${order.tableNumber})</h3>
-          <p style="color:var(--text-muted); font-size:12px; margin-bottom:14px;">Modify quantities, remove items, or add new dishes to this table's order</p>
-          <div id="edit-order-modal-content"></div>
-        </div>
-      </div>
-    `;
+  < div class= "modal-overlay" id = "edit-order-modal" >
+    <div class="modal-card" style="max-width:520px;">
+      <button class="modal-close" onclick="document.getElementById('edit-order-modal').remove()">✕</button>
+      <h3 style="font-size:20px; margin-bottom:4px;">✏️ Edit Order #${order.orderNumber} (${order.tableNumber})</h3>
+      <p style="color:var(--text-muted); font-size:12px; margin-bottom:14px;">Modify quantities, remove items, or add new dishes to this table's order</p>
+      <div id="edit-order-modal-content"></div>
+    </div>
+      </div >
+  `;
 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
     this.refreshEditModalDOM();
@@ -2126,9 +2127,10 @@ class App {
     const total = subtotal + tax;
 
     modalEl.innerHTML = `
-      <div style="max-height:300px; overflow-y:auto; margin-bottom:14px; border-bottom:1px solid var(--surface-border); padding-bottom:10px;">
-        ${tempItems.length === 0 ? '<p style="color:var(--text-muted); text-align:center; padding:20px 0;">No items in order.</p>' : ''}
-        ${tempItems.map((item, idx) => `
+  < div style = "max-height:300px; overflow-y:auto; margin-bottom:14px; border-bottom:1px solid var(--surface-border); padding-bottom:10px;" >
+    ${ tempItems.length === 0 ? '<p style="color:var(--text-muted); text-align:center; padding:20px 0;">No items in order.</p>' : '' }
+        ${
+  tempItems.map((item, idx) => `
           <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--surface-border);">
             <div>
               <strong style="font-size:13px; display:block;">${item.name}</strong>
@@ -2144,8 +2146,9 @@ class App {
               <button class="btn-enterprise" style="padding:2px 6px; color:var(--danger); border-color:var(--danger);" onclick="window.app.removeEditItem(${idx})">🗑️</button>
             </div>
           </div>
-        `).join('')}
-      </div>
+        `).join('')
+}
+      </div >
 
       <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px; color:var(--text-muted);">
         <span>Subtotal</span>
@@ -2168,7 +2171,7 @@ class App {
           🚀 Save & Dispatch to Kitchen
         </button>
       </div>
-    `;
+`;
   }
 
   saveEditOrder(orderId) {
@@ -2206,63 +2209,63 @@ class App {
     const brandName = isSwiggy ? 'Swiggy Delivery' : 'Zomato Delivery';
 
     const modalHtml = `
-      <div class="modal-overlay" id="online-order-modal">
-        <div class="modal-card" style="max-width:520px; border-top: 5px solid ${brandColor};">
-          <button class="modal-close" onclick="document.getElementById('online-order-modal').remove()">✕</button>
-          
-          <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
-            <div style="background:${brandColor}; color:#FFF; padding:6px 12px; border-radius:8px; font-weight:800; font-size:14px;">
-              ${isSwiggy ? '🛵 SWIGGY' : '🍕 ZOMATO'}
-            </div>
-            <div>
-              <h3 style="font-size:18px; margin:0;">${brandName} Order Relay</h3>
-              <p style="font-size:11px; color:var(--text-muted); margin:0;">Live Online Aggregator Order Simulation & API Webhook Integration</p>
-            </div>
-          </div>
+  < div class="modal-overlay" id = "online-order-modal" >
+    <div class="modal-card" style="max-width:520px; border-top: 5px solid ${brandColor};">
+      <button class="modal-close" onclick="document.getElementById('online-order-modal').remove()">✕</button>
 
-          <form onsubmit="window.app.handleOnlineOrderSubmit(event, '${aggregator}')">
-            <div class="form-group-std">
-              <label>Customer Name & Delivery Address</label>
-              <input type="text" id="online-cust-name" value="${isSwiggy ? 'Rahul Nair (Beach Road, Flat 4B)' : 'Priya Menon (Kadavanthra, Block C)'}" required />
-            </div>
-
-            <div class="form-group-std">
-              <label>Select Primary Dish</label>
-              <select id="online-item-1">
-                ${store.menu.map(m => `<option value="${m.id}">${m.name} - ₹${m.price}</option>`).join('')}
-              </select>
-            </div>
-
-            <div class="form-group-std">
-              <label>Select Beverage / Side Dish</label>
-              <select id="online-item-2">
-                ${store.menu.filter(m => m.category === 'beverages' || m.category === 'desserts' || m.category === 'starters').map(m => `<option value="${m.id}">${m.name} - ₹${m.price}</option>`).join('')}
-              </select>
-            </div>
-
-            <div style="background:var(--bg-main); border:1px solid var(--surface-border); padding:10px; border-radius:8px; margin-bottom:14px; font-size:12px;">
-              <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                <span>Payment Status:</span>
-                <strong style="color:var(--success);">✅ Paid Online (${isSwiggy ? 'Swiggy Pay' : 'Zomato UPI'})</strong>
-              </div>
-              <div style="display:flex; justify-content:space-between;">
-                <span>Routing Target:</span>
-                <strong style="color:var(--primary);">👨‍🍳 Direct to KDS Cooking Queue</strong>
-              </div>
-            </div>
-
-            <div style="display:flex; gap:10px;">
-              <button type="button" class="btn-enterprise" style="flex:1; justify-content:center;" onclick="window.store.simulateOnlineOrder('${aggregator}'); document.getElementById('online-order-modal').remove();">
-                ⚡ Quick Random Order
-              </button>
-              <button type="submit" class="btn-primary" style="flex:1.2; justify-content:center; background:${brandColor}; color:#FFF;">
-                🚀 Dispatch ${isSwiggy ? 'Swiggy' : 'Zomato'} Ticket
-              </button>
-            </div>
-          </form>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <div style="background:${brandColor}; color:#FFF; padding:6px 12px; border-radius:8px; font-weight:800; font-size:14px;">
+          ${isSwiggy ? '🛵 SWIGGY' : '🍕 ZOMATO'}
+        </div>
+        <div>
+          <h3 style="font-size:18px; margin:0;">${brandName} Order Relay</h3>
+          <p style="font-size:11px; color:var(--text-muted); margin:0;">Live Online Aggregator Order Simulation & API Webhook Integration</p>
         </div>
       </div>
-    `;
+
+      <form onsubmit="window.app.handleOnlineOrderSubmit(event, '${aggregator}')">
+        <div class="form-group-std">
+          <label>Customer Name & Delivery Address</label>
+          <input type="text" id="online-cust-name" value="${isSwiggy ? 'Rahul Nair (Beach Road, Flat 4B)' : 'Priya Menon (Kadavanthra, Block C)'}" required />
+        </div>
+
+        <div class="form-group-std">
+          <label>Select Primary Dish</label>
+          <select id="online-item-1">
+            ${store.menu.map(m => `<option value="${m.id}">${m.name} - ₹${m.price}</option>`).join('')}
+          </select>
+        </div>
+
+        <div class="form-group-std">
+          <label>Select Beverage / Side Dish</label>
+          <select id="online-item-2">
+            ${store.menu.filter(m => m.category === 'beverages' || m.category === 'desserts' || m.category === 'starters').map(m => `<option value="${m.id}">${m.name} - ₹${m.price}</option>`).join('')}
+          </select>
+        </div>
+
+        <div style="background:var(--bg-main); border:1px solid var(--surface-border); padding:10px; border-radius:8px; margin-bottom:14px; font-size:12px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span>Payment Status:</span>
+            <strong style="color:var(--success);">✅ Paid Online (${isSwiggy ? 'Swiggy Pay' : 'Zomato UPI'})</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span>Routing Target:</span>
+            <strong style="color:var(--primary);">👨‍🍳 Direct to KDS Cooking Queue</strong>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button type="button" class="btn-enterprise" style="flex:1; justify-content:center;" onclick="window.store.simulateOnlineOrder('${aggregator}'); document.getElementById('online-order-modal').remove();">
+            ⚡ Quick Random Order
+          </button>
+          <button type="submit" class="btn-primary" style="flex:1.2; justify-content:center; background:${brandColor}; color:#FFF;">
+            🚀 Dispatch ${isSwiggy ? 'Swiggy' : 'Zomato'} Ticket
+          </button>
+        </div>
+      </form>
+    </div>
+      </div >
+  `;
 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
   }
@@ -2284,7 +2287,7 @@ class App {
     store.createOrder({
       tableId: null,
       source: isSwiggy ? 'swiggy' : 'zomato',
-      customerName: `${custName} (${isSwiggy ? 'Swiggy' : 'Zomato'})`,
+      customerName: `${ custName } (${ isSwiggy ? 'Swiggy' : 'Zomato' })`,
       items
     });
 
@@ -2299,16 +2302,16 @@ class App {
     const qrSvg = generateTableQRSVG(table.number, table.qrUrl, 240);
 
     const modalHtml = `
-      <div class="modal-overlay" id="qr-modal">
-        <div class="modal-card" style="text-align:center; max-width:380px;">
-          <button class="modal-close" onclick="document.getElementById('qr-modal').remove()">✕</button>
-          <h3 style="font-size:18px; margin-bottom:4px;">Table ${table.number} QR Sticker</h3>
-          <p style="color:var(--text-muted); font-size:12px; margin-bottom:14px;">Scan with smartphone camera to open self-order portal</p>
-          <div style="display:flex; justify-content:center; margin:10px 0;">${qrSvg}</div>
-          <button class="btn-primary" style="width:100%; justify-content:center; margin-top:14px;" onclick="window.print()">🖨️ Print QR Sticker</button>
-        </div>
-      </div>
-    `;
+  < div class="modal-overlay" id = "qr-modal" >
+    <div class="modal-card" style="text-align:center; max-width:380px;">
+      <button class="modal-close" onclick="document.getElementById('qr-modal').remove()">✕</button>
+      <h3 style="font-size:18px; margin-bottom:4px;">Table ${table.number} QR Sticker</h3>
+      <p style="color:var(--text-muted); font-size:12px; margin-bottom:14px;">Scan with smartphone camera to open self-order portal</p>
+      <div style="display:flex; justify-content:center; margin:10px 0;">${qrSvg}</div>
+      <button class="btn-primary" style="width:100%; justify-content:center; margin-top:14px;" onclick="window.print()">🖨️ Print QR Sticker</button>
+    </div>
+      </div >
+  `;
 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
   }
