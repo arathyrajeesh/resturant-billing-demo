@@ -2,26 +2,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-  /* Luxury Brown & Golden Theme Palette */
-  --bg-main: #FDFBF7;
+  /* T CLOCK RESTO CAFE - Signature Caramel Gold & Chocolate Roast Palette */
+  --bg-main: #FAF5EC;
   --surface-white: #FFFFFF;
   --surface-card: #FFFFFF;
-  --surface-border: #E8DFD1;
-  --surface-hover: #F7F1E5;
+  --surface-border: #E8D7C3;
+  --surface-hover: #F5E8D7;
 
-  --text-dark: #2C1A0E;
-  --text-muted: #7E5F46;
-  --text-light: #A68A72;
+  --text-dark: #280E09;
+  --text-muted: #7A4B3A;
+  --text-light: #A37563;
 
-  --primary: #D4AF37;
-  --primary-hover: #B8962E;
-  --primary-light: #FAF4E8;
+  --primary: #E5A84B;
+  --primary-hover: #D49437;
+  --primary-light: #FAF0DF;
 
-  --brown-dark: #3D2314;
-  --brown-accent: #5C3A21;
+  --brown-dark: #34140D;
+  --brown-accent: #59271C;
 
   --success: #2E7D32;
-  --warning: #D4AF37;
+  --warning: #E5A84B;
   --danger: #DC2626;
   --purple: #7C3AED;
   --blue: #2563EB;
@@ -30,28 +30,28 @@
   --radius-md: 10px;
   --radius-lg: 14px;
 
-  --shadow-sm: 0 1px 3px rgba(61, 35, 20, 0.08);
-  --shadow-md: 0 4px 6px -1px rgba(61, 35, 20, 0.12);
+  --shadow-sm: 0 1px 3px rgba(52, 20, 13, 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(52, 20, 13, 0.12);
 }
 
-/* Dark Mode Theme - Luxury Mahogany Brown & Warm Gold Atmosphere */
+/* Dark Mode Theme - T CLOCK Dark Roast Chocolate Atmosphere */
 [data-theme="dark"] {
-  --bg-main: #1F140E;
-  --surface-white: #2E1E16;
-  --surface-card: #2E1E16;
-  --surface-border: #4A3427;
-  --surface-hover: #4A3427;
+  --bg-main: #240C08;
+  --surface-white: #34140D;
+  --surface-card: #34140D;
+  --surface-border: #4D2117;
+  --surface-hover: #4D2117;
 
-  --text-dark: #F7EBD9;
-  --text-muted: #C4AB94;
-  --text-light: #9C836E;
+  --text-dark: #FAF0DF;
+  --text-muted: #D1B39B;
+  --text-light: #A8866E;
 
-  --primary: #E6C265;
-  --primary-hover: #F0CF78;
-  --primary-light: rgba(212, 175, 55, 0.2);
+  --primary: #E5A84B;
+  --primary-hover: #F0BC65;
+  --primary-light: rgba(229, 168, 75, 0.2);
 
-  --brown-dark: #1F140E;
-  --brown-accent: #8C5E3C;
+  --brown-dark: #240C08;
+  --brown-accent: #59271C;
 
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
 }
