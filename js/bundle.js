@@ -860,6 +860,8 @@ class App {
     this.isMobileSidebarOpen = false;
     this.customerCart = [];
     this.selectedPortions = {};
+    this.showAllAdminTables = false;
+    this.showAllStaffTables = false;
     
     store.subscribe(() => this.render());
 
@@ -1340,7 +1342,8 @@ class App {
       { id: 'admin', label: 'Admin Dashboard', roles: ['admin'] },
       { id: 'staff', label: 'Staff Ordering & Billing', roles: ['admin', 'staff'] },
       { id: 'kitchen', label: 'Kitchen Order Screen', roles: ['admin', 'staff', 'kitchen'] },
-      { id: 'customer', label: 'Customer Portal', roles: ['admin', 'staff', 'kitchen', 'customer'] }
+      { id: 'customer', label: 'Customer Portal', roles: ['admin', 'staff', 'kitchen', 'customer'] },
+      { id: 'settings', label: 'Settings', roles: ['admin'] }
     ];
 
     const visibleItems = allNavItems.filter(item => item.roles.includes(role));
@@ -1461,6 +1464,9 @@ class App {
       case 'customer':
         this.renderCustomerWebPortal();
         break;
+      case 'settings':
+        this.renderSettingsView();
+        break;
       default:
         this.renderAdminDashboard();
     }
@@ -1487,9 +1493,6 @@ class App {
             <p style="color:var(--text-muted); font-size:13px; margin-top:2px;">Business Analytics, Financial Margins, Table Management & QR Codes</p>
           </div>
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn-enterprise" style="border-color:var(--primary); color:var(--primary); font-weight:700;" onclick="window.app.scrollToReceiptSettings()">
-              Edit Billing Settings
-            </button>
             <button class="btn-enterprise" style="border-color:var(--primary); color:var(--primary); font-weight:700;" onclick="window.app.openAddTableModal()">
               Add New Table
             </button>
@@ -1538,7 +1541,7 @@ class App {
               </div>
 
               <div class="tables-floor-grid">
-                ${store.tables.map(t => `
+                ${(this.showAllAdminTables ? store.tables : store.tables.slice(0, 6)).map(t => `
                   <div class="table-card-std ${t.status}">
                     <div class="table-title">${t.number}</div>
                     <div style="font-size:11px; color:var(--text-muted); font-weight:600;">${t.seats} Seats • ${t.section || 'Main'}</div>
@@ -1546,6 +1549,13 @@ class App {
                   </div>
                 `).join('')}
               </div>
+              ${store.tables.length > 6 ? `
+                <div style="text-align:center; margin-top:14px;">
+                  <button class="btn-enterprise" style="padding:8px 18px; font-weight:700; color:var(--primary); border-color:var(--primary);" onclick="window.app.toggleAdminTablesExpand()">
+                    ${this.showAllAdminTables ? '▲ Show Fewer Tables (Collapse to 6)' : `▼ Show More Tables (${store.tables.length - 6} More)`}
+                  </button>
+                </div>
+              ` : ''}
             </div>
 
             <div class="panel-card">
@@ -1591,68 +1601,7 @@ class App {
           </div>
 
           <div>
-            <div class="panel-card" id="billing-settings-panel" style="border: 2px solid var(--primary);">
-              <div class="section-header" style="margin-bottom:14px;">
-                <div class="panel-title">Billing & Receipt Customization</div>
-                <span class="status-tag tag-available" style="font-size:11px;">Live Branding</span>
-              </div>
-              
-              <form onsubmit="window.app.handleReceiptSettingsSubmit(event)">
-                <div class="form-group-std">
-                  <label>Restaurant Name</label>
-                  <input type="text" id="rc-restaurant-name" value="${store.receiptSettings.restaurantName || ''}" required placeholder="MALABAR TABLE" />
-                </div>
-
-                <div class="form-group-std">
-                  <label>Tagline / Subtitle</label>
-                  <input type="text" id="rc-tagline" value="${store.receiptSettings.tagline || ''}" placeholder="Fine Dining Restaurant" />
-                </div>
-
-                <div class="form-group-std">
-                  <label>Address / Location</label>
-                  <input type="text" id="rc-address" value="${store.receiptSettings.address || ''}" placeholder="Beach Road, Calicut, Kerala" />
-                </div>
-
-                <div class="form-group-std">
-                  <label>Contact Phone Number</label>
-                  <input type="text" id="rc-phone" value="${store.receiptSettings.phone || ''}" placeholder="+91 98765 43210" />
-                </div>
-
-                <div class="form-group-std">
-                  <label>GSTIN Number</label>
-                  <input type="text" id="rc-gstin" value="${store.receiptSettings.gstin || ''}" placeholder="32ABCDE1234F1Z5" />
-                </div>
-
-                <div class="form-group-std">
-                  <label>Logo Image (Upload File from System or Paste URL)</label>
-                  
-                  <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
-                    <input type="file" id="rc-logo-file-input" accept="image/*" style="display:none;" onchange="window.app.handleReceiptLogoUpload(event)" />
-                    <button type="button" class="btn-enterprise" style="flex:1; justify-content:center;" onclick="document.getElementById('rc-logo-file-input').click()">
-                      📁 Browse & Upload Logo File...
-                    </button>
-                  </div>
-
-                  <div id="rc-logo-upload-preview" style="${store.receiptSettings.logoUrl ? 'display:block;' : 'display:none;'} margin-bottom:8px; text-align:center;">
-                    <img id="rc-logo-preview-img" src="${store.receiptSettings.logoUrl || ''}" style="max-height:80px; border-radius:6px; border:2px solid var(--primary); object-fit:contain; background:#fff; padding:4px;" alt="Logo Preview" />
-                    <p style="font-size:11px; color:var(--success); font-weight:700; margin-top:2px;">✅ Receipt Logo Active!</p>
-                  </div>
-
-                  <input type="url" id="rc-logo-url" value="${store.receiptSettings.logoUrl || ''}" placeholder="Or paste image URL" />
-                </div>
-
-                <div class="form-group-std">
-                  <label>Thermal Receipt Footer Greeting</label>
-                  <textarea id="rc-footer-note" rows="2" style="width:100%; padding:8px; border-radius:8px; border:1px solid var(--surface-border); background:var(--bg-main); color:var(--text-dark); font-family:inherit; font-size:12px;">${store.receiptSettings.footerNote || ''}</textarea>
-                </div>
-
-                <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:11px; margin-top:8px;">
-                  Save Receipt Settings
-                </button>
-              </form>
-            </div>
-
-            <div class="panel-card" style="margin-top:20px;">
+            <div class="panel-card">
               <div class="panel-title">Revenue by Channel</div>
               <div style="display:flex; flex-direction:column; gap:12px;">
                 <div class="ranking-item">
@@ -1737,6 +1686,86 @@ class App {
   }
 
   scrollToReceiptSettings() {
+    this.switchView('settings');
+  }
+
+  renderSettingsView() {
+    this.container.innerHTML = `
+      <div class="view-container">
+        <div class="section-header" style="margin-bottom:20px;">
+          <div>
+            <h2>⚙️ Settings & Billing Customization</h2>
+            <p style="color:var(--text-muted); font-size:13px;">Manage Restaurant Info, Thermal Receipt Branding & Business Details</p>
+          </div>
+        </div>
+
+        <div style="max-width:720px;">
+          <div class="panel-card" id="billing-settings-panel" style="border: 2px solid var(--primary);">
+            <div class="section-header" style="margin-bottom:14px;">
+              <div class="panel-title">Billing & Receipt Customization</div>
+              <span class="status-tag tag-available" style="font-size:11px;">Live Thermal Receipt Branding</span>
+            </div>
+            
+            <form onsubmit="window.app.handleReceiptSettingsSubmit(event)">
+              <div class="form-group-std">
+                <label>Restaurant Name</label>
+                <input type="text" id="rc-restaurant-name" value="${store.receiptSettings.restaurantName || ''}" required placeholder="MALABAR TABLE" />
+              </div>
+
+              <div class="form-group-std">
+                <label>Tagline / Subtitle</label>
+                <input type="text" id="rc-tagline" value="${store.receiptSettings.tagline || ''}" placeholder="Fine Dining Restaurant" />
+              </div>
+
+              <div class="form-group-std">
+                <label>Address / Location</label>
+                <input type="text" id="rc-address" value="${store.receiptSettings.address || ''}" placeholder="Beach Road, Calicut, Kerala" />
+              </div>
+
+              <div class="form-group-std">
+                <label>Contact Phone Number</label>
+                <input type="text" id="rc-phone" value="${store.receiptSettings.phone || ''}" placeholder="+91 98765 43210" />
+              </div>
+
+              <div class="form-group-std">
+                <label>GSTIN Number</label>
+                <input type="text" id="rc-gstin" value="${store.receiptSettings.gstin || ''}" placeholder="32ABCDE1234F1Z5" />
+              </div>
+
+              <div class="form-group-std">
+                <label>Logo Image (Upload File from System or Paste URL)</label>
+                
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                  <input type="file" id="rc-logo-file-input" accept="image/*" style="display:none;" onchange="window.app.handleReceiptLogoUpload(event)" />
+                  <button type="button" class="btn-enterprise" style="flex:1; justify-content:center;" onclick="document.getElementById('rc-logo-file-input').click()">
+                    📁 Browse & Upload Logo File...
+                  </button>
+                </div>
+
+                <div id="rc-logo-upload-preview" style="${store.receiptSettings.logoUrl ? 'display:block;' : 'display:none;'} margin-bottom:8px; text-align:center;">
+                  <img id="rc-logo-preview-img" src="${store.receiptSettings.logoUrl || ''}" style="max-height:80px; border-radius:6px; border:2px solid var(--primary); object-fit:contain; background:#fff; padding:4px;" alt="Logo Preview" />
+                  <p style="font-size:11px; color:var(--success); font-weight:700; margin-top:2px;">✅ Receipt Logo Active!</p>
+                </div>
+
+                <input type="url" id="rc-logo-url" value="${store.receiptSettings.logoUrl || ''}" placeholder="Or paste image URL" />
+              </div>
+
+              <div class="form-group-std">
+                <label>Thermal Receipt Footer Greeting</label>
+                <textarea id="rc-footer-note" rows="2" style="width:100%; padding:8px; border-radius:8px; border:1px solid var(--surface-border); background:var(--bg-main); color:var(--text-dark); font-family:inherit; font-size:12px;">${store.receiptSettings.footerNote || ''}</textarea>
+              </div>
+
+              <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:11px; margin-top:8px; background:#059669;">
+                <span>💾</span> Save Settings & Receipt Branding
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  scrollToBillingSettings() {
     const el = document.getElementById('billing-settings-panel');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
@@ -2881,6 +2910,16 @@ class App {
     `;
 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+  }
+
+  toggleAdminTablesExpand() {
+    this.showAllAdminTables = !this.showAllAdminTables;
+    this.render();
+  }
+
+  toggleStaffTablesExpand() {
+    this.showAllStaffTables = !this.showAllStaffTables;
+    this.render();
   }
 
   handleDishFileUpload(event) {
