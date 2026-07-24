@@ -331,7 +331,7 @@ function generateTableQRSVG(tableNumber, url, size = 260) {
 
   return `
     <div class="real-qr-card" style="display:inline-block; background:#FFFFFF; padding:16px; border-radius:16px; border:2px solid var(--surface-border); box-shadow:var(--shadow-md); text-align:center;">
-      <div style="font-weight:800; font-size:16px; color:#0F172A; margin-bottom:8px;">MALABAR TABLE</div>
+      <div style="font-weight:800; font-size:16px; color:#0F172A; margin-bottom:8px;">T CLOCK RESTAURANT</div>
       <div style="position:relative; display:inline-block;">
         <img src="${qrApiUrl}" width="${size}" height="${size}" style="display:block; border-radius:8px;" alt="QR Code for Table ${tableNumber}" />
       </div>
@@ -367,7 +367,7 @@ class RestaurantStore {
     this.menu = this.load('malabar_menu', MENU_ITEMS);
 
     this.receiptSettings = this.load('malabar_receipt_settings', {
-      restaurantName: 'MALABAR TABLE',
+      restaurantName: 'T CLOCK',
       tagline: 'Fine Dining Restaurant',
       address: 'Beach Road, Calicut, Kerala - 673001',
       phone: '+91 98765 43210',
@@ -1209,8 +1209,8 @@ class App {
       <div class="login-wrapper">
         <div class="login-card-std" style="max-width:440px;">
           <div style="text-align:center; margin-bottom:24px;">
-            <div style="width:48px; height:48px; background:var(--primary); color:#fff; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; margin:0 auto 12px auto; font-weight:800;">MT</div>
-            <h2 style="font-size:22px; font-weight:800;">Malabar Table POS</h2>
+            <div style="width:48px; height:48px; background:var(--primary); color:#fff; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; margin:0 auto 12px auto; font-weight:800;">TC</div>
+            <h2 style="font-size:22px; font-weight:800;">T Clock POS</h2>
             <p style="color:var(--text-muted); font-size:13px; margin-top:4px;">Select Dashboard Workspace to Continue</p>
           </div>
 
@@ -1330,9 +1330,9 @@ class App {
     this.sidebar.innerHTML = `
       <div>
         <a href="#" class="sidebar-brand" onclick="return false;">
-          <div class="sidebar-brand-logo">MT</div>
+          <div class="sidebar-brand-logo">TC</div>
           <div class="sidebar-brand-info">
-            <h1>Malabar Table</h1>
+            <h1>T Clock</h1>
             <p style="font-size:10px; color:var(--primary); font-weight:700;">${role.toUpperCase()} DASHBOARD</p>
           </div>
         </a>
@@ -1355,7 +1355,7 @@ class App {
           </div>
         </div>
 
-        <button class="btn-enterprise" style="width:100%; justify-content:center; color:var(--danger); border-color:var(--danger); font-weight:700;" onclick="window.store.logout()">
+        <button class="btn-enterprise" style="width:100%; justify-color:var(--danger); border-color:var(--danger); font-weight:700;" onclick="window.store.logout()">
           Logout
         </button>
       </div>
@@ -1367,9 +1367,9 @@ class App {
       const table = store.tables.find(t => t.id === store.customerTableId) || store.tables[3];
       this.topHeader.innerHTML = `
         <div class="header-left" style="display:flex; align-items:center; gap:12px;">
-          <div style="width:36px; height:36px; background:var(--primary); color:#FFF; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px;">MT</div>
+          <div style="width:36px; height:36px; background:var(--primary); color:#FFF; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px;">TC</div>
           <div>
-            <h3 style="font-size:15px; font-weight:800; margin:0; line-height:1.2;">Malabar Table</h3>
+            <h3 style="font-size:15px; font-weight:800; margin:0; line-height:1.2;">T Clock</h3>
             <span style="font-size:11px; color:var(--primary); font-weight:700;">Customer Self-Order • Table ${table.number}</span>
           </div>
         </div>
