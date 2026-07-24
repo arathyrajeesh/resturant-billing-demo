@@ -171,65 +171,9 @@ const MENU_ITEMS = [
   }
 ];
 
-const INITIAL_ORDERS = [
-  {
-    id: 'ORD-1001',
-    orderNumber: 1001,
-    tableId: 5,
-    tableNumber: 'T-05',
-    source: 'staff-mobile',
-    status: 'preparing',
-    paymentStatus: 'unpaid',
-    createdAt: new Date(Date.now() - 15 * 60000).toISOString(),
-    items: [
-      { itemId: 'm1_Full', name: 'Malabar Mutton Biryani (Full)', price: 380, quantity: 2, notes: '' },
-      { itemId: 'm9_Full', name: 'Kulukki Sarbath (Full)', price: 70, quantity: 2, notes: '' }
-    ],
-    subtotal: 900,
-    tax: 45,
-    discount: 0,
-    total: 945,
-    paymentMethod: null
-  },
-  {
-    id: 'ORD-1002',
-    orderNumber: 1002,
-    tableId: 3,
-    tableNumber: 'T-03',
-    source: 'qr-customer',
-    status: 'placed',
-    paymentStatus: 'unpaid',
-    createdAt: new Date(Date.now() - 8 * 60000).toISOString(),
-    items: [
-      { itemId: 'm2_Full', name: 'Kerala Parotta & Beef Roast (Full)', price: 290, quantity: 1, notes: 'Extra spicy' },
-      { itemId: 'm5_Half', name: 'Kozhi Porichathu (Half)', price: 140, quantity: 1, notes: '' }
-    ],
-    subtotal: 430,
-    tax: 21.5,
-    discount: 0,
-    total: 451.5,
-    paymentMethod: null
-  },
-  {
-    id: 'ORD-1003',
-    orderNumber: 1003,
-    tableId: 99,
-    tableNumber: 'Swiggy #784',
-    source: 'swiggy',
-    status: 'preparing',
-    paymentStatus: 'paid-online',
-    createdAt: new Date(Date.now() - 5 * 60000).toISOString(),
-    items: [
-      { itemId: 'm3_Full', name: 'Karimeen Pollichathu (Full)', price: 450, quantity: 1, notes: '' },
-      { itemId: 'm7_Full', name: 'Kerala Wheat Parotta (Full)', price: 60, quantity: 2, notes: '' }
-    ],
-    subtotal: 570,
-    tax: 28.5,
-    discount: 0,
-    total: 598.5,
-    paymentMethod: 'Swiggy Pay'
-  }
-];
+// No pre-loaded demo orders — all orders come from real usage via Supabase
+const INITIAL_ORDERS = [];
+
 
 // ================= 2. AUDIO SYNTHESIZER =================
 class AudioService {
@@ -363,6 +307,11 @@ class RestaurantStore {
     });
 
     this.tables = this.load('malabar_tables', INITIAL_TABLES);
+    // Clear any old sample orders from localStorage so Supabase is the single source of truth
+    const stored = this.load('malabar_orders', null);
+    if (stored && stored.some(o => ['ORD-1001','ORD-1002','ORD-1003'].includes(o.id))) {
+      localStorage.removeItem('malabar_orders');
+    }
     this.orders = this.load('malabar_orders', INITIAL_ORDERS);
     this.menu = this.load('malabar_menu', MENU_ITEMS);
 
@@ -2266,9 +2215,10 @@ class App {
 
         <div class="kds-grid">
           ${activeOrders.length === 0 ? `
-            <div class="panel-card" style="text-align:center; padding:50px 20px; grid-column:1/-1;">
-              <p style="color:var(--text-muted); font-size:16px; margin-bottom:14px;">Kitchen Queue Clean. All orders fulfilled.</p>
-              <button class="btn-primary" style="margin:0 auto; display:inline-flex;" onclick="window.store.resetDemoData()">Load Sample Live Orders into Kitchen Queue</button>
+            <div class="panel-card" style="text-align:center; padding:60px 20px; grid-column:1/-1;">
+              <div style="font-size:48px; margin-bottom:16px;">👨‍🍳</div>
+              <p style="color:var(--text-muted); font-size:16px; font-weight:600;">Kitchen Queue is Empty</p>
+              <p style="color:var(--text-muted); font-size:13px; margin-top:6px;">Waiting for new orders from Customer Portal or Staff POS...</p>
             </div>
           ` : ''}
           ${activeOrders.map(o => `

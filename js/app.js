@@ -1397,9 +1397,10 @@ class App {
 
         <div class="kds-grid">
           ${activeOrders.length === 0 ? `
-            <div class="panel-card" style="text-align:center; padding:50px 20px; grid-column:1/-1;">
-              <p style="color:var(--text-muted); font-size:16px; margin-bottom:14px;">Kitchen Queue Clean. All orders fulfilled.</p>
-              <button class="btn-primary" style="margin:0 auto; display:inline-flex;" onclick="window.store.resetDemoData()">Load Sample Live Orders into Kitchen Queue</button>
+            <div class="panel-card" style="text-align:center; padding:60px 20px; grid-column:1/-1;">
+              <div style="font-size:48px; margin-bottom:16px;">👨‍🍳</div>
+              <p style="color:var(--text-muted); font-size:16px; font-weight:600;">Kitchen Queue is Empty</p>
+              <p style="color:var(--text-muted); font-size:13px; margin-top:6px;">Waiting for new orders from Customer Portal or Staff POS...</p>
             </div>
           ` : ''}
           ${activeOrders.map(o => `
